@@ -19,9 +19,9 @@ const NavBar = () => {
   };
 
   return (
-    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
-      <Container>
-        <Navbar.Brand>UserAuth</Navbar.Brand>
+    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" fluid="true">
+      <Container fluid>
+        <Navbar.Brand>Quizitude</Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
