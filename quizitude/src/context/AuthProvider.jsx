@@ -12,11 +12,28 @@ const signOut = () => supabase.auth.signOut();
 
 const passwordReset = (email) =>
   supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: "http://localhost:5173/update-password"
+    redirectTo: "http://localhost:5173/update-password",
   });
 
 const updatePassword = (updatedPassword) =>
   supabase.auth.updateUser({ password: updatedPassword });
+
+const signInWithGoogle = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
+    },
+  })
+  if (error) {
+    console.error('Error:', error.message)
+    return
+  }
+  console.log(data)
+};
 
 const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(false);
@@ -57,8 +74,10 @@ const AuthProvider = ({ children }) => {
         login,
         signOut,
         passwordReset,
-        updatePassword
-      }}>
+        updatePassword,
+        signInWithGoogle,
+      }}
+    >
       {!loading && children}
     </AuthContext.Provider>
   );
