@@ -37,10 +37,14 @@ const Register = () => {
       );
       console.log(data);
       console.log(error);
-      if (!error && data) {
-        setMsg(
-          "Registration Successful. Check your email to confirm your account"
-        );
+      if (error) {
+        if (error.message === "User already registered") {
+          setErrorMsg("Email already exists. Please use a different email or login.");
+        } else {
+          setErrorMsg("Error in Creating Account");
+        }
+      } else {
+        setMsg("Registration Successful. Check your email to confirm your account");
       }
     } catch (error) {
       setErrorMsg("Error in Creating Account");
