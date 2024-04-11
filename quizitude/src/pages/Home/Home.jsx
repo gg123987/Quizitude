@@ -1,7 +1,7 @@
-import React from "react";
-import { useAuth } from "../context/AuthProvider";
+import "./home.css"
+import { useAuth } from "../../context/AuthProvider";
 
-const Home = () => {
+export const Home = () => {
   const { user } = useAuth();
 
   return (

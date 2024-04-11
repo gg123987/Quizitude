@@ -144,7 +144,6 @@ export default function SignInSide() {
               Welcome back! Please enter your details.
             </Typography>
             
-
             <Button
               onClick={handleGoogleSignIn}
               fullWidth

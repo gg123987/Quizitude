@@ -1,0 +1,17 @@
+.topBar {
+    display: grid;
+    height: 40px; 
+    background-color: #fffcfc; 
+    padding: 10px 20px; 
+    position: fixed; 
+    border-bottom: 1px solid #ccc; 
+    width: 100%;
+  }
+  
+  .topBar-content {
+    display: flex;
+    align-items: center;
+  }
+
+  
+  

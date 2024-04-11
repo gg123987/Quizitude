@@ -1,0 +1,33 @@
+.decks {
+    display: grid;
+    grid-template-rows: auto 1fr; /* Define rows: header & content */
+    grid-template-columns: 15% 1fr; /* Define columns: sidebar & content */
+    background-color: #fffcfc;
+    min-width: 1150px;
+  } 
+  
+  .deck-content {
+    display: flex; 
+  }
+  
+  .title {
+    color: black;
+    text-align: left; 
+    padding: 20px;
+    grid-column: 2 / span 1; /* Span 1 column */
+    grid-row: 1; 
+    margin-top: 5vh;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .formControlDropdown {
+    width: 200px; 
+    margin: 0; 
+  }
+  
+  .SearchBar {
+    width: 15%; 
+    margin-right: 10px; 
+  }
+  
