@@ -12,19 +12,20 @@
   }
   
   .sideBar-tabs {
-    list-style: none; 
+    list-style: none; /* remove bullet points */
     padding: 0; 
   }
   
 .sideBar-tabs li .MuiButton-root {
     width: 100%;
-    border-radius: 10px; 
+    border-radius: 10px; /* Round corners */
     font-size: 10px;
     background-color: #303484; 
     display: flex;
-    justify-content: flex-start;
+    justify-content: flex-start; /* align the icon and text to the left */
   }
   
+  /* Change the background, text, and border colour when tab is active */
   .sideBar-tabs li.active .MuiButton-root {
     border-color: white; 
     background-color: white;

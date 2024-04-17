@@ -4,14 +4,15 @@ import HomeIcon from "@mui/icons-material/HomeOutlined";
 import LayersIcon from "@mui/icons-material/LayersOutlined";
 import FolderIcon from '@mui/icons-material/FolderOpenOutlined';
 import { Button } from "@mui/material";
-// npm install @mui/material @mui/icons-material @emotion/react @emotion/styled
 import logoSmall from '../../assets/Logo-small.png';
 
 const SideBar = () => {
+  // State variables
   const [activeTab, setActiveTab] = useState('home');
 
+  // Event handlers
   const handleClick = (tabName) => {
-    setActiveTab(tabName);
+    setActiveTab(tabName); 
   };
 
   return (
@@ -19,12 +20,12 @@ const SideBar = () => {
         <img src={logoSmall} alt="logo" width="23px" height="23px" />
       <ul className="sideBar-tabs">
         <li
-          className={activeTab === 'home' ? 'active' : ''}
+          className={activeTab === 'home' ? 'active' : ''}  // Check if the tab is active
           onClick={() => handleClick('home')}
         >
         <Button
-            sx={{ borderRadius: 10 }}
-            variant="contained"
+            sx={{ borderRadius: 10 }} // Round corners
+            variant="contained" // Adds a bit of padding
             startIcon={<HomeIcon />}
         >
         Home

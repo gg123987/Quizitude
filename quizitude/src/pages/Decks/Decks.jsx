@@ -1,52 +1,61 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import SearchBar from "material-ui-search-bar"; // npm i --save material-ui-search-bar
+import SearchBar from "material-ui-search-bar"; 
 import './decks.css';
 import SideBar from '../../components/sideBar/SideBar';
 import TopBar from '../../components/topBar/TopBar';
-  
+import Popup from '../../components/popUpNewDeck/Popup'; 
 
 const Decks = () => {
-const [sort, setSort] = React.useState('');
+  // State variables
+  const [sort, setSort] = useState('');
+  const [isPopupOpen, setIsPopupOpen] = useState(false); 
 
-  const handleChange = (event) => {
+  // Event handlers
+  const handleInputLabelChange = (event) => {
     setSort(event.target.value);
+  };
+
+  const handleOpenPopup = () => {
+    setIsPopupOpen(true);
+  };
+
+  const handleClosePopup = () => {
+    setIsPopupOpen(false);
   };
   
   return (
     <div className='decks'>
-        <TopBar />
+        <TopBar handleOpenPopup={handleOpenPopup} /> {/* Pass the handleOpenPopup function to TopBar */}
         <SideBar />
         <h1 className="title">All Decks</h1>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px', gridColumn: 2, gridRow: 2 }} >
             <SearchBar
-            onChange={() => console.log('onChange')}
-            onRequestSearch={() => console.log('onRequestSearch')}
-            style={{ maxWidth: '300px' }}
+            style={{ maxWidth: '400px', width: '100%'}}
             />
-            <FormControl className='formControlDropdown'>
-            <InputLabel id="demo-simple-select-label">Sort By</InputLabel>
+            <FormControl className='decksInputLabel'>
+            <InputLabel id="inputLabel">Sort By</InputLabel>
             <Select
-                labelId="demo-simple-select-label"
+                labelId="inputLabel"
                 id="demo-simple-select"
                 value={sort}
                 label="Sort By"
-                onChange={handleChange}
+                onChange={handleInputLabelChange}
+                style= {{ minWidth: '200px'}}
             >
-                {/* Some Examples, not sure what they'd like specifically */} 
                 <MenuItem value="Recently Created">Recently Created</MenuItem>
-                <MenuItem value="Category">Last Modified</MenuItem>
-                <MenuItem value="Category">Oldest</MenuItem>
+                <MenuItem value="Last Modified">Last Modified</MenuItem>
+                <MenuItem value="Oldest">Oldest</MenuItem>
             </Select>
             </FormControl>
         </Box>
+        {isPopupOpen && <Popup handleClosePopup={handleClosePopup} />} {/* Show the Popup component if isPopupOpen is true */}
     </div>
   );
 }
 
-
-export default Decks
+export default Decks;

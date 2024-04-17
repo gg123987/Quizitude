@@ -1,17 +1,28 @@
 .topBar {
-    display: grid;
-    height: 40px; 
-    background-color: #fffcfc; 
-    padding: 10px 20px; 
-    position: fixed; 
-    border-bottom: 1px solid #ccc; 
-    width: 100%;
-  }
-  
-  .topBar-content {
-    display: flex;
-    align-items: center;
-  }
+  display: grid; 
+  height: 50px;
+  background-color: #fffcfc;
+  padding: 10px 20px; /* top and bottom padding of 10px, left and right padding of 20px */
+  position: fixed; /* Fixed position so it stays at the top of the screen */
+  border-bottom: 1px solid #ccc;
+  width: 100%;
+}
 
-  
-  
+.topBar-content {
+  display: flex;
+  align-items: center; /* Centre vertically */
+  justify-content: center; /* Centre horizontally */
+  position: relative; /* Position the content relative to the topBar */
+}
+
+.topBar-content button.newDeck {
+  color: white;
+  background-color: #303484;
+  height: 35px;
+  cursor: pointer;
+  position: fixed; 
+  top: 6px; 
+  right: 20px; 
+}
+
+
