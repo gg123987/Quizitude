@@ -40,6 +40,11 @@ const NavBar = () => {
                 Home
               </Nav.Link>
             )}
+            {auth && (
+              <Nav.Link as={Link} to="/decks">
+                All decks
+              </Nav.Link>
+            )}
           </Nav>
           <Nav>
             {auth && (
