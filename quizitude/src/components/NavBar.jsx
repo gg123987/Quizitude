@@ -40,8 +40,28 @@ const NavBar = () => {
                 Home
               </Nav.Link>
             )}
+            {auth && (
+              <Nav.Link as={Link} to="/decks">
+                All decks
+              </Nav.Link>
+            )}
+            {auth && (
+              <Nav.Link as={Link} to="/categories">
+                Categories
+              </Nav.Link>
+            )}
           </Nav>
           <Nav>
+            {auth && (
+              <Nav.Link as={Link} to="/settings">
+                Settings
+              </Nav.Link>
+            )}
+            {auth && (
+              <Nav.Link as={Link} to="/profile">
+                Profile
+              </Nav.Link>
+            )}
             {auth && (
               <Nav.Link as={Button} onClick={handleLogout}>
                 LogOut
