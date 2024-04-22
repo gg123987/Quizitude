@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "./supabase/supabaseClient";
 import Auth from "./pages/Auth";
 import Account from "./pages/Account";
+import LLM from "./API/LLM";
 
 import { Container } from "react-bootstrap";
 import { Route, Routes } from "react-router-dom";
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="/passwordreset" element={<PasswordReset />} />
         <Route path="/update-password" element={<UpdatePassword />} />
         <Route path="/decks" element={<Decks />} />
+        <Route path="/LLM" element={<LLM />} />
       </Routes>
     </>
   );

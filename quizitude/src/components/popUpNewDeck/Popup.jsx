@@ -10,6 +10,8 @@ import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import './popup.css'; 
+import fetchLLMResponse from '../../API/LLM2';
+
 
 const Popup = ({ handleClosePopup }) => {
   // State variables
@@ -72,6 +74,18 @@ const Popup = ({ handleClosePopup }) => {
       }
     }
   };
+
+  // Handler function for the "Generate Flashcards" button click event
+  const handleGenerateFlashcards = () => {
+      // Check if PDF and number of questions are present
+      if (pdf && noOfQuestions) {
+        // Call fetchLLMResponse function and pass the required parameters
+        fetchLLMResponse(noOfQuestions, pdf);
+      } else {
+        // Handle case where PDF or number of questions is missing
+        alert('Please upload a PDF and enter the number of questions.');
+      }
+    };
   
 
   return (
@@ -148,7 +162,7 @@ const Popup = ({ handleClosePopup }) => {
           <input
             type="file"
             id="pdf-upload"
-            value={pdf}
+            //value={pdf}
             accept=".pdf"
             onChange={handlePDFChange}
             style={{ display: 'none' }}
@@ -159,6 +173,7 @@ const Popup = ({ handleClosePopup }) => {
           id="generateButton"
           fullWidth
           style={{ backgroundColor: '#303484', color: 'white' }}
+          onClick={handleGenerateFlashcards}
         >
           Generate Flashcards
         </Button>
