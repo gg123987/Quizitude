@@ -21,6 +21,7 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
         "model": "openai/gpt-3.5-turbo",
         "messages": [
           { "role": "user", "content": `Using the following data, create a series of ${noOfQuestions} ${typeOfQuestion} questions and answers: ${text}`},
+          //{ "role": "user", "content": "Give the answers in JSON format. With heading Questions, Answers and Solution"},
         ],
       })
     });

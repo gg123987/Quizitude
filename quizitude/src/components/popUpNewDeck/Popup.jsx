@@ -8,6 +8,7 @@ import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import CircularProgress from '@mui/material/CircularProgress';
 import DeleteIcon from '@mui/icons-material/Delete';
 import './popup.css'; 
 import fetchLLMResponse from '../../API/LLM2';
@@ -19,6 +20,7 @@ const Popup = ({ handleClosePopup }) => {
   const [noOfQuestions, setNoOfQuestions] = useState(0);
   const [questionType, setQuestionType] = useState('');
   const [pdf, setFile] = useState(null);
+  const [loading, setLoading] = useState(false); // Add a new state variable [loading]
   const maxPDFSize = 30 * 1024 * 1024; // 30 MB in bytes
 
   // Event handlers 
@@ -76,14 +78,17 @@ const Popup = ({ handleClosePopup }) => {
   };
 
   // Handler function for the "Generate Flashcards" button click event
-  const handleGenerateFlashcards = () => {
+  const handleGenerateFlashcards = async () => {
+      setLoading(true); // Set loading to true
+      let response; // Declare the 'response' variable
       // Check if PDF and number of questions are present
-      if (pdf && noOfQuestions) {
+      if (pdf && noOfQuestions && questionType && cardTitle) {
         // Call fetchLLMResponse function and pass the required parameters
-        fetchLLMResponse(noOfQuestions, pdf, questionType);
+        response = await fetchLLMResponse(noOfQuestions, pdf, questionType);
+        setLoading(false); // Set loading to false
       } else {
         // Handle case where PDF or number of questions is missing
-        alert('Please upload a PDF and enter the number of questions.');
+        alert('Please enter all the required details to generate flashcards.');
       }
     };
   
@@ -175,7 +180,9 @@ const Popup = ({ handleClosePopup }) => {
           style={{ backgroundColor: '#303484', color: 'white' }}
           onClick={handleGenerateFlashcards}
         >
-          Generate Flashcards
+          {!loading && 'Generate Flashcards'}
+          {loading && <CircularProgress />}
+          
         </Button>
         </div>
       </div>

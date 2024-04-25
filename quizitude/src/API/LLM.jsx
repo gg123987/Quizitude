@@ -13,7 +13,7 @@ export default function LLM() {
 
   const handleClick = async () => {
     const responseData = await fetchLLMResponse(); // Fetch data
-    console.log(responseData);
+    //console.log(responseData);
     setApiData(responseData);
   }
 
