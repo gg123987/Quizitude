@@ -177,11 +177,11 @@ const Popup = ({ handleClosePopup }) => {
         <Button
           id="generateButton"
           fullWidth
-          style={{ backgroundColor: '#303484', color: 'white' }}
+          style={{ backgroundColor: '#303484', color: 'white', minHeight: '40px' }}
           onClick={handleGenerateFlashcards}
         >
           {!loading && 'Generate Flashcards'}
-          {loading && <CircularProgress />}
+          {loading && <CircularProgress size={25} />}
           
         </Button>
         </div>
