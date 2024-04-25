@@ -80,7 +80,7 @@ const Popup = ({ handleClosePopup }) => {
       // Check if PDF and number of questions are present
       if (pdf && noOfQuestions) {
         // Call fetchLLMResponse function and pass the required parameters
-        fetchLLMResponse(noOfQuestions, pdf);
+        fetchLLMResponse(noOfQuestions, pdf, questionType);
       } else {
         // Handle case where PDF or number of questions is missing
         alert('Please upload a PDF and enter the number of questions.');
