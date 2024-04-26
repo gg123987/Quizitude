@@ -16,10 +16,14 @@
     padding: 0; 
   }
   
+  .sideBar-tabs li {
+    margin-bottom: 20px; /* Adjust the space between the items */
+}
+
 .sideBar-tabs li .MuiButton-root {
     width: 100%;
-    border-radius: 10px; /* Round corners */
-    font-size: 10px;
+    border-radius: 10px; 
+    font-size: 14px;
     background-color: #303484; 
     display: flex;
     justify-content: flex-start; /* align the icon and text to the left */

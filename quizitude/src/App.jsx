@@ -16,6 +16,7 @@ import UpdatePassword from "./pages/UpdatePassword";
 
 import Signin from "./pages/SignInSide";
 import Decks from "./pages/Decks/Decks.jsx";
+import Categories from "./pages/Categories/Categories";
 
 const App = () => {
   return (
@@ -30,6 +31,7 @@ const App = () => {
         <Route path="/passwordreset" element={<PasswordReset />} />
         <Route path="/update-password" element={<UpdatePassword />} />
         <Route path="/decks" element={<Decks />} />
+        <Route path="/categories" element={<Categories />} />
       </Routes>
     </>
   );
