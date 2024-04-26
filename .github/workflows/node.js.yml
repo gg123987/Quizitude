@@ -29,7 +29,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: './quizitude/quizitude/package-lock.json'
+        cache-dependency-path: '/github/workspace/quizitude/quizitude/package-lock.json'
+    - name: Set npm cache location
+      run: npm config set cache /github/home/.npm
     - name: Install Dependencies
       run: npm ci
     - name: Build
