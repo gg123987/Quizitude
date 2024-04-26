@@ -14,6 +14,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: ./quizitude/quizitude
+
     strategy:
       matrix:
         node-version: [14.x, 16.x, 18.x]
@@ -21,17 +25,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4 # Updated to use Node.js 20
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+        cache-dependency-path: './quizitude/quizitude/package-lock.json'
     - name: Install Dependencies
       run: npm ci
-      working-directory: ./quizitude
     - name: Build
       run: npm run build --if-present
-      working-directory: ./quizitude
     - name: Test
       run: npm test
-      working-directory: ./quizitude
-
