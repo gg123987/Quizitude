@@ -10,6 +10,9 @@ import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DeleteIcon from '@mui/icons-material/Delete';
 import './popup.css'; 
+import fetchLLMResponse from '../../API/LLM';
+import CircularWithValueLabel from '../CircularProgressSpinner';
+
 
 const Popup = ({ handleClosePopup }) => {
   // State variables
@@ -17,7 +20,9 @@ const Popup = ({ handleClosePopup }) => {
   const [noOfQuestions, setNoOfQuestions] = useState(0);
   const [questionType, setQuestionType] = useState('');
   const [pdf, setFile] = useState(null);
+  const [loading, setLoading] = useState(false); // Add a new state variable [loading]
   const maxPDFSize = 30 * 1024 * 1024; // 30 MB in bytes
+
 
   // Event handlers 
   const handleCardTitleChange = (event) => {
@@ -72,6 +77,22 @@ const Popup = ({ handleClosePopup }) => {
       }
     }
   };
+
+  // Handler function for the "Generate Flashcards" button click event
+  const handleGenerateFlashcards = async () => {
+      let response; // Declare the 'response' variable
+      // Check if PDF and number of questions are present
+      if (pdf && noOfQuestions && questionType && cardTitle) {
+        setLoading(true); // Set loading to true
+        // Call fetchLLMResponse function and pass the required parameters
+        response = await fetchLLMResponse(noOfQuestions, pdf, questionType);
+        setLoading(false); // Set loading to false
+      } else {
+        // Handle case where PDF or number of questions is missing
+        alert('Please enter all the required details to generate flashcards.');
+      }
+    };
+
   
 
   return (
@@ -157,9 +178,12 @@ const Popup = ({ handleClosePopup }) => {
         <Button
           id="generateButton"
           fullWidth
-          style={{ backgroundColor: '#303484', color: 'white' }}
+          style={{ backgroundColor: '#303484', color: 'white', minHeight: '40px' }}
+          onClick={handleGenerateFlashcards}
         >
-          Generate Flashcards
+          {!loading && 'Generate Flashcards'}
+          {loading && <CircularWithValueLabel/>}
+          
         </Button>
         </div>
       </div>
