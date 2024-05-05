@@ -8,10 +8,10 @@ import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import CircularProgress from '@mui/material/CircularProgress';
 import DeleteIcon from '@mui/icons-material/Delete';
 import './popup.css'; 
-import fetchLLMResponse from '../../API/LLM2';
+import fetchLLMResponse from '../../API/LLM';
+import CircularWithValueLabel from '../CircularProgressSpinner';
 
 
 const Popup = ({ handleClosePopup }) => {
@@ -22,6 +22,7 @@ const Popup = ({ handleClosePopup }) => {
   const [pdf, setFile] = useState(null);
   const [loading, setLoading] = useState(false); // Add a new state variable [loading]
   const maxPDFSize = 30 * 1024 * 1024; // 30 MB in bytes
+
 
   // Event handlers 
   const handleCardTitleChange = (event) => {
@@ -79,10 +80,10 @@ const Popup = ({ handleClosePopup }) => {
 
   // Handler function for the "Generate Flashcards" button click event
   const handleGenerateFlashcards = async () => {
-      setLoading(true); // Set loading to true
       let response; // Declare the 'response' variable
       // Check if PDF and number of questions are present
       if (pdf && noOfQuestions && questionType && cardTitle) {
+        setLoading(true); // Set loading to true
         // Call fetchLLMResponse function and pass the required parameters
         response = await fetchLLMResponse(noOfQuestions, pdf, questionType);
         setLoading(false); // Set loading to false
@@ -91,6 +92,7 @@ const Popup = ({ handleClosePopup }) => {
         alert('Please enter all the required details to generate flashcards.');
       }
     };
+
   
 
   return (
@@ -181,7 +183,7 @@ const Popup = ({ handleClosePopup }) => {
           onClick={handleGenerateFlashcards}
         >
           {!loading && 'Generate Flashcards'}
-          {loading && <CircularProgress size={25} />}
+          {loading && <CircularWithValueLabel/>}
           
         </Button>
         </div>
