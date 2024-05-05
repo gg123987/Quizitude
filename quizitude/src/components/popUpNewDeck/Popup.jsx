@@ -169,7 +169,6 @@ const Popup = ({ handleClosePopup }) => {
           <input
             type="file"
             id="pdf-upload"
-            //value={pdf}
             accept=".pdf"
             onChange={handlePDFChange}
             style={{ display: 'none' }}
