@@ -20,6 +20,8 @@ const Popup = ({ handleClosePopup }) => {
   // State variables
   const [currentPage, setCurrentPage] = useState(0);
   const [currentFlashcard, setCurrentFlashcard] = useState(1); 
+  const [questionList, setQuestionList] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState(''); 
   const [cardTitle, setCardTitle] = useState('');
   const [noOfQuestions, setNoOfQuestions] = useState(0);
   const [questionType, setQuestionType] = useState('');
@@ -89,6 +91,10 @@ const Popup = ({ handleClosePopup }) => {
         setLoading(true); // Set loading to true
         // Call fetchLLMResponse function and pass the required parameters
         response = await fetchLLMResponse(noOfQuestions, pdf, questionType);
+        let thisResponse = JSON.parse(response);
+        setQuestionList(thisResponse); // Set the question list
+        setCurrentQuestion(thisResponse[0]); // Set the current question
+
         setLoading(false); // Set loading to false
         setCurrentPage(1); // Move to the next page
       } else {
@@ -97,21 +103,42 @@ const Popup = ({ handleClosePopup }) => {
       }
     };
 
+    const updateCurrentQuestionForward = () => {
+      //(using -1 + 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
+      setCurrentQuestion(questionList[currentFlashcard-1+1]);
+      console.log(currentFlashcard);
+      console.log(currentQuestion.question);
+
+    };
+
+    const updateCurrentQuestionBackward = () => {
+      //(using -1 - 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
+      setCurrentQuestion(questionList[currentFlashcard-1-1]);
+    }
+
     const handleNextFlashcard = () => {
+      //move the current flashcard to the next only if the current question is not the last question
       if (currentFlashcard < noOfQuestions) {
         setCurrentFlashcard(currentFlashcard + 1);
+        updateCurrentQuestionForward();
       }
     };
 
     const handlePreviousFlashcard = () => {
+      //move the current flashcard to the previous only if the current question is not the first question
       if (currentFlashcard > 1) {
         setCurrentFlashcard(currentFlashcard - 1);
+        updateCurrentQuestionBackward();
       }
     };
 
+
+
+
+
   
   const pages = [
-    <div className="page1-content">
+    <div key = {0} className="page1-content">
       <div className="header">
         <h2>Generate Flashcards</h2>
         <p>This creates a deck of cards based on any material you upload here.</p>
@@ -197,7 +224,7 @@ const Popup = ({ handleClosePopup }) => {
         </Button>
       </div>
     </div>,
-    <div className="page2-content">
+    <div key = {1} className="page2-content">
       <div className="header">
         <h2>Review Flashcards</h2>
         <p>{noOfQuestions} Cards Generated</p>
@@ -213,6 +240,8 @@ const Popup = ({ handleClosePopup }) => {
               fullWidth
               className="reviewTextField"
               style={{backgroundColor: 'white'}}
+              value={currentQuestion.question}
+              onChange={(e) => setCurrentQuestion({ ...currentQuestion, question: e.target.value })}
             />
             <p className='bottom'>This will appear on the front of the card</p>
           </div>
@@ -225,7 +254,9 @@ const Popup = ({ handleClosePopup }) => {
               fullWidth
               className="reviewTextField"
               style={{backgroundColor: 'white'}}
-              />
+              value={currentQuestion.answer}
+              onChange={(e) => setCurrentQuestion({ ...currentQuestion, answer: e.target.value })}
+            />
             <p className='bottom'>This will appear on the back of the card</p>
           </div>
         </div>

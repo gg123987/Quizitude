@@ -37,9 +37,11 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "google/gemma-7b-it:free",
+        "model": "gryphe/mythomist-7b:free",
+        //"response_format": {"type": 'json_object'},
         "messages": [
-          { "role": "user", "content": `Given the provided data, generate ${noOfQuestions} ${typeOfQuestion} questions with answers. Give the answer in JSON format with keys "question", "choices" in an array, and "answer". The JSON format should be enclosed only in square brackets. Here's the data: ${text}.`},
+          { "role": "system", "content": `Give the answer in a array of JSON format objects with the following schema: {"question": "","choices":["",""],"answer": ""} separated by commas`},
+          { "role": "user", "content": `Given the provided data, generate ${noOfQuestions} ${typeOfQuestion} questions with answers. . Here's the data: ${text}.`},
         ],
       })
     });
@@ -48,11 +50,12 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
       throw new Error("Failed to fetch data");
     }
     const data = await response.json();
+
     console.log(data.choices[0].message.content);
-    console.log(data.choices[0].message);
     return data.choices[0].message.content; // Return the content from the response
     
   } catch (error) {
+    console.error("Error fetching data:", error);
     throw new Error("Error fetching data:", error);
   }
 }
