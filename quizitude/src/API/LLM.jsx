@@ -8,6 +8,25 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
 
   
   const text = await getPdfText(pdf);
+
+
+  //USE THIS CODE TO CHANGE THE MESSAGE DEPENDING ON THE TYPE OF QUESTION
+  // let messages;
+  // if (typeOfQuestion === "multiple-choice") {
+  //   messages = [
+  //     { 
+  //       "role": "user", 
+  //       "content": `Using the following data, create a series of ${noOfQuestions} multiple-choice questions and answers: Give the answers in raw JSON format enclosed only in square brackets with Keys named 'question' and 'answer'. If the question is Multiple choice, include all options in the question key. HERE IS THE DATA:  ${text}. `
+  //     }
+  //   ];
+  // } else if (typeOfQuestion === "short-answer") {
+  //   messages = [
+  //     { 
+  //       "role": "user", 
+  //       "content": `Using the following data, create a series of ${noOfQuestions} short-answer questions and answers: Give the answers in raw JSON format enclosed only in square brackets with Keys named 'question' and 'answer'. HERE IS THE DATA:  ${text}. `
+  //     }
+  //   ]
+  // }
   
 
   try {
@@ -18,10 +37,9 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "openai/gpt-3.5-turbo",
+        "model": "google/gemma-7b-it:free",
         "messages": [
-          { "role": "user", "content": `Using the following data, create a series of ${noOfQuestions} ${typeOfQuestion} questions and answers: ${text}`},
-          //{ "role": "user", "content": "Give the answers in JSON format. With heading Questions, Answers and Solution"},
+          { "role": "user", "content": `Given the provided data, generate ${noOfQuestions} ${typeOfQuestion} questions with answers. Give the answer in JSON format with keys "question", "choices" in an array, and "answer". The JSON format should be enclosed only in square brackets. Here's the data: ${text}.`},
         ],
       })
     });
@@ -31,6 +49,7 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
     }
     const data = await response.json();
     console.log(data.choices[0].message.content);
+    console.log(data.choices[0].message);
     return data.choices[0].message.content; // Return the content from the response
     
   } catch (error) {
