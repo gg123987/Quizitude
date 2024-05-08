@@ -69,3 +69,39 @@
   .generateButton {
     padding-top: 20px;
   }
+
+.review-container {
+  background-color: #fcfcfd;
+  border: 1px solid grey;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+.textfields-container {
+  display: flex;
+  gap: 2.5%;
+}
+
+.top {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.bottom {
+  margin-top: 5px;
+}
+
+.textfield-wrapper1 {
+  width: 100%;
+}
+
+.textfield-wrapper2 {
+  width: 100%;
+}
+
+.navigation {
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-top: 10px; 
+}
