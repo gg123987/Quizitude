@@ -12,17 +12,20 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import './popup.css'; 
 import fetchLLMResponse from '../../API/LLM';
 import CircularWithValueLabel from '../CircularProgressSpinner';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 
 const Popup = ({ handleClosePopup }) => {
   // State variables
+  const [currentPage, setCurrentPage] = useState(0);
+  const [currentFlashcard, setCurrentFlashcard] = useState(1); 
   const [cardTitle, setCardTitle] = useState('');
   const [noOfQuestions, setNoOfQuestions] = useState(0);
   const [questionType, setQuestionType] = useState('');
   const [pdf, setFile] = useState(null);
   const [loading, setLoading] = useState(false); // Add a new state variable [loading]
   const maxPDFSize = 30 * 1024 * 1024; // 30 MB in bytes
-
 
   // Event handlers 
   const handleCardTitleChange = (event) => {
@@ -87,46 +90,54 @@ const Popup = ({ handleClosePopup }) => {
         // Call fetchLLMResponse function and pass the required parameters
         response = await fetchLLMResponse(noOfQuestions, pdf, questionType);
         setLoading(false); // Set loading to false
+        setCurrentPage(1); // Move to the next page
       } else {
         // Handle case where PDF or number of questions is missing
         alert('Please enter all the required details to generate flashcards.');
       }
     };
 
-  
+    const handleNextFlashcard = () => {
+      if (currentFlashcard < noOfQuestions) {
+        setCurrentFlashcard(currentFlashcard + 1);
+      }
+    };
 
-  return (
-    <div className="popup-background">
-      <div className="popup">
-        <IconButton className="closeButton" onClick={handleClosePopup} size="large">
-          <CloseIcon fontSize="large" />
-        </IconButton>
-        <div className="header">
-          <h2>Generate Flashcards</h2>
-          <p>This creates a deck of cards based on any material you upload here.</p>
+    const handlePreviousFlashcard = () => {
+      if (currentFlashcard > 1) {
+        setCurrentFlashcard(currentFlashcard - 1);
+      }
+    };
+
+  
+  const pages = [
+    <div className="page1-content">
+      <div className="header">
+        <h2>Generate Flashcards</h2>
+        <p>This creates a deck of cards based on any material you upload here.</p>
+      </div>
+      <div className="textfields-container">
+        <div className="textfield-wrapper">
+          <TextField
+            id="titleOfCard"
+            value={cardTitle}
+            label="Title of Card"
+            className="titleOfCard"
+            onChange={handleCardTitleChange}
+            fullWidth
+          />
         </div>
-        <div className="textfields-container">
-          <div className="textfield-wrapper">
-            <TextField
-              id="titleOfCard"
-              value={cardTitle}
-              label="Title of Card"
-              className="titleOfCard"
-              onChange={handleCardTitleChange}
-              fullWidth
-            />
-          </div>
-          <div className="textfield-wrapper">
-            <TextField
-              id="noOfQuestions"
-              value={noOfQuestions}
-              label="No of Questions"
-              className="NoOfQuestions"
-              type="number"
-              onChange={handleNoOfQuestionsChange}
-              fullWidth
-            />
-          </div>
+        <div className="textfield-wrapper">
+          <TextField
+            id="noOfQuestions"
+            value={noOfQuestions}
+            label="No of Questions"
+            className="NoOfQuestions"
+            type="number"
+            onChange={handleNoOfQuestionsChange}
+            fullWidth
+          />
+        </div>
         </div>
           <FormControl fullWidth>
             <InputLabel id="typeOfQuestion">Type of Question</InputLabel>
@@ -183,8 +194,70 @@ const Popup = ({ handleClosePopup }) => {
         >
           {!loading && 'Generate Flashcards'}
           {loading && <CircularWithValueLabel/>}
-          
         </Button>
+      </div>
+    </div>,
+    <div className="page2-content">
+      <div className="header">
+        <h2>Review Flashcards</h2>
+        <p>{noOfQuestions} Cards Generated</p>
+      </div>
+      <div className="review-container">
+        <div className="textfields-container">
+          <div className="textfield-wrapper1">
+            <p className="top">Question</p>
+            <TextField
+              id="reviewTextField1"
+              multiline
+              rows={12} 
+              fullWidth
+              className="reviewTextField"
+              style={{backgroundColor: 'white'}}
+            />
+            <p className='bottom'>This will appear on the front of the card</p>
+          </div>
+          <div className="textfield-wrapper2">
+            <p className='top'>Answer</p>
+            <TextField
+              id="reviewTextField2"
+              multiline
+              rows={12} 
+              fullWidth
+              className="reviewTextField"
+              style={{backgroundColor: 'white'}}
+              />
+            <p className='bottom'>This will appear on the back of the card</p>
+          </div>
+        </div>
+        <div className="navigation">
+          <ArrowBackIcon onClick={handlePreviousFlashcard} />
+          <span>{currentFlashcard} of {noOfQuestions}</span>
+          <ArrowForwardIcon onClick={handleNextFlashcard} />
+        </div>
+      </div>
+      <Button
+        id="saveButton"
+        style={{ backgroundColor: '#303484', color: 'white', minHeight: '40px', width: '60%', marginTop: '20px'}}
+      >
+        Save Flashcards
+      </Button>
+      <Button
+        id="regenerateButton"
+        style={{ backgroundColor: '#f6fafd', color: 'black', minHeight: '40px', width: '60%', marginTop: '10px'}}
+      >
+        Regenerate Flashcards
+      </Button>
+    </div>
+  ]
+
+  return (
+    <div className="popup-background">
+      <div className="popup">
+        <IconButton className="closeButton" onClick={handleClosePopup} size="large">
+          <CloseIcon fontSize="large" />
+        </IconButton>
+        <div className="popup-content">
+          {pages[currentPage]}
         </div>
       </div>
     </div>
