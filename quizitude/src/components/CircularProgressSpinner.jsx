@@ -44,18 +44,28 @@ CircularProgressWithLabel.propTypes = {
 };
 
 // Functional component to display CircularProgressWithLabel with a controlled progress value
-export default function CircularWithValueLabel() {
-  const [progress, setProgress] = React.useState(10);
+export default function CircularWithValueLabel({ interval = 400 }) {
+  // PropTypes for the CircularWithValueLabel component
+  CircularWithValueLabel.propTypes = {
+    interval: PropTypes.number, // Add interval prop validation
+  };
+  const [progress, setProgress] = React.useState(0);
 
   // Effect hook to simulate progress increment
   React.useEffect(() => {
+
+    // Check if progress has reached 100%
+    if (progress >= 100) {
+      return; // If so, return early to stop further updates
+    }
+    //else, set an interval to update progress
     const timer = setInterval(() => {
-      setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10)); // Increment progress value
-    }, 1800); // Interval for incrementing progress
+      setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 1)); // Increment progress value
+    }, interval); // Interval for incrementing progress
     return () => {
       clearInterval(timer); // Cleanup function to clear interval
     };
-  }, []); // Empty dependency array to run effect only once
+  }, [progress]); // Empty dependency array to run effect only once
 
   // Render CircularProgressWithLabel with the current progress value
   return <CircularProgressWithLabel value={progress} size={35} />; // Set the size of the CircularProgressWithLabel
