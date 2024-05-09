@@ -10,39 +10,44 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
   const text = await getPdfText(pdf);
 
 
-  //USE THIS CODE TO CHANGE THE MESSAGE DEPENDING ON THE TYPE OF QUESTION
-  // let messages;
-  // if (typeOfQuestion === "multiple-choice") {
-  //   messages = [
-  //     { 
-  //       "role": "user", 
-  //       "content": `Using the following data, create a series of ${noOfQuestions} multiple-choice questions and answers: Give the answers in raw JSON format enclosed only in square brackets with Keys named 'question' and 'answer'. If the question is Multiple choice, include all options in the question key. HERE IS THE DATA:  ${text}. `
-  //     }
-  //   ];
-  // } else if (typeOfQuestion === "short-answer") {
-  //   messages = [
-  //     { 
-  //       "role": "user", 
-  //       "content": `Using the following data, create a series of ${noOfQuestions} short-answer questions and answers: Give the answers in raw JSON format enclosed only in square brackets with Keys named 'question' and 'answer'. HERE IS THE DATA:  ${text}. `
-  //     }
-  //   ]
-  // }
+  //This code is to control the message that is sent to the LLM model based on the type of question
+  let messages;
+  if (typeOfQuestion === "multiple-choice") {
+    messages = [
+      { "role": "system", 
+        "content": `Give the answer in a array of JSON format objects with the following schema: {"question": "","choices":["",""],"answer": ""} separated by commas`
+      },
+      { 
+        "role": "user", 
+        "content": `Given the provided data, generate ${noOfQuestions} multiple-choice questions with answers. . Here's the data: ${text}. `
+      }
+    ];
+  } else if (typeOfQuestion === "short-answer") {
+    messages = [
+      { 
+        "role": "system", 
+        "content": `Give the answer in a array of JSON format objects with the following schema: {"question": "", "answer": ""} separated by commas`
+      },
+      { 
+        "role": "user", 
+        "content": `Given the provided data, generate ${noOfQuestions} short-answer questions with answers. . Here's the data: ${text}.`
+      }
+      
+    ]
+  }
   
 
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${"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"}`,
+        "Authorization": `Bearer ${"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"}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
         "model": "gryphe/mythomist-7b:free",
         //"response_format": {"type": 'json_object'},
-        "messages": [
-          { "role": "system", "content": `Give the answer in a array of JSON format objects with the following schema: {"question": "","choices":["",""],"answer": ""} separated by commas`},
-          { "role": "user", "content": `Given the provided data, generate ${noOfQuestions} ${typeOfQuestion} questions with answers. . Here's the data: ${text}.`},
-        ],
+        "messages": messages
       })
     });
     
@@ -52,11 +57,38 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
     const data = await response.json();
 
     console.log(data.choices[0].message.content);
-    return data.choices[0].message.content; // Return the content from the response
+    let thisResponse = JSON.parse(data.choices[0].message.content);
+
+
+    if (typeOfQuestion === "multiple-choice"){
+      // Modify each question in the response array
+      thisResponse.forEach(question => {
+        // Append a new line to the value of the "question" key
+        question.question += '\n';
+        question.question += 'Options:\n';
+
+        // Initialize a counter for options
+        let optionCounter = 65; // ASCII value of 'A'
+        // Loop through choices
+        question.choices.forEach(choice => {
+          // Append the letter for the option
+          question.question += `${String.fromCharCode(optionCounter)}. ${choice}\n`;
+          // Increment the counter for the next letter
+          optionCounter++;
+        });
+        
+        // Delete the "choices" key
+        delete question.choices;
+      });
+    }
+
+    console.log(thisResponse);
+    return thisResponse; // Return the content from the response
     
   } catch (error) {
-    console.error("Error fetching data:", error);
-    throw new Error("Error fetching data:", error);
+    console.error("Error fetching data1:", error);
+    alert("Error: Issue with the AI model. Please attempt to regenerate the flashcards");
+    throw Error("Error fetching data2:", error);
   }
 }
 

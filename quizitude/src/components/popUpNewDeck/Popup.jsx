@@ -83,35 +83,59 @@ const Popup = ({ handleClosePopup }) => {
     }
   };
 
-  // Handler function for the "Generate Flashcards" button click event
   const handleGenerateFlashcards = async () => {
-      let response; // Declare the 'response' variable
-      // Check if PDF and number of questions are present
+    try {
+      let response;
       if (pdf && noOfQuestions && questionType && cardTitle) {
-        setLoading(true); // Set loading to true
-        // Call fetchLLMResponse function and pass the required parameters
-        response = await fetchLLMResponse(noOfQuestions, pdf, questionType);
-        let thisResponse = JSON.parse(response);
-        setQuestionList(thisResponse); // Set the question list
-        setCurrentQuestion(thisResponse[0]); // Set the current question
-
-        setLoading(false); // Set loading to false
-        setCurrentPage(1); // Move to the next page
+        setLoading(true);
+        let thisResponse = await fetchLLMResponse(noOfQuestions, pdf, questionType);
+        setQuestionList(thisResponse);
+        setCurrentQuestion(thisResponse[0]);
+        setCurrentPage(1);
       } else {
-        // Handle case where PDF or number of questions is missing
         alert('Please enter all the required details to generate flashcards.');
       }
-    };
+    } catch (error) {
+      console.error('Error generating flashcards here:', error);
+      setLoading(false);
+    }
+  };
 
     const updateCurrentQuestionForward = () => {
+
+      // Fetch the updated values from the DOM
+      const updatedQuestion = document.getElementById('reviewTextFieldQuestion').value;
+      const updatedAnswer = document.getElementById('reviewTextFieldAnswer').value;
+
+      // Update the currentQuestion state with the updated values
+      setCurrentQuestion({ question: updatedQuestion, answer: updatedAnswer });
+      //console.log(currentQuestion.question);
+
+      // Update questionsList with the amended question
+      const updatedQuestionList = [...questionList];
+      updatedQuestionList[currentFlashcard - 1] = currentQuestion;
+      setQuestionList(updatedQuestionList);
+
+      // Move to the next question
       //(using -1 + 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
       setCurrentQuestion(questionList[currentFlashcard-1+1]);
-      console.log(currentFlashcard);
-      console.log(currentQuestion.question);
-
     };
 
     const updateCurrentQuestionBackward = () => {
+
+      // Fetch the updated values from the DOM
+      const updatedQuestion = document.getElementById('reviewTextFieldQuestion').value;
+      const updatedAnswer = document.getElementById('reviewTextFieldAnswer').value;
+
+      // Update the currentQuestion state with the updated values
+      setCurrentQuestion({ question: updatedQuestion, answer: updatedAnswer });
+
+      // Update questionsList with the amended question
+      const updatedQuestionList = [...questionList];
+      updatedQuestionList[currentFlashcard - 1] = currentQuestion;
+      setQuestionList(updatedQuestionList);
+
+      // Move to the previous question
       //(using -1 - 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
       setCurrentQuestion(questionList[currentFlashcard-1-1]);
     }
@@ -129,12 +153,9 @@ const Popup = ({ handleClosePopup }) => {
       if (currentFlashcard > 1) {
         setCurrentFlashcard(currentFlashcard - 1);
         updateCurrentQuestionBackward();
+        //console.log(document.getElementById('reviewTextFieldQuestion').value);
       }
     };
-
-
-
-
 
   
   const pages = [
@@ -220,7 +241,7 @@ const Popup = ({ handleClosePopup }) => {
           onClick={handleGenerateFlashcards}
         >
           {!loading && 'Generate Flashcards'}
-          {loading && <CircularWithValueLabel/>}
+          {loading && <CircularWithValueLabel interval = {400}/>}
         </Button>
       </div>
     </div>,
@@ -234,7 +255,7 @@ const Popup = ({ handleClosePopup }) => {
           <div className="textfield-wrapper1">
             <p className="top">Question</p>
             <TextField
-              id="reviewTextField1"
+              id="reviewTextFieldQuestion"
               multiline
               rows={12} 
               fullWidth
@@ -248,7 +269,7 @@ const Popup = ({ handleClosePopup }) => {
           <div className="textfield-wrapper2">
             <p className='top'>Answer</p>
             <TextField
-              id="reviewTextField2"
+              id="reviewTextFieldAnswer"
               multiline
               rows={12} 
               fullWidth
