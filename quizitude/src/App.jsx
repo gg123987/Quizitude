@@ -1,19 +1,11 @@
 import "./App.css";
-import { useState, useEffect } from "react";
-import { supabase } from "./supabase/supabaseClient";
-import Auth from "./pages/Auth";
-import Account from "./pages/Account";
-
-import { Container } from "react-bootstrap";
 import { Route, Routes } from "react-router-dom";
 import AuthRoute from "./components/AuthRoute";
-import NavBar from "./components/NavBar";
 import Home from "./pages/Home/Home.jsx";
-import Login from "./pages/Login";
 import PasswordReset from "./pages/PasswordReset";
 import Register from "./pages/Register";
 import UpdatePassword from "./pages/UpdatePassword";
-import Signin from "./pages/SignInSide";
+import Signin from "./pages/LogIn";
 import Decks from "./pages/Decks/Decks.jsx";
 import Categories from "./pages/Categories/Categories";
 

@@ -8,7 +8,10 @@ export const useAuth = () => useContext(AuthContext);
 const login = (email, password) =>
   supabase.auth.signInWithPassword({ email, password });
 
-const signOut = () => supabase.auth.signOut();
+const signOut = () => {
+  localStorage.removeItem("rememberMeToken");
+  supabase.auth.signOut();
+};
 
 const passwordReset = (email) =>
   supabase.auth.resetPasswordForEmail(email, {
@@ -46,16 +49,32 @@ const AuthProvider = ({ children }) => {
       const { data } = await supabase.auth.getUser();
       const { user: currentUser } = data;
       setUser(currentUser ?? null);
-      setAuth(currentUser ? true : false);
       setLoading(false);
     };
+
+    const getSessionData = async () => {
+      const token = localStorage.getItem('rememberMeToken');
+      if (token) {
+        // If token exists, try to restore session
+        const { data: sessionData, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Error getting session data:", error.message);
+          return;
+        }
+        if (sessionData) {
+          setAuth(true);
+          setUser(sessionData.user);
+        }
+      }
+    };
+
+    getSessionData();
     getUser();
+
     const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event == "PASSWORD_RECOVERY") {
-        setAuth(false);
-      } else if (event === "SIGNED_IN") {
-        setUser(session.user);
+      if (event === "SIGNED_IN") {
         setAuth(true);
+        setUser(session.user);
       } else if (event === "SIGNED_OUT") {
         setAuth(false);
         setUser(null);
@@ -64,7 +83,7 @@ const AuthProvider = ({ children }) => {
     return () => {
       data.subscription.unsubscribe();
     };
-  }, []);
+  }, []);  
 
   return (
     <AuthContext.Provider

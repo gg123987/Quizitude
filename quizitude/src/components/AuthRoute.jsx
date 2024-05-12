@@ -2,7 +2,6 @@ import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
 import NavBar from "../components/NavBar"; // Import NavBar component
-import SignInSide from "../pages/SignInSide"; // Import your login page
 
 const AuthRoute = () => {
   const { auth } = useAuth();
