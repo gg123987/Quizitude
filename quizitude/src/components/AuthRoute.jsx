@@ -1,22 +1,30 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
-import NavBar from "../components/NavBar"; // Import NavBar component
+import ResponsiveDrawer from "./Navigation/Drawer";
 
 const AuthRoute = () => {
   const { auth } = useAuth();
   const location = useLocation();
 
   // Check if the current path is a login or register page
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/register";
+  // Check if the current path is for the StudyMode page
+  const isStudyModePage = location.pathname === "/study";
 
   return (
     <>
-      {/* Render NavBar if the user is authenticated */}
-      {auth && <NavBar />}
-      
+      {/* Show the sidebar if authenticated and not on the StudyMode page */}
+      {auth && !isStudyModePage && (
+        <ResponsiveDrawer>
+          <Outlet />
+        </ResponsiveDrawer>
+      )}
+
       {/* Redirect to login page if not authenticated and not on the login/register page */}
       {!auth && !isAuthPage && <Navigate to={"/login"} replace state={{ path: location.pathname }} />}
+      {/* Render the Outlet if not on the StudyMode page */}
+      {auth && isStudyModePage && <Outlet />}
     </>
   );
 };

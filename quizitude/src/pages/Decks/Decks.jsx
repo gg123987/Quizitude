@@ -4,11 +4,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import SearchBar from "material-ui-search-bar"; 
 import './decks.css';
-import SideBar from '../../components/sideBar/SideBar';
-import TopBar from '../../components/topBar/TopBar';
-import Popup from '../../components/popUpNewDeck/Popup'; 
 
 const Decks = () => {
   // State variables
@@ -30,13 +26,9 @@ const Decks = () => {
   
   return (
     <div className='decks'>
-        <TopBar handleOpenPopup={handleOpenPopup} /> {/* Pass the handleOpenPopup function to TopBar */}
-        <SideBar />
         <h1 className="title">All Decks</h1>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px', gridColumn: 2, gridRow: 2 }} >
-            <SearchBar
-            style={{ maxWidth: '400px', width: '100%'}}
-            />
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '20px', gridColumn: 2, gridRow: 2}} >
+            
             <FormControl className='decksInputLabel'>
             <InputLabel id="inputLabel">Sort By</InputLabel>
             <Select

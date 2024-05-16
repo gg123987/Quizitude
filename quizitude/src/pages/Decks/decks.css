@@ -1,10 +1,7 @@
 .decks {
-    display: grid;
-    grid-template-rows: auto 1fr;  /* First row auto height, second row takes remaining space */
-    grid-template-columns: 15% 1fr;  /* First column takes 15% (same as side bar width), second column takes the rest */
-    background-color: #fffcfc;
-    min-width: 1150px;
-  } 
+  display: flex;
+  position: relative;
+} 
   
   .deck-content {
     display: flex; 

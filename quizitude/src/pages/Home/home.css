@@ -1,3 +1,22 @@
-div {
+.home {
+    display: grid;
+    grid-template-rows: auto 1fr;  /* First row auto height, second row takes remaining space */
+    grid-template-columns: 15% 1fr;  /* First column takes 15% (same as side bar width), second column takes the rest */
+    background-color: #fffcfc;
+    min-width: 1150px;
+  } 
+  
+  .deck-content {
+    display: flex; 
+  }
+  
+  .title {
     color: black;
-}
+    text-align: left; 
+    padding: 20px;
+    grid-column: 2 / span 1;  /* Title spans from the second column and takes up 1 column */
+    grid-row: 1; /* Title appears in the first row */
+    margin-top: 40px; 
+    font-size: 28px;
+    font-weight: bold;
+  }

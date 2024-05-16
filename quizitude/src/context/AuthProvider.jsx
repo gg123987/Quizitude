@@ -63,8 +63,7 @@ const AuthProvider = ({ children }) => {
         }
         if (sessionData) {
           setAuth(true);
-          setUser(sessionData.user);
-        }
+          setUser(sessionData.user);}
       }
     };
 

@@ -251,7 +251,7 @@ const Popup = ({ handleClosePopup }) => {
   ]
 
   return (
-    <div className="popup-background">
+    <div className="popup-background" onClick={handleClosePopup}>
       <div className="popup">
         <IconButton className="closeButton" onClick={handleClosePopup} size="large">
           <CloseIcon fontSize="large" />
