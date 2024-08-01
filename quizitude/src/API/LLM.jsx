@@ -19,7 +19,7 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
       },
       { 
         "role": "user", 
-        "content": `Given the provided data, generate ${noOfQuestions} multiple-choice questions with answers. . Here's the data: ${text}. `
+        "content": `Given the provided data, generate ${noOfQuestions} multiple-choice questions with answers. Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`
       }
     ];
   } else if (typeOfQuestion === "short-answer") {
@@ -30,9 +30,8 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
       },
       { 
         "role": "user", 
-        "content": `Given the provided data, generate ${noOfQuestions} short-answer questions with answers. . Here's the data: ${text}.`
-      }
-      
+        "content": `Given the provided data, generate ${noOfQuestions} short-answer questions with answers. . Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`
+      }      
     ]
   }
   
@@ -45,7 +44,8 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        "model": "gryphe/mythomist-7b:free",
+        //"model": "gryphe/mythomist-7b:free",
+        "model": "meta-llama/llama-3.1-8b-instruct:free",
         //"response_format": {"type": 'json_object'},
         "messages": messages
       })
