@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Groq from "groq-sdk"
 import pdfToText from 'react-pdftotext'
 
 
@@ -9,6 +10,7 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
   
   const text = await getPdfText(pdf);
 
+  const groq = new Groq({ apiKey: "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" ,dangerouslyAllowBrowser: true});
 
   //This code is to control the message that is sent to the LLM model based on the type of question
   let messages;
@@ -35,7 +37,8 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
     ]
   }
   
-
+  // THIS USES THE OPENROUTER API
+  /*
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -89,6 +92,51 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
     console.error("Error fetching data1:", error);
     alert("Error: Issue with the AI model. Please attempt to regenerate the flashcards");
     throw Error("Error fetching data2:", error);
+  }
+    */
+
+  // THIS USES THE LATEST LLAMA MODEL3 AVAILABLE ON GROQ API FOR FREE 
+  try {
+    const response = await groq.chat.completions.create({
+      messages: messages,
+      model: "llama3-8b-8192"  // Update this with the desired model 
+    });
+
+    if (!response.choices.length) {
+      throw new Error("No choices returned from the model");
+    }
+
+    let thisResponse = JSON.parse(response.choices[0].message.content);
+
+    if (typeOfQuestion === "multiple-choice") {
+      // Modify each question in the response array
+      thisResponse.forEach(question => {
+        // Append a new line to the value of the "question" key
+        question.question += '\n';
+        question.question += 'Options:\n';
+
+        // Initialize a counter for options
+        let optionCounter = 65; // ASCII value of 'A'
+        // Loop through choices
+        question.choices.forEach(choice => {
+          // Append the letter for the option
+          question.question += `${String.fromCharCode(optionCounter)}. ${choice}\n`;
+          // Increment the counter for the next letter
+          optionCounter++;
+        });
+        
+        // Delete the "choices" key
+        delete question.choices;
+      });
+    }
+
+    console.log(thisResponse);
+    return thisResponse; // Return the content from the response
+    
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    alert("Error: Issue with the AI model. Please attempt to regenerate the flashcards");
+    throw new Error("Error fetching data:", error);
   }
 }
 
