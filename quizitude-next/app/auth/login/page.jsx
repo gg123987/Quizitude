@@ -1,54 +1,8 @@
 import Link from "next/link";
-import { headers } from "next/headers";
-import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
+import { login, signup } from "@/lib/actions";
 
 export default function Login({ searchParams }) {
-  const signIn = async (formData) => {
-    "use server";
-
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const supabase = createClient();
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      return redirect("/login?message=Could not authenticate user");
-    }
-
-    return redirect("/protected");
-  };
-
-  const signUp = async (formData) => {
-    "use server";
-
-    const origin = headers().get("origin");
-    const full_name = formData.get("name");
-    const email = formData.get("email");
-    const password = formData.get("password");
-    const supabase = createClient();
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name },
-        emailRedirectTo: `${origin}/auth/callback`,
-      },
-    });
-
-    if (error) {
-      return redirect("/login?message=Could not authenticate user");
-    }
-
-    return redirect("/login?message=Check email to continue sign in process");
-  };
-
   return (
     <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
       <Link
@@ -102,14 +56,14 @@ export default function Login({ searchParams }) {
           required
         />
         <SubmitButton
-          formAction={signIn}
+          formAction={login}
           className="bg-green-700 rounded-md px-4 py-2 text-foreground mb-2"
           pendingText="Signing In..."
         >
           Sign In
         </SubmitButton>
         <SubmitButton
-          formAction={signUp}
+          formAction={signup}
           className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2"
           pendingText="Signing Up..."
         >
