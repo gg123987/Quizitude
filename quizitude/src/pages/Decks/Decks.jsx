@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -9,19 +9,10 @@ import './decks.css';
 const Decks = () => {
   // State variables
   const [sort, setSort] = useState('');
-  const [isPopupOpen, setIsPopupOpen] = useState(false); 
 
   // Event handlers
   const handleInputLabelChange = (event) => {
     setSort(event.target.value);
-  };
-
-  const handleOpenPopup = () => {
-    setIsPopupOpen(true);
-  };
-
-  const handleClosePopup = () => {
-    setIsPopupOpen(false);
   };
   
   return (
@@ -45,7 +36,6 @@ const Decks = () => {
             </Select>
             </FormControl>
         </Box>
-        {isPopupOpen && <Popup handleClosePopup={handleClosePopup} />} {/* Show the Popup component if isPopupOpen is true */}
     </div>
   );
 }

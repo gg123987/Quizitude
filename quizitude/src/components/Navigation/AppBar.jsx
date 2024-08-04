@@ -1,27 +1,27 @@
 // CustomAppBar.js
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import PropTypes from 'prop-types';
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
-import IconBreadcrumbs from "../IconBreadcrumbs";
+import IconBreadcrumbs from "./IconBreadcrumbs";
 import { useLocation } from "react-router-dom";
-import { Button, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import "./appbar.css";
 import SettingsIcon from "@mui/icons-material/Settings";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import AccountMenu from "../AccountMenu";
-import WindowDimensions from "../../context/WindowDimensions";
-import CustomButton from "../CustomButton";
+import AccountMenu from "../Buttons/AccountMenu";
+import WindowDimensions from "@/context/WindowDimensions";
+import CustomButton from "../Buttons/CustomButton";
+import NewDeckModal from "../NewDeck/Modal";
+import "./appbar.css";
 
-const CustomAppBar = ({ handleDrawerToggle, drawerWidth, handleOpenPopup }) => {
+const CustomAppBar = ({ handleDrawerToggle, drawerWidth, modalOpen, setModalOpen }) => {
   const location = useLocation();
   const currentPage = location.pathname;
-  const { height, width } = WindowDimensions();
-  const [ buttonText, setButtonText ] = useState("New Deck");
+  const { width } = WindowDimensions();
+  const [buttonText, setButtonText] = useState("New Deck");
 
-  // if width is less than 600px, set the button text to ""
   useEffect(() => {
     if (width < 900) {
       setButtonText("");
@@ -30,6 +30,8 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth, handleOpenPopup }) => {
     }
   }, [width]);
 
+  const handleOpen = () => setModalOpen(true);
+  const handleClose = () => setModalOpen(false);
 
   return (
     <AppBar
@@ -54,7 +56,6 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth, handleOpenPopup }) => {
             <MenuIcon />
           </IconButton>
 
-          {/* If not on the home page, show the IconBreadcrumbs */}
           {currentPage !== "/" && <IconBreadcrumbs page={currentPage} />}
         </Toolbar>
 
@@ -69,7 +70,7 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth, handleOpenPopup }) => {
             spaceBetween: "3px",
           }}
         >
-          <CustomButton onClick={handleOpenPopup} icon={<AddIcon />} >
+          <CustomButton onClick={handleOpen} icon={<AddIcon />}>
             {buttonText}
           </CustomButton>
           <IconButton
@@ -97,9 +98,17 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth, handleOpenPopup }) => {
             <AccountMenu />
           </IconButton>
         </Toolbar>
+        <NewDeckModal open={modalOpen} handleClose={handleClose} />
       </div>
     </AppBar>
   );
+};
+
+CustomAppBar.propTypes = {
+  handleDrawerToggle: PropTypes.func.isRequired,
+  drawerWidth: PropTypes.number.isRequired,
+  modalOpen: PropTypes.bool.isRequired,
+  setModalOpen: PropTypes.func.isRequired,
 };
 
 export default CustomAppBar;

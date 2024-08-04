@@ -6,7 +6,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import Divider from "@mui/material/Divider";
 import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
-import { useAuth } from "../context/AuthProvider";
+import { useAuth } from "@/context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import QuizIcon from '@mui/icons-material/Quiz';
 

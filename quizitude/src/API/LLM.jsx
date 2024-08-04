@@ -1,14 +1,8 @@
-import { useState } from 'react';
 import pdfToText from 'react-pdftotext'
-
-
-
 
 export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestion) {
 
-  
   const text = await getPdfText(pdf);
-  
 
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import FlashcardList from "../../components/Flashcard/FlashcardList";
 import "./studymode.css";
 import Button from "@mui/material/Button";
