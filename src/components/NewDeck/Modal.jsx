@@ -14,7 +14,7 @@ import PropTypes from 'prop-types';
 import CircularWithValueLabel from "../CircularProgressSpinner";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { fetchLLMResponse } from "@/api";
+import fetchLLMResponse from "@/api/LLM";
 import "./modal.css";
 
 const NewDeck = ({ open, handleClose }) => { 
@@ -80,11 +80,10 @@ const NewDeck = ({ open, handleClose }) => {
   };
 
   const handleGenerateFlashcards = async () => {
-    let response;
-    
+        
     if (pdf && noOfQuestions && questionType && cardTitle) {
       setLoading(true);
-      response = await fetchLLMResponse(noOfQuestions, pdf, questionType);
+      await fetchLLMResponse(noOfQuestions, pdf, questionType);
       setLoading(false);
       setCurrentPage(1);
     } else {

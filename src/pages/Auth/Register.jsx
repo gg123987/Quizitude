@@ -1,29 +1,25 @@
-import * as React from "react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import Alert from '@mui/material/Alert';
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthProvider";
+import useAuth from '@/hooks/useAuth';
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import backgroundImage from "../assets/nick-morrison-FHnnjk1Yj7Y-unsplash.jpg";
-import stars from "../assets/Stars.png";
-import logoSmall from "../assets/Logo-small.png";
-import GoogleLogin from "../assets/Google Login.svg";
-import { supabase } from "../supabase/supabaseClient";
+import backgroundImage from "@/assets/nick-morrison-FHnnjk1Yj7Y-unsplash.jpg";
+import stars from "@/assets/Stars.png";
+import logoSmall from "@/assets/Logo-small.png";
+import GoogleSignup from "@/assets/Google Signup.svg";
 
 const defaultTheme = createTheme();
 
-export default function SignInSide() {
-  const [rememberMe, setRememberMe] = useState(false);
+export default function Register() {
+  const fNameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const [errorMsg, setErrorMsg] = useState("");
@@ -31,52 +27,56 @@ export default function SignInSide() {
   const [passwordError, setPasswordError] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, user } = useAuth();
+  const { register } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setErrorMsg("");
       setLoading(true);
-      if (!passwordRef.current?.value || !emailRef.current?.value) {
-        setErrorMsg("Please fill in the fields");
+      setEmailError(false);
+      setPasswordError(false);
+
+      if (!fNameRef.current?.value || !passwordRef.current?.value || !emailRef.current?.value) {
+        setErrorMsg("Please fill in all fields");
         setLoading(false);
         return;
       }
-      const {
-        data: { user, session },
-        error
-      } = await login(emailRef.current.value, passwordRef.current.value);
 
-      if (error) {        
-        if(error.message === 'Invalid login credentials'){
-          const { data: users, error } = await supabase
-            .from('profiles')
-            .select('email')
-            .eq('email', emailRef.current.value)
-            .single()
+      if (!emailRef.current.value.includes("@") || !emailRef.current.value.includes(".")) {
+        setEmailError(true);
+        setLoading(false);
+        return;
+      }
 
-          const count = users ? 1 : 0;
+      if (passwordRef.current.value.length < 8) {
+        setPasswordError(true);
+        setLoading(false);
+        return;
+      }
 
-          if (count > 0) {
-            setEmailError(false);
-            setPasswordError(true);
-          } else{
-            setEmailError(true);
-            setPasswordError(false);
-          }
+      setErrorMsg("");
+      setLoading(true);
+      
+      const { data, error } = await register(
+        emailRef.current.value,
+        passwordRef.current.value,
+        fNameRef.current.value,
+      );
+      
+      console.log(data);
+      console.log(error);
+      if (error) {
+        if (error.message === "User already registered") {
+          setErrorMsg("Email already exists. Please use a different email or login.");
+        } else {
+          setErrorMsg("Error in Creating Account");
         }
-          
       } else {
-        if (user && session) {
-          if (rememberMe) {
-            localStorage.setItem("rememberMeToken", session.access_token);
-          }
-          navigate("/");
-        }
+        navigate("/login");
       }
     } catch (error) {
-      setErrorMsg("An unexpected error occurred. Please try again later.");
+      setErrorMsg("Error in Creating Account");
     }
     setLoading(false);
   };  
@@ -132,20 +132,21 @@ export default function SignInSide() {
               color: "#ffffff",
               zIndex: 1,
               position: "absolute",
-              padding: "30px 130px",
+              padding: "12% 9%",
             }}
           >
             <img src={stars} alt="stars" width="80px" height="80px" />
             <Typography
               variant="h2"
               component="h1"
-              fontSize={"5.3rem"}
+              fontSize={"5rem"}
               fontFamily={"Inter"}
               marginTop="40px"
               fontWeight={300}
               gutterBottom
             >
-              Study Smarter through AI-Generated Flashcards
+              Study Smarter  <br />
+              through AI-Generated Flashcards
             </Typography>
           </Box>
         </Grid>
@@ -156,7 +157,7 @@ export default function SignInSide() {
               mx: "auto",
               display: "flex",
               flexDirection: "column",
-              padding: "20px 100px",
+              padding: "20px 80px",
               width: "100%",
               maxWidth: "570px",
               justifyContent: "center"
@@ -170,7 +171,7 @@ export default function SignInSide() {
               textAlign="left"
               marginTop={"30px"}
             >
-              Log in
+              Sign Up
             </Typography>
             <Typography
               fontFamily="Inter"
@@ -180,14 +181,14 @@ export default function SignInSide() {
               marginTop={"10px"}
               marginBottom={"30px"}
             >
-              Welcome back! Please enter your details.
+              Start studying with flashcards today
             </Typography>
             
             <Button
               onClick={handleGoogleSignIn}
               fullWidth
             >
-              <img src={GoogleLogin} alt="Google Login"/>
+              <img src={GoogleSignup} alt="Google Signup"/>
             </Button>
 
             <Typography
@@ -196,10 +197,9 @@ export default function SignInSide() {
               fontSize={"0.9em"}
               textAlign="left"
               marginTop={"40px"}
-              marginBottom={"20px"}
               alignSelf={"center"}
             >
-              or Sign in with Email
+              or Sign up with Email
             </Typography>
             <Box
               component="form"
@@ -211,11 +211,32 @@ export default function SignInSide() {
                 <Alert
                   severity="error"
                   onClose={() => setErrorMsg("")}
-                  sx={{ marginBottom: "20px" }}
+                  sx={{ marginBottom: "20px", mt: "10px" }}
                 >
                   {errorMsg}
                 </Alert>
               )}
+              <Typography 
+                fontFamily="Inter"
+                fontWeight={400}
+                fontSize={"0.9em"}
+                textAlign="left"
+                marginTop={"20px"}
+                marginBottom={"4px"}
+              >
+                First Name
+              </Typography>
+              <TextField
+                required
+                fullWidth
+                id="fName"
+                label=""
+                name="fName"
+                autoComplete="fName"
+                autoFocus
+                inputRef={fNameRef}
+                disabled={loading}
+              />
               <Typography 
                 fontFamily="Inter"
                 fontWeight={400}
@@ -235,7 +256,9 @@ export default function SignInSide() {
                 autoComplete="email"
                 autoFocus
                 inputRef={emailRef}
-                helperText={emailError ? "We do not recognize this email. Please try again" : ""}
+                error={emailError}
+                disabled={loading}
+                helperText={emailError ? "Please use a valid email address" : ""}
                 sx={{ borderColor: emailError ? "red" : "" }}
               />
               <Typography 
@@ -257,34 +280,19 @@ export default function SignInSide() {
                 id="password"
                 autoComplete="current-password"
                 inputRef={passwordRef}
-                helperText={passwordError ? "Incorrect password" : ""}
+                error={passwordError}
+                disabled={loading}
+                helperText={passwordError ? "Must be at least 8 characters" : ""}
                 sx={{ borderColor: passwordError ? "red" : "" }}
               />
-              <Grid container sx={{ marginTop: '10px' }}>
-                <Grid item xs>
-                  <FormControlLabel
-                    control={<Checkbox value={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} color="primary" />}
-                    label={<Typography
-                      fontFamily="Inter"
-                      fontWeight="500"
-                      fontSize="14px"
-                    > Remember me
-                    </Typography>}
-                />
-                </Grid>
-                <Grid item sx={{ marginTop: '10px' }}>
-                  <Link href="/passwordreset" variant="body2" sx={{ fontWeight: 'bold', color: '#3538CD', textDecoration: 'none' }}>
-                    Forgot password?
-                  </Link>
-                </Grid>
-              </Grid>
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2, backgroundColor: '#3538CD', color: '#FFFFFF', borderRadius: '10px'}}
+                disabled={loading}
+                sx={{ height: 50, mt: 5, mb: 2, backgroundColor: '#3538CD', color: '#FFFFFF', borderRadius: '10px'}}
               >
-                Sign In
+                Get started
               </Button>
             </Box>
               <Box sx={{ display: 'flex', alignSelf: 'center', marginTop: '20px', marginBottom: '4px' }}>
@@ -294,14 +302,14 @@ export default function SignInSide() {
                   fontSize={"0.9em"}
                   textAlign="center"
                 >
-                  Don't have an account?
+                  Already have an account?
                 </Typography>
                 <Link 
-                  href="/register" 
+                  href="/login" 
                   variant="body2" 
                   sx={{ fontWeight: 'bold', color: '#3538CD', textDecoration: 'none', marginLeft: '4px' }}
                 >
-                  Sign Up
+                  Log in
                 </Link>
               </Box>
           </Box>

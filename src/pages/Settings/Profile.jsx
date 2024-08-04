@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
-import { useAuth } from '../../context/AuthProvider';
-import { supabase } from '../../supabase/supabaseClient'
-import Avatar from '../../components/profile/Avatar'
+import useAuth from '@/hooks/useAuth'
+import { supabase } from '@/utils/supabase'
+import Avatar from '@/components/Profile/Avatar'
+import PropTypes from 'prop-types';
 
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true)
@@ -17,7 +18,7 @@ export default function Account({ session }) {
       console.log(user)
 
       const { data, error } = await supabase
-        .from('profiles')
+        .from('users')
         .select(`full_name, email, avatar_url`)
         .eq('id', user.id)
         .single()
@@ -40,7 +41,7 @@ export default function Account({ session }) {
     return () => {
       ignore = true
     }
-  }, [session])
+  }, [session, user])
 
   async function updateProfile(event, avatarUrl) {
     event.preventDefault()
@@ -102,3 +103,7 @@ export default function Account({ session }) {
     </form>
   )
 }
+
+Account.propTypes = {
+  session: PropTypes.object,
+};

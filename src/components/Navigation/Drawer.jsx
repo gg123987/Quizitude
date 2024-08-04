@@ -13,7 +13,7 @@ import logoWhite from "@/assets/Logo-white.svg";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import CustomAppBar from "./AppBar";
-import WindowDimensions from "@/context/WindowDimensions";
+import useWindowDimensions from '@/hooks/useWindowDimensions';
 import "./drawer.css";
 
 
@@ -25,7 +25,7 @@ function ResponsiveDrawer({ window, ...props }) {
 
   const location = useLocation();
   const currentPage = location.pathname;
-  const { width } = WindowDimensions();
+  const { width } = useWindowDimensions();
 
   const container = window !== undefined ? () => window().document.body : undefined;
 
@@ -69,7 +69,6 @@ function ResponsiveDrawer({ window, ...props }) {
     } else {
       // if modal is closed, set drawer width to sidebar width
       const sidebarWidth = document.querySelector(".sideBar")?.offsetWidth || 0;
-      console.log(sidebarWidth);
       setDrawerWidth(sidebarWidth === 0 ? 0 : Math.max(180, sidebarWidth));
     }
   }, [width, modalOpen]);

@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { useAuth } from "../context/AuthProvider";
+import useAuth from '@/hooks/useAuth';
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -37,16 +37,24 @@ export default function UpdatePassword() {
       setLoading(false);
       return;
     }
+
     try {
       setErrorMsg("");
-      const { data, error } = await updatePassword(passwordRef.current.value);
+      const { error } = await updatePassword(passwordRef.current.value);
       if (!error) {
         navigate("/");
       }
     } catch (error) {
       setErrorMsg("Error in Updating Password. Please try again");
     }
+    
     setLoading(false);
+  };
+
+  const handlePasswordChange = () => {
+    if (passwordError) {
+      setPasswordError(false);
+    }
   };
 
   return (
@@ -63,7 +71,8 @@ export default function UpdatePassword() {
         fontSize={25}
         textAlign="center"
         marginBottom={"5px"}
-        >Set new password
+      >
+        Set new password
       </Typography>
       <Typography
         fontFamily="Inter"
@@ -72,14 +81,14 @@ export default function UpdatePassword() {
         textAlign="center"
         marginBottom={"20px"}
         maxWidth={"30%"}
-        >
-          Your new password must be different to <br />
-          previously used passwords.
+      >
+        Your new password must be different to <br />
+        previously used passwords.
       </Typography>
       {errorMsg && (
         <Alert
           severity="error"
-          onClose={() => setMsg("")}
+          onClose={() => setErrorMsg("")}
           sx={{ marginBottom: "20px" }}
         >
           {errorMsg}
@@ -88,70 +97,71 @@ export default function UpdatePassword() {
       <Box
         sx={{ maxWidth: "18%" }}
       >
-      <form onSubmit={handleSubmit}>
-        <Typography 
-          fontFamily="Inter"
-          fontWeight={400}
-          fontSize={"0.9em"}
-          textAlign="left"
-          marginTop={"25px"}
-          marginBottom={"4px"}
-        >
-          New Password
-        </Typography>
-        <TextField
-          required
-          fullWidth
-          name="password"
-          label=""
-          type="password"
-          id="password"
-          autoComplete="password"
-          inputRef={passwordRef}
-          error={passwordError}
-          helperText={passwordError ? "Must be at least 8 characters." : ""}
-          sx={{ 
-            borderColor: passwordError ? "red" : "",
-            '& .MuiInputBase-input': {
-              height: '10px',
-            }
-          }}
-        />
-        <Typography 
-          fontFamily="Inter"
-          fontWeight={400}
-          fontSize={"0.9em"}
-          textAlign="left"
-          marginTop={"25px"}
-          marginBottom={"4px"}
-        >
-          Confirm Password
-        </Typography>
-        <TextField
-          required
-          fullWidth
-          name="confirmPassword"
-          label=""
-          type="password"
-          id="confirmPassword"
-          autoComplete=""
-          inputRef={confirmPasswordRef}
-          sx={{ 
-            '& .MuiInputBase-input': {
-              height: '10px',
-            }
-          }}
-        />
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          disabled={loading}
-          sx={{ mt: 3, mb: 2, backgroundColor: '#3538CD', color: '#FFFFFF', borderRadius: '8px', height: '40px'}}
-        >
-          Reset password
-        </Button>
-      </form>
+        <form onSubmit={handleSubmit}>
+          <Typography
+            fontFamily="Inter"
+            fontWeight={400}
+            fontSize={"0.9em"}
+            textAlign="left"
+            marginTop={"25px"}
+            marginBottom={"4px"}
+          >
+            New Password
+          </Typography>
+          <TextField
+            required
+            fullWidth
+            name="password"
+            label=""
+            type="password"
+            id="password"
+            autoComplete="password"
+            inputRef={passwordRef}
+            error={passwordError}
+            helperText={passwordError ? "Must be at least 8 characters." : ""}
+            onChange={handlePasswordChange}
+            sx={{
+              borderColor: passwordError ? "red" : "",
+              '& .MuiInputBase-input': {
+                height: '10px',
+              }
+            }}
+          />
+          <Typography
+            fontFamily="Inter"
+            fontWeight={400}
+            fontSize={"0.9em"}
+            textAlign="left"
+            marginTop={"25px"}
+            marginBottom={"4px"}
+          >
+            Confirm Password
+          </Typography>
+          <TextField
+            required
+            fullWidth
+            name="confirmPassword"
+            label=""
+            type="password"
+            id="confirmPassword"
+            autoComplete=""
+            inputRef={confirmPasswordRef}
+            sx={{
+              '& .MuiInputBase-input': {
+                height: '10px',
+              }
+            }}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            disabled={loading}
+            sx={{ mt: 3, mb: 2, backgroundColor: '#3538CD', color: '#FFFFFF', borderRadius: '8px', height: '40px' }}
+          >
+            Reset password
+          </Button>
+        </form>
       </Box>
       <Box sx={{ display: 'flex', alignSelf: 'center', marginTop: '20px', marginBottom: '4px' }}>
         <Link

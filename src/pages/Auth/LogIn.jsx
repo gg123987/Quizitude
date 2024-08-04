@@ -1,27 +1,28 @@
-import * as React from "react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import Alert from '@mui/material/Alert';
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthProvider";
+import useAuth from '../../hooks/useAuth';
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import backgroundImage from "../../assets/nick-morrison-FHnnjk1Yj7Y-unsplash.jpg";
-import stars from "../../assets/Stars.png";
-import logoSmall from "../../assets/Logo-small.png";
-import GoogleSignup from "../../assets/Google Signup.svg";
-import { supabase } from "../../supabase/supabaseClient";
+import backgroundImage from "@/assets/nick-morrison-FHnnjk1Yj7Y-unsplash.jpg";
+import stars from "@/assets/Stars.png";
+import logoSmall from "@/assets/Logo-small.png";
+import GoogleLogin from "@/assets/Google Login.svg";
+import { supabase } from "@/utils/supabase";
 
 const defaultTheme = createTheme();
 
-export default function Register() {
-  const fNameRef = useRef(null);
+export default function SignInSide() {
+  const [rememberMe, setRememberMe] = useState(false);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
   const [errorMsg, setErrorMsg] = useState("");
@@ -29,64 +30,53 @@ export default function Register() {
   const [passwordError, setPasswordError] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  
-  const register = (email, password, name ) =>
-    supabase.auth.signUp({ 
-      email, 
-      password,
-      data: { name }
-    });
+  const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setErrorMsg("");
       setLoading(true);
-      setEmailError(false);
-      setPasswordError(false);
-
-      if (!fNameRef.current?.value || !passwordRef.current?.value || !emailRef.current?.value) {
-        setErrorMsg("Please fill in all fields");
-        setLoading(false);
-        return;
-      }
-
-      if (!emailRef.current.value.includes("@") || !emailRef.current.value.includes(".")) {
-        setEmailError(true);
-        setLoading(false);
-        return;
-      }
-
-      if (passwordRef.current.value.length < 8) {
-        setPasswordError(true);
-        setLoading(false);
-        return;
-      }
-
-      setErrorMsg("");
-      setLoading(true);
-      console.log(fNameRef.current.value);
-      console.log(emailRef.current.value);
-      console.log(passwordRef.current.value);
       
-      const { data, error } = await register(
-        emailRef.current.value,
-        passwordRef.current.value,
-        fNameRef.current.value,
-      );
-      console.log(data);
-      console.log(error);
-      if (error) {
-        if (error.message === "User already registered") {
-          setErrorMsg("Email already exists. Please use a different email or login.");
-        } else {
-          setErrorMsg("Error in Creating Account");
+      if (!passwordRef.current?.value || !emailRef.current?.value) {
+        setErrorMsg("Please fill in the fields");
+        setLoading(false);
+        return;
+      }
+      const { user, session , error } = await login(emailRef.current.value, passwordRef.current.value);
+
+      console.log('Login data:', user, session, error);
+
+      if (error) {        
+        if(error.message === 'Invalid login credentials'){
+          const { data: users } = await supabase
+            .from('users')
+            .select('email')
+            .eq('email', emailRef.current.value)
+            .single()
+
+          const count = users ? 1 : 0;
+
+          if (count > 0) {
+            setEmailError(false);
+            setPasswordError(true);
+          } else{
+            setEmailError(true);
+            setPasswordError(false);
+          }
         }
+          
       } else {
-        navigate("/login");
+        if (user && session) {
+          if (rememberMe) {
+            localStorage.setItem("rememberMeToken", session.access_token);
+          }
+          navigate("/");
+        }
       }
     } catch (error) {
-      setErrorMsg("Error in Creating Account");
+      console.error('Login error:', error.message);
+      setErrorMsg("An unexpected error occurred. Please try again later.");
     }
     setLoading(false);
   };  
@@ -155,7 +145,7 @@ export default function Register() {
               fontWeight={300}
               gutterBottom
             >
-              Study Smarter  <br />
+              Study Smarter <br />
               through AI-Generated Flashcards
             </Typography>
           </Box>
@@ -167,7 +157,7 @@ export default function Register() {
               mx: "auto",
               display: "flex",
               flexDirection: "column",
-              padding: "20px 80px",
+              padding: "20px 100px",
               width: "100%",
               maxWidth: "570px",
               justifyContent: "center"
@@ -181,7 +171,7 @@ export default function Register() {
               textAlign="left"
               marginTop={"30px"}
             >
-              Sign Up
+              Log in
             </Typography>
             <Typography
               fontFamily="Inter"
@@ -191,14 +181,14 @@ export default function Register() {
               marginTop={"10px"}
               marginBottom={"30px"}
             >
-              Start studying with flashcards today
+              Welcome back! Please enter your details.
             </Typography>
             
             <Button
               onClick={handleGoogleSignIn}
               fullWidth
             >
-              <img src={GoogleSignup} alt="Google Signup"/>
+              <img src={GoogleLogin} alt="Google Login"/>
             </Button>
 
             <Typography
@@ -207,9 +197,10 @@ export default function Register() {
               fontSize={"0.9em"}
               textAlign="left"
               marginTop={"40px"}
+              marginBottom={"20px"}
               alignSelf={"center"}
             >
-              or Sign up with Email
+              or Sign in with Email
             </Typography>
             <Box
               component="form"
@@ -221,32 +212,11 @@ export default function Register() {
                 <Alert
                   severity="error"
                   onClose={() => setErrorMsg("")}
-                  sx={{ marginBottom: "20px", mt: "10px" }}
+                  sx={{ marginBottom: "20px" }}
                 >
                   {errorMsg}
                 </Alert>
               )}
-              <Typography 
-                fontFamily="Inter"
-                fontWeight={400}
-                fontSize={"0.9em"}
-                textAlign="left"
-                marginTop={"20px"}
-                marginBottom={"4px"}
-              >
-                First Name
-              </Typography>
-              <TextField
-                required
-                fullWidth
-                id="fName"
-                label=""
-                name="fName"
-                autoComplete="fName"
-                autoFocus
-                inputRef={fNameRef}
-                disabled={loading}
-              />
               <Typography 
                 fontFamily="Inter"
                 fontWeight={400}
@@ -266,10 +236,9 @@ export default function Register() {
                 autoComplete="email"
                 autoFocus
                 inputRef={emailRef}
-                error={emailError}
-                disabled={loading}
-                helperText={emailError ? "Please use a valid email address" : ""}
+                helperText={emailError ? "We do not recognize this email. Please try again" : ""}
                 sx={{ borderColor: emailError ? "red" : "" }}
+                disabled={loading}
               />
               <Typography 
                 fontFamily="Inter"
@@ -290,19 +259,35 @@ export default function Register() {
                 id="password"
                 autoComplete="current-password"
                 inputRef={passwordRef}
-                error={passwordError}
-                disabled={loading}
-                helperText={passwordError ? "Must be at least 8 characters" : ""}
+                helperText={passwordError ? "Incorrect password" : ""}
                 sx={{ borderColor: passwordError ? "red" : "" }}
+                disabled={loading}
               />
+              <Grid container sx={{ marginTop: '10px' }}>
+                <Grid item xs>
+                  <FormControlLabel
+                    control={<Checkbox value={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} color="primary" />}
+                    label={<Typography
+                      fontFamily="Inter"
+                      fontWeight="500"
+                      fontSize="14px"
+                    > Remember me
+                    </Typography>}
+                />
+                </Grid>
+                <Grid item sx={{ marginTop: '10px' }}>
+                  <Link href="/passwordreset" variant="body2" sx={{ fontWeight: 'bold', color: '#3538CD', textDecoration: 'none' }}>
+                    Forgot password?
+                  </Link>
+                </Grid>
+              </Grid>
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                disabled={loading}
-                sx={{ height: 50, mt: 5, mb: 2, backgroundColor: '#3538CD', color: '#FFFFFF', borderRadius: '10px'}}
+                sx={{ mt: 3, mb: 2, backgroundColor: '#3538CD', color: '#FFFFFF', borderRadius: '10px'}}
               >
-                Get started
+                Sign In
               </Button>
             </Box>
               <Box sx={{ display: 'flex', alignSelf: 'center', marginTop: '20px', marginBottom: '4px' }}>
@@ -312,14 +297,14 @@ export default function Register() {
                   fontSize={"0.9em"}
                   textAlign="center"
                 >
-                  Already have an account?
+                  Dont have an account?
                 </Typography>
                 <Link 
-                  href="/login" 
+                  href="/register" 
                   variant="body2" 
                   sx={{ fontWeight: 'bold', color: '#3538CD', textDecoration: 'none', marginLeft: '4px' }}
                 >
-                  Log in
+                  Sign Up
                 </Link>
               </Box>
           </Box>

@@ -10,16 +10,16 @@ import { useLocation } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import SettingsIcon from "@mui/icons-material/Settings";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import AccountMenu from "../Buttons/AccountMenu";
-import WindowDimensions from "@/context/WindowDimensions";
-import CustomButton from "../Buttons/CustomButton";
+import AccountMenu from "./AccountMenu";
+import useWindowDimensions from '@/hooks/useWindowDimensions';
+import CustomButton from "../CustomButton";
 import NewDeckModal from "../NewDeck/Modal";
 import "./appbar.css";
 
 const CustomAppBar = ({ handleDrawerToggle, drawerWidth, modalOpen, setModalOpen }) => {
   const location = useLocation();
   const currentPage = location.pathname;
-  const { width } = WindowDimensions();
+  const { width } = useWindowDimensions();
   const [buttonText, setButtonText] = useState("New Deck");
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '../../supabase/supabaseClient'
+import PropTypes from 'prop-types'
+import { supabase } from '@/utils/supabase'
 
 export default function Avatar({ url, size, onUpload }) {
   const [avatarUrl, setAvatarUrl] = useState(null)
@@ -79,4 +80,10 @@ export default function Avatar({ url, size, onUpload }) {
       </div>
     </div>
   )
+}
+
+Avatar.propTypes = {
+  url: PropTypes.string.isRequired,
+  size: PropTypes.number.isRequired,
+  onUpload: PropTypes.func.isRequired,
 }
