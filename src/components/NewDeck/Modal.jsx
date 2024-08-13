@@ -23,6 +23,7 @@ const NewDeck = ({ open, handleClose }) => {
   const [cardTitle, setCardTitle] = useState("");
   const [noOfQuestions, setNoOfQuestions] = useState("");
   const [questionType, setQuestionType] = useState("");
+  const [categoryType, setCategoryType] = useState("");
   const [pdf, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const maxPDFSize = 30 * 1024 * 1024; // 30 MB in bytes
@@ -37,6 +38,10 @@ const NewDeck = ({ open, handleClose }) => {
 
   const handleQuestionTypeChange = (event) => {
     setQuestionType(event.target.value);
+  };
+
+  const handleCategoryTypeChange = (event) => {
+    setCategoryType(event.target.value);
   };
 
   const handlePDFChange = (event) => {
@@ -81,7 +86,7 @@ const NewDeck = ({ open, handleClose }) => {
 
   const handleGenerateFlashcards = async () => {
         
-    if (pdf && noOfQuestions && questionType && cardTitle) {
+    if (pdf && noOfQuestions && questionType && cardTitle && categoryType) {
       setLoading(true);
       await fetchLLMResponse(noOfQuestions, pdf, questionType);
       setLoading(false);
@@ -134,6 +139,7 @@ const NewDeck = ({ open, handleClose }) => {
           />
         </div>
       </div>
+      <div className="textfields-container">
       <FormControl fullWidth>
         <InputLabel id="typeOfQuestion">Type of Question</InputLabel>
         <Select
@@ -141,11 +147,25 @@ const NewDeck = ({ open, handleClose }) => {
           value={questionType}
           label="Type of Question"
           onChange={handleQuestionTypeChange}
-        >
+          >
           <MenuItem value="multiple-choice">Multiple Choice</MenuItem>
           <MenuItem value="short-answer">Short Answer</MenuItem>
         </Select>
       </FormControl>
+
+      <FormControl fullWidth>
+        <InputLabel id="typeOfCategory">Category</InputLabel>
+        <Select
+          id="typeOfCategory"
+          value={categoryType}
+          label="Type of Category"
+          onChange={handleCategoryTypeChange}
+          >
+          <MenuItem value="maths">Maths</MenuItem>
+          <MenuItem value="science">Science</MenuItem>
+        </Select>
+      </FormControl>
+      </div>
       <div
         className={`upload-container ${pdf ? "has-pdf" : ""}`}
         onClick={() => document.getElementById("pdf-upload").click()}
