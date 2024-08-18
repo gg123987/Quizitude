@@ -12,7 +12,7 @@ import { useLocation } from "react-router-dom";
 import logoWhite from "@/assets/Logo-white.svg";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
-import CustomAppBar from "./AppBar";
+import CustomAppBar from "@/components/Layout/Header/AppBar";
 import useWindowDimensions from '@/hooks/useWindowDimensions';
 import "./drawer.css";
 
@@ -149,6 +149,7 @@ function ResponsiveDrawer({ window, ...props }) {
     </Box>
   );
 }
+
 ResponsiveDrawer.propTypes = {
   window: PropTypes.func,
   children: PropTypes.node,

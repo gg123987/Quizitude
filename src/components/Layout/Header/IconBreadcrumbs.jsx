@@ -1,4 +1,3 @@
-import * as React from "react";
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import HomeIcon from "@mui/icons-material/Home";
@@ -9,8 +8,10 @@ function handleClick(event, navigate, path) {
   navigate(path); // Navigate to the specified path
 }
 
+import PropTypes from "prop-types";
+
 export default function IconBreadcrumbs({ parentPage = "", page = "" }) {
-  const navigate = useNavigate(); // Initialize navigate function
+  const navigate = useNavigate();
 
   parentPage = parentPage.replace("/", "");
   page = page.replace("/", "");
@@ -87,3 +88,8 @@ export default function IconBreadcrumbs({ parentPage = "", page = "" }) {
     </div>
   );
 }
+
+IconBreadcrumbs.propTypes = {
+  parentPage: PropTypes.string,
+  page: PropTypes.string,
+};

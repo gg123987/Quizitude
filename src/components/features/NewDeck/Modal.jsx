@@ -11,7 +11,7 @@ import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PropTypes from 'prop-types';
-import CircularWithValueLabel from "../CircularProgressSpinner";
+import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import fetchLLMResponse from "@/api/LLM";

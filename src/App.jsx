@@ -1,6 +1,6 @@
 import "./App.css";
 import { Route, Routes } from "react-router-dom";
-import AuthRoute from "./components/AuthRoute";
+import AuthRoute from "./components/common/AuthRoute";
 import HomePage from "./pages/Home/HomePage";
 import PasswordReset from "./pages/Auth/PasswordReset.jsx";
 import Register from "./pages/Auth/Register.jsx";

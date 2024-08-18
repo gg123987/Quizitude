@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import Alert from '@mui/material/Alert';
 import { useNavigate } from "react-router-dom";
-import useAuth from '../../hooks/useAuth';
+import useAuth from '@/hooks/useAuth';
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";

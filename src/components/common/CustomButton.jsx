@@ -1,6 +1,7 @@
-import React from "react";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
+
+import PropTypes from 'prop-types';
 
 const CustomButton = ({ children, icon, ...props }) => {
   return (
@@ -24,6 +25,12 @@ const CustomButton = ({ children, icon, ...props }) => {
       </Typography>
     </Button>
   );
+};
+
+CustomButton.propTypes = {
+  children: PropTypes.node.isRequired,
+  icon: PropTypes.node,
+  style: PropTypes.object,
 };
 
 export default CustomButton;

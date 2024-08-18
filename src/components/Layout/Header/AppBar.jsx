@@ -12,8 +12,8 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountMenu from "./AccountMenu";
 import useWindowDimensions from '@/hooks/useWindowDimensions';
-import CustomButton from "../CustomButton";
-import NewDeckModal from "../NewDeck/Modal";
+import CustomButton from "@/components/common/CustomButton";
+import NewDeckModal from "@/components/features/NewDeck/Modal";
 import "./appbar.css";
 
 const CustomAppBar = ({ handleDrawerToggle, drawerWidth, modalOpen, setModalOpen }) => {

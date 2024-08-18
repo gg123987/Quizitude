@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import FlashcardList from "../../components/Flashcard/FlashcardList";
+import FlashcardList from "@/components/features/Flashcard/FlashcardList";
 import "./studymode.css";
 import Button from "@mui/material/Button";
 import CloseIcon from "@mui/icons-material/Close";
-import FlashcardSlider from "../../components/Flashcard/FlashcardSlider";
+import FlashcardSlider from "@/components/features/Flashcard/FlashcardSlider";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { AppBar, IconButton, Toolbar } from "@mui/material";
@@ -13,7 +13,7 @@ import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
-import confetti from "../../assets/confetti.svg";
+import confetti from "@/assets/confetti.svg";
 
 const StudyMode = () => {
   const [cards, setCards] = useState(SAMPLE_CARDS_LONG); // Array of flashcards
@@ -524,7 +524,7 @@ const StudyMode = () => {
                       },
                     }}
                   >
-                    Don't know this
+                    Dont know this
                   </Button>
                 </>
               )}
@@ -548,49 +548,6 @@ const StudyMode = () => {
     </div>
   );
 };
-
-const SAMPLE_CARDS = [
-  {
-    id: 1,
-    question: "What is the capital of France?",
-    answer: "Paris",
-    options: [],
-    score: undefined,
-    answered: undefined,
-  },
-  {
-    id: 2,
-    question: "What is the capital of Spain?",
-    answer: "Madrid",
-    options: ["Paris", "London", "Berlin", "Madrid"],
-    score: undefined,
-    answered: undefined,
-  },
-  {
-    id: 3,
-    question: "What is the capital of Italy?",
-    answer: "Rome",
-    options: ["Paris", "Rome", "Berlin", "Madrid"],
-    score: undefined,
-    answered: undefined,
-  },
-  {
-    id: 4,
-    question: "What is the capital of Germany?",
-    answer: "Berlin",
-    options: ["Paris", "London", "Berlin", "Madrid"],
-    score: undefined,
-    answered: undefined,
-  },
-  {
-    id: 5,
-    question: "What is the capital of the United Kingdom?",
-    answer: "London",
-    options: ["Paris", "London", "Berlin", "Madrid"],
-    score: undefined,
-    answered: undefined,
-  },
-];
 
 const SAMPLE_CARDS_LONG = [
   {

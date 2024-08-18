@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import useAuth from '@/hooks/useAuth'
 import { supabase } from '@/utils/supabase'
-import Avatar from '@/components/Profile/Avatar'
+import Avatar from '@/components/features/Profile/Avatar'
 import PropTypes from 'prop-types';
 
 export default function Account({ session }) {

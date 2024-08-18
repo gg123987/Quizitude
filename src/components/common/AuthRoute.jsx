@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import useAuth from "@/hooks/useAuth";
-import ResponsiveDrawer from "./Navigation/Drawer";
+import ResponsiveDrawer from "@/components/Layout/Sidebar/Drawer";
 
 const AuthRoute = () => {
   const { auth } = useAuth();
