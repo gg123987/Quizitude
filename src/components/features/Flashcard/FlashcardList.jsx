@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from 'prop-types';
 import Flashcard from "./Flashcard";
 
 const FlashcardList = ({ flashcards, flipped=false }) => {
@@ -15,6 +15,11 @@ const FlashcardList = ({ flashcards, flipped=false }) => {
       })}
     </div>
   );
+};
+
+FlashcardList.propTypes = {
+  flashcards: PropTypes.array.isRequired,
+  flipped: PropTypes.bool
 };
 
 export default FlashcardList;

@@ -1,9 +1,9 @@
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
-const CustomButton = ({ children, icon, ...props }) => {
+const CustomButton = ({ children, icon, fontSize = "0.9rem", ...props }) => {
   return (
     <Button
       {...props}
@@ -16,11 +16,21 @@ const CustomButton = ({ children, icon, ...props }) => {
         display: "flex", // Ensure flexbox behavior
         alignItems: "center", // Align content vertically
         justifyContent: "center", // Center content horizontally
-        ...props.style // Allow additional custom styles
+        ...props.style, // Allow additional custom styles
       }}
     >
       {icon && <span style={{ marginRight: "5px" }}>{icon}</span>}
-      <Typography variant="button" sx={{ mr: children ? '5px' : '-3px', fontFamily: "Inter", fontSize: "0.9rem", textTransform: 'none' }}>
+      <Typography
+        variant="button"
+        sx={{
+          mr: children ? "5px" : "-3px",
+          fontFamily: "Inter",
+          fontSize,
+          textAlign: 'center',
+          textTransform: "none",
+          margin: 0,
+        }}
+      >
         {children} {/* Button label */}
       </Typography>
     </Button>
@@ -30,6 +40,7 @@ const CustomButton = ({ children, icon, ...props }) => {
 CustomButton.propTypes = {
   children: PropTypes.node.isRequired,
   icon: PropTypes.node,
+  fontSize: PropTypes.string,
   style: PropTypes.object,
 };
 

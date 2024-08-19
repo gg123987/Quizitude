@@ -7,27 +7,27 @@ import Drawer from "@mui/material/Drawer";
 import HomeIcon from "@mui/icons-material/HomeOutlined";
 import LayersIcon from "@mui/icons-material/LayersOutlined";
 import FolderIcon from "@mui/icons-material/FolderOpenOutlined";
-import Toolbar from "@mui/material/Toolbar";
 import { useLocation } from "react-router-dom";
 import logoWhite from "@/assets/Logo-white.svg";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
 import CustomAppBar from "@/components/Layout/Header/AppBar";
-import useWindowDimensions from '@/hooks/useWindowDimensions';
+import useWindowDimensions from "@/hooks/useWindowDimensions";
+import useModal from "@/hooks/useModal";
 import "./drawer.css";
-
 
 function ResponsiveDrawer({ window, ...props }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [drawerWidth, setDrawerWidth] = useState(230);
-  const [modalOpen, setModalOpen] = useState(false);
 
   const location = useLocation();
   const currentPage = location.pathname;
   const { width } = useWindowDimensions();
+  const { modalOpen } = useModal();
 
-  const container = window !== undefined ? () => window().document.body : undefined;
+  const container =
+    window !== undefined ? () => window().document.body : undefined;
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -76,21 +76,46 @@ function ResponsiveDrawer({ window, ...props }) {
   const drawer = (
     <div className="sideBar">
       <Box sx={{ display: "flex", padding: "30px 20px" }}>
-        <img src={logoWhite} alt="Quizitude Logo" style={{ width: "30px", height: "30px" }} />
+        <img
+          src={logoWhite}
+          alt="Quizitude Logo"
+          style={{ width: "30px", height: "30px" }}
+        />
       </Box>
       <ul className="sideBar-tabs">
-        <li className={currentPage === "/" ? "active" : ""} onClick={() => handleClick("home")}>
-          <Button sx={{ borderRadius: 1 }} variant="contained" startIcon={<HomeIcon />}>
+        <li
+          className={currentPage === "/" ? "active" : ""}
+          onClick={() => handleClick("home")}
+        >
+          <Button
+            sx={{ borderRadius: 1 }}
+            variant="contained"
+            startIcon={<HomeIcon />}
+          >
             Home
           </Button>
         </li>
-        <li className={currentPage === "/decks" ? "active" : ""} onClick={() => handleClick("decks")}>
-          <Button sx={{ borderRadius: 1 }} variant="contained" startIcon={<LayersIcon />}>
+        <li
+          className={currentPage === "/decks" ? "active" : ""}
+          onClick={() => handleClick("decks")}
+        >
+          <Button
+            sx={{ borderRadius: 1 }}
+            variant="contained"
+            startIcon={<LayersIcon />}
+          >
             All Decks
           </Button>
         </li>
-        <li className={currentPage === "/categories" ? "active" : ""} onClick={() => handleClick("categories")}>
-          <Button sx={{ borderRadius: 1 }} variant="contained" startIcon={<FolderIcon />}>
+        <li
+          className={currentPage === "/categories" ? "active" : ""}
+          onClick={() => handleClick("categories")}
+        >
+          <Button
+            sx={{ borderRadius: 1 }}
+            variant="contained"
+            startIcon={<FolderIcon />}
+          >
             Categories
           </Button>
         </li>
@@ -99,7 +124,7 @@ function ResponsiveDrawer({ window, ...props }) {
   );
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", height: "100vh" }}>
       <CssBaseline />
       {!modalOpen && (
         <>
@@ -111,7 +136,7 @@ function ResponsiveDrawer({ window, ...props }) {
             onClose={handleDrawerClose}
             ModalProps={{ keepMounted: true }}
             sx={{
-              display: { xs: "block", sm: "none" },
+              display: { xs: "block", sm: "block", md: "none" },
               "& .MuiDrawer-paper": {
                 boxSizing: "border-box",
                 width: drawerWidth,
@@ -125,7 +150,7 @@ function ResponsiveDrawer({ window, ...props }) {
           <Drawer
             variant="permanent"
             sx={{
-              display: { xs: "none", sm: "block" },
+              display: { xs: "none", sm: "none", md: "block" },
               "& .MuiDrawer-paper": {
                 boxSizing: "border-box",
                 width: drawerWidth,
@@ -139,10 +164,28 @@ function ResponsiveDrawer({ window, ...props }) {
           </Drawer>
         </>
       )}
-      <CustomAppBar handleDrawerToggle={handleDrawerToggle} drawerWidth={drawerWidth} modalOpen={modalOpen} setModalOpen={setModalOpen} />
-      <Box component="main" sx={{ flexGrow: 1, width: { sm: `calc(${width}px - ${drawerWidth}px)` } }}>
-        <Toolbar />
-        <Box sx={{ marginLeft: { sm: `${drawerWidth}px` } }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          width: "100%",
+        }}
+      >
+        <Box sx={{ display: "flex", flexDirection: "row" }}>
+          <CustomAppBar
+            handleDrawerToggle={handleDrawerToggle}
+            drawerWidth={drawerWidth}
+          />
+        </Box>
+        <Box
+          sx={{
+            marginLeft: { sm: `${drawerWidth}px` },
+            marginTop: '64px',
+            flexDirection: "row",
+            flex: 1,
+          }}
+        >
           {props.children}
         </Box>
       </Box>

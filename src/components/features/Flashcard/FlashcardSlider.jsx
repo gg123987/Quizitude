@@ -1,6 +1,6 @@
-import React from 'react';
+import PropTypes from 'prop-types';
 import Flashcard from './Flashcard';
-import './flashcardslider.css';
+import './flashcard.css';
 
 const FlashcardSlider = ({ flashcards, reviewedCards, currentCardIndex, onCardClick }) => {
     return (
@@ -24,6 +24,13 @@ const FlashcardSlider = ({ flashcards, reviewedCards, currentCardIndex, onCardCl
             })}
         </div>
     );
+};
+
+FlashcardSlider.propTypes = {
+    flashcards: PropTypes.array.isRequired,
+    reviewedCards: PropTypes.array.isRequired,
+    currentCardIndex: PropTypes.number.isRequired,
+    onCardClick: PropTypes.func.isRequired,
 };
 
 export default FlashcardSlider;

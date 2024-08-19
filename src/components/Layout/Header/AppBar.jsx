@@ -1,4 +1,3 @@
-// CustomAppBar.js
 import { useState, useEffect } from "react";
 import PropTypes from 'prop-types';
 import AppBar from "@mui/material/AppBar";
@@ -14,24 +13,23 @@ import AccountMenu from "./AccountMenu";
 import useWindowDimensions from '@/hooks/useWindowDimensions';
 import CustomButton from "@/components/common/CustomButton";
 import NewDeckModal from "@/components/features/NewDeck/Modal";
+import useModal from "@/hooks/useModal";
 import "./appbar.css";
 
-const CustomAppBar = ({ handleDrawerToggle, drawerWidth, modalOpen, setModalOpen }) => {
+const CustomAppBar = ({ handleDrawerToggle, drawerWidth }) => {
   const location = useLocation();
   const currentPage = location.pathname;
   const { width } = useWindowDimensions();
   const [buttonText, setButtonText] = useState("New Deck");
+  const { modalOpen, openModal, closeModal } = useModal();
 
   useEffect(() => {
-    if (width < 900) {
+    if (width < 1000) {
       setButtonText("");
     } else {
       setButtonText("New Deck");
     }
   }, [width]);
-
-  const handleOpen = () => setModalOpen(true);
-  const handleClose = () => setModalOpen(false);
 
   return (
     <AppBar
@@ -39,9 +37,10 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth, modalOpen, setModalOpen
       sx={{
         width: { sm: `calc(${width}px - ${drawerWidth}px)` },
         ml: { sm: `${drawerWidth}px` },
-        backgroundColor: "transparent",
+        backgroundColor: "#F9FAFB",
         boxShadow: "none",
-        borderBottom: "none",
+        borderBottom: 2,
+        borderBottomColor: "rgba(0, 0, 0, 0.03)",
       }}
     >
       <div style={{ display: "flex", alignItems: "center" }}>
@@ -51,7 +50,7 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth, modalOpen, setModalOpen
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 0, display: { sm: "none" }, color: "grey" }}
+            sx={{ mr: 0, display: { md: "none" }, color: "grey" }}
           >
             <MenuIcon />
           </IconButton>
@@ -70,7 +69,7 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth, modalOpen, setModalOpen
             spaceBetween: "3px",
           }}
         >
-          <CustomButton onClick={handleOpen} icon={<AddIcon />}>
+          <CustomButton onClick={openModal} icon={<AddIcon />}>
             {buttonText}
           </CustomButton>
           <IconButton
@@ -98,7 +97,7 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth, modalOpen, setModalOpen
             <AccountMenu />
           </IconButton>
         </Toolbar>
-        <NewDeckModal open={modalOpen} handleClose={handleClose} />
+        <NewDeckModal open={modalOpen} handleClose={closeModal} />
       </div>
     </AppBar>
   );
@@ -107,8 +106,6 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth, modalOpen, setModalOpen
 CustomAppBar.propTypes = {
   handleDrawerToggle: PropTypes.func.isRequired,
   drawerWidth: PropTypes.number.isRequired,
-  modalOpen: PropTypes.bool.isRequired,
-  setModalOpen: PropTypes.func.isRequired,
 };
 
 export default CustomAppBar;

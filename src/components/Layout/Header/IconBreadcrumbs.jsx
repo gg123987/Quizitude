@@ -1,7 +1,9 @@
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import HomeIcon from "@mui/icons-material/Home";
+import HomeIcon from "@/assets/home.svg";
 import { useNavigate } from "react-router-dom";
+import Box from "@mui/material/Box";
+import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 
 function handleClick(event, navigate, path) {
   event.preventDefault();
@@ -19,7 +21,7 @@ export default function IconBreadcrumbs({ parentPage = "", page = "" }) {
   return (
     <div role="presentation">
       {parentPage === "" ? (
-        <Breadcrumbs separator=">" aria-label="breadcrumb">
+        <Breadcrumbs separator={<ChevronRightOutlinedIcon fontSize="small" color="disabled" />} aria-label="breadcrumb">
           <span
             onClick={(event) => handleClick(event, navigate, "/")}
             style={{
@@ -30,7 +32,9 @@ export default function IconBreadcrumbs({ parentPage = "", page = "" }) {
               cursor: "pointer",
             }}
           >
-            <HomeIcon sx={{ mr: 0.5, ml: 4 }} fontSize="small" />
+            <Box sx={{ mr: 0.5, ml: 4, }} >
+              <img src={HomeIcon} alt="home" className="home" width={"15px"} />
+            </Box>
           </span>
           <Typography
             sx={{ display: "flex", alignItems: "center" }}
@@ -57,7 +61,9 @@ export default function IconBreadcrumbs({ parentPage = "", page = "" }) {
               cursor: "pointer",
             }}
           >
-            <HomeIcon sx={{ mr: 0.5, ml: 4 }} fontSize="small" />
+            <Box sx={{ mr: 0.5, ml: 4, }} >
+              <img src={HomeIcon} alt="home" className="home" width={"15px"} />
+            </Box>
           </span>
           <span
             onClick={(event) => handleClick(event, navigate, `/${parentPage}`)}
