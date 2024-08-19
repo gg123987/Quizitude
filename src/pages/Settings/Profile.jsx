@@ -70,7 +70,7 @@ export default function Account({ session }) {
   }
 
   return (
-    <div className="settings-navbar">
+    <div className="profile-container">
 
     <form onSubmit={updateProfile} className="form-widget">
       <Avatar
@@ -80,26 +80,30 @@ export default function Account({ session }) {
           setAvatarUrl(filePath); // Set the avatar URL when upload is complete
         }}
         />
-      <div>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          value={user.email || ''}
-          onChange={(e) => setEmail(e.target.value)}
-          />
-      </div>
-      <div>
-        <label htmlFor="full_name">Full Name</label>
-        <input
-          id="full_name"
-          type="text"
-          required
-          value={user.user_metadata.full_name || ''}
-          onChange={(e) => setFullName(e.target.value)}
-          />
-      </div>
-      <div>
+        <div className="form-fields">
+          <div>
+            {/* <label htmlFor="email">Email</label> */}
+            <input
+              id="email"
+              type="email"
+              value={user.email || ''}
+              onChange={(e) => setEmail(e.target.value)}
+              readOnly
+              />
+          </div>
+          <div>
+            {/* <label htmlFor="full_name">Full Name</label> */}
+            <input
+              id="full_name"
+              type="text"
+              required
+              value={user.user_metadata.full_name || ''}
+              onChange={(e) => setFullName(e.target.value)}
+              readOnly
+              />
+          </div>
+        </div>
+      <div className='upload-button-container'>
         <button className="button block primary" type="submit" disabled={loading}>
           {loading ? 'Loading ...' : 'Update'}
         </button>
