@@ -3,6 +3,7 @@ import useAuth from '@/hooks/useAuth'
 import { supabase } from '@/utils/supabase'
 import Avatar from '@/components/features/Profile/Avatar'
 import PropTypes from 'prop-types';
+import './profile.css'
 
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true)
@@ -69,13 +70,13 @@ export default function Account({ session }) {
 
   return (
     <form onSubmit={updateProfile} className="form-widget">
-        <Avatar
+      <Avatar
         url={avatar_url}
         size={150}
-        onUpload={(event, url) => {
-            updateProfile(event, url)
+        onUpload={(filePath) => {
+        setAvatarUrl(filePath); // Set the avatar URL when upload is complete
         }}
-        />
+      />
       <div>
         <label htmlFor="email">Email</label>
         <input
