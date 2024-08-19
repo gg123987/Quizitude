@@ -4,7 +4,7 @@ import { supabase } from '@/utils/supabase';
 import './avatar.css'
 
 export default function Avatar({ url, size, onUpload }) {
-  const [avatarUrl, setAvatarUrl] = useState(null);
+  const [avatarUrl, setAvatarUrl] = useState(url);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {

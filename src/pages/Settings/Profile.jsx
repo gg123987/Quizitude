@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import useAuth from '@/hooks/useAuth'
 import { supabase } from '@/utils/supabase'
-import Avatar from '@/components/features/Profile/Avatar'
+import Avatar from '@/components/features/Profile/Avatar/Avatar'
 import PropTypes from 'prop-types';
 import './profile.css'
+import SettingsNavbar from '@/components/features/Profile/SettingsNavbar/SettingsNavbar'
 
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true)
@@ -69,14 +70,16 @@ export default function Account({ session }) {
   }
 
   return (
+    <div className="settings-navbar">
+
     <form onSubmit={updateProfile} className="form-widget">
       <Avatar
         url={avatar_url}
         size={150}
         onUpload={(filePath) => {
-        setAvatarUrl(filePath); // Set the avatar URL when upload is complete
+          setAvatarUrl(filePath); // Set the avatar URL when upload is complete
         }}
-      />
+        />
       <div>
         <label htmlFor="email">Email</label>
         <input
@@ -84,7 +87,7 @@ export default function Account({ session }) {
           type="email"
           value={user.email || ''}
           onChange={(e) => setEmail(e.target.value)}
-        />
+          />
       </div>
       <div>
         <label htmlFor="full_name">Full Name</label>
@@ -94,7 +97,7 @@ export default function Account({ session }) {
           required
           value={user.user_metadata.full_name || ''}
           onChange={(e) => setFullName(e.target.value)}
-        />
+          />
       </div>
       <div>
         <button className="button block primary" type="submit" disabled={loading}>
@@ -102,6 +105,8 @@ export default function Account({ session }) {
         </button>
       </div>
     </form>
+    <SettingsNavbar />
+  </div>
   )
 }
 
