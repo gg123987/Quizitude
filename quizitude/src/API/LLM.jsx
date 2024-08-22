@@ -10,7 +10,8 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
   
   const text = await getPdfText(pdf);
 
-  const groq = new Groq({ apiKey: "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" ,dangerouslyAllowBrowser: true});
+  //const groq = new Groq({ apiKey: "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" ,dangerouslyAllowBrowser: true});
+  const groq = new Groq({ apiKey: "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" ,dangerouslyAllowBrowser: true});
 
   //This code is to control the message that is sent to the LLM model based on the type of question
   let messages;
@@ -37,7 +38,7 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
     ]
   }
   
-  // THIS USES THE OPENROUTER API
+  // THIS USES THE OPENROUTER API`
   /*
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -107,7 +108,6 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
     }
 
     let thisResponse = JSON.parse(response.choices[0].message.content);
-
     if (typeOfQuestion === "multiple-choice") {
       // Modify each question in the response array
       thisResponse.forEach(question => {
