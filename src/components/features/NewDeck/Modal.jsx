@@ -13,7 +13,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-// import fetchLLMResponse from "@/api/LLM";
+import fetchLLMResponse from "@/api/LLM";
 import useModal from "@/hooks/useModal";
 import useAuth from "@/hooks/useAuth";
 import Fade from "@mui/material/Fade";
@@ -143,24 +143,18 @@ const NewDeck = () => {
     }
   };
 
-  /*
+  
   const handleGenerateFlashcards = async () => {
-    if (file && noOfQuestions && questionType && deckName && categoryType) {
-      setLoading(true);
+    if (file && noOfQuestions && questionType && deckName && categoryId) {
+      setUploading(true);
 
-      // Insert dummy data for testing
-      const deckData = { name: "New Deck", user_id: 1 };
-      const fileData = { name: "example.pdf", path: "path/to/example.pdf" };
-      createDeckWithDummyData(deckData, fileData);
-
-      //await fetchLLMResponse(noOfQuestions, pdf, questionType);
-      setLoading(false);
+      await fetchLLMResponse(noOfQuestions, file, questionType);
+      setUploading(false);
       setCurrentPage(1);
     } else {
       alert("Please enter all the required details to generate flashcards.");
     }
   };
-  */
 
   const handleNextFlashcard = () => {
     if (currentFlashcard < noOfQuestions) {
@@ -313,7 +307,7 @@ const NewDeck = () => {
             color: "white",
             minHeight: "40px",
           }}
-          onClick={handleUpload}
+          onClick={handleGenerateFlashcards}
           disabled={uploading}
         >
           {!uploading && "Generate Flashcards"}
@@ -370,6 +364,8 @@ const NewDeck = () => {
           width: "60%",
           marginTop: "20px",
         }}
+        onClick={handleUpload}
+        disabled={uploading}
       >
         Save Flashcards
       </Button>
