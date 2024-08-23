@@ -33,6 +33,8 @@ const NewDeck = () => {
   const { modalOpen, closeModal } = useModal();
   const [currentPage, setCurrentPage] = useState(0);
   const [currentFlashcard, setCurrentFlashcard] = useState(1);
+  const [questionList, setQuestionList] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState(''); 
   const [noOfQuestions, setNoOfQuestions] = useState("");
   const [questionType, setQuestionType] = useState("");
   const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
@@ -145,26 +147,78 @@ const NewDeck = () => {
 
   
   const handleGenerateFlashcards = async () => {
+    try {
+      let response;
     if (file && noOfQuestions && questionType && deckName && categoryId) {
       setUploading(true);
 
-      await fetchLLMResponse(noOfQuestions, file, questionType);
+      let thisResponse = await fetchLLMResponse(noOfQuestions, file, questionType);
+      setQuestionList(thisResponse);
+      setCurrentQuestion(thisResponse[0]);
+      setCurrentPage(1);
+      
       setUploading(false);
       setCurrentPage(1);
     } else {
       alert("Please enter all the required details to generate flashcards.");
     }
+    } catch (error) {
+      console.error("Error during upload:", error);
+      setUploading(false);
+    }
   };
+
+  const updateCurrentQuestionForward = () => {
+
+    // Fetch the updated values from the DOM
+    const updatedQuestion = document.getElementById('reviewTextFieldQuestion').value;
+    const updatedAnswer = document.getElementById('reviewTextFieldAnswer').value;
+
+    // Update the currentQuestion state with the updated values
+    setCurrentQuestion({ question: updatedQuestion, answer: updatedAnswer });
+    //console.log(currentQuestion.question);
+
+    // Update questionsList with the amended question
+    const updatedQuestionList = [...questionList];
+    updatedQuestionList[currentFlashcard - 1] = currentQuestion;
+    setQuestionList(updatedQuestionList);
+
+    // Move to the next question
+    //(using -1 + 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
+    setCurrentQuestion(questionList[currentFlashcard-1+1]);
+  };
+
+  const updateCurrentQuestionBackward = () => {
+
+    // Fetch the updated values from the DOM
+    const updatedQuestion = document.getElementById('reviewTextFieldQuestion').value;
+    const updatedAnswer = document.getElementById('reviewTextFieldAnswer').value;
+
+    // Update the currentQuestion state with the updated values
+    setCurrentQuestion({ question: updatedQuestion, answer: updatedAnswer });
+
+    // Update questionsList with the amended question
+    const updatedQuestionList = [...questionList];
+    updatedQuestionList[currentFlashcard - 1] = currentQuestion;
+    setQuestionList(updatedQuestionList);
+
+    // Move to the previous question
+    //(using -1 - 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
+    setCurrentQuestion(questionList[currentFlashcard-1-1]);
+  }
 
   const handleNextFlashcard = () => {
     if (currentFlashcard < noOfQuestions) {
       setCurrentFlashcard(currentFlashcard + 1);
+      updateCurrentQuestionForward();
     }
   };
 
   const handlePreviousFlashcard = () => {
     if (currentFlashcard > 1) {
       setCurrentFlashcard(currentFlashcard - 1);
+      updateCurrentQuestionBackward();
+      //console.log(document.getElementById('reviewTextFieldQuestion').value);
     }
   };
 
@@ -264,6 +318,8 @@ const NewDeck = () => {
           </Select>
         </FormControl>
       </div>
+
+
       <div
         className={`upload-container ${file ? "has-pdf" : ""}`}
         onClick={() => document.getElementById("pdf-upload").click()}
@@ -311,7 +367,7 @@ const NewDeck = () => {
           disabled={uploading}
         >
           {!uploading && "Generate Flashcards"}
-          {uploading && <CircularWithValueLabel />}
+          {uploading && <CircularWithValueLabel interval = {400} />}
         </Button>
       </div>
     </div>,
@@ -331,6 +387,8 @@ const NewDeck = () => {
               fullWidth
               className="reviewTextField"
               style={{ backgroundColor: "white" }}
+              value={currentQuestion.question}
+              onChange={(e) => setCurrentQuestion({ ...currentQuestion, question: e.target.value })}
             />
             <p className="bottom">This will appear on the front of the card</p>
           </div>
@@ -343,6 +401,8 @@ const NewDeck = () => {
               fullWidth
               className="reviewTextField"
               style={{ backgroundColor: "white" }}
+              value={currentQuestion.answer}
+              onChange={(e) => setCurrentQuestion({ ...currentQuestion, answer: e.target.value })}
             />
             <p className="bottom">This will appear on the back of the card</p>
           </div>
