@@ -34,7 +34,7 @@ const NewDeck = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [currentFlashcard, setCurrentFlashcard] = useState(1);
   const [questionList, setQuestionList] = useState([]);
-  const [currentQuestion, setCurrentQuestion] = useState(''); 
+  const [currentQuestion, setCurrentQuestion] = useState("");
   const [noOfQuestions, setNoOfQuestions] = useState("");
   const [questionType, setQuestionType] = useState("");
   const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
@@ -145,23 +145,26 @@ const NewDeck = () => {
     }
   };
 
-  
   const handleGenerateFlashcards = async () => {
     try {
       let response;
-    if (file && noOfQuestions && questionType && deckName && categoryId) {
-      setUploading(true);
+      if (file && noOfQuestions && questionType && deckName && categoryId) {
+        setUploading(true);
 
-      let thisResponse = await fetchLLMResponse(noOfQuestions, file, questionType);
-      setQuestionList(thisResponse);
-      setCurrentQuestion(thisResponse[0]);
-      setCurrentPage(1);
-      
-      setUploading(false);
-      setCurrentPage(1);
-    } else {
-      alert("Please enter all the required details to generate flashcards.");
-    }
+        let thisResponse = await fetchLLMResponse(
+          noOfQuestions,
+          file,
+          questionType
+        );
+        setQuestionList(thisResponse);
+        setCurrentQuestion(thisResponse[0]);
+        setCurrentPage(1);
+
+        setUploading(false);
+        setCurrentPage(1);
+      } else {
+        alert("Please enter all the required details to generate flashcards.");
+      }
     } catch (error) {
       console.error("Error during upload:", error);
       setUploading(false);
@@ -169,10 +172,13 @@ const NewDeck = () => {
   };
 
   const updateCurrentQuestionForward = () => {
-
     // Fetch the updated values from the DOM
-    const updatedQuestion = document.getElementById('reviewTextFieldQuestion').value;
-    const updatedAnswer = document.getElementById('reviewTextFieldAnswer').value;
+    const updatedQuestion = document.getElementById(
+      "reviewTextFieldQuestion"
+    ).value;
+    const updatedAnswer = document.getElementById(
+      "reviewTextFieldAnswer"
+    ).value;
 
     // Update the currentQuestion state with the updated values
     setCurrentQuestion({ question: updatedQuestion, answer: updatedAnswer });
@@ -185,14 +191,17 @@ const NewDeck = () => {
 
     // Move to the next question
     //(using -1 + 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
-    setCurrentQuestion(questionList[currentFlashcard-1+1]);
+    setCurrentQuestion(questionList[currentFlashcard - 1 + 1]);
   };
 
   const updateCurrentQuestionBackward = () => {
-
     // Fetch the updated values from the DOM
-    const updatedQuestion = document.getElementById('reviewTextFieldQuestion').value;
-    const updatedAnswer = document.getElementById('reviewTextFieldAnswer').value;
+    const updatedQuestion = document.getElementById(
+      "reviewTextFieldQuestion"
+    ).value;
+    const updatedAnswer = document.getElementById(
+      "reviewTextFieldAnswer"
+    ).value;
 
     // Update the currentQuestion state with the updated values
     setCurrentQuestion({ question: updatedQuestion, answer: updatedAnswer });
@@ -204,8 +213,8 @@ const NewDeck = () => {
 
     // Move to the previous question
     //(using -1 - 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
-    setCurrentQuestion(questionList[currentFlashcard-1-1]);
-  }
+    setCurrentQuestion(questionList[currentFlashcard - 1 - 1]);
+  };
 
   const handleNextFlashcard = () => {
     if (currentFlashcard < noOfQuestions) {
@@ -319,7 +328,6 @@ const NewDeck = () => {
         </FormControl>
       </div>
 
-
       <div
         className={`upload-container ${file ? "has-pdf" : ""}`}
         onClick={() => document.getElementById("pdf-upload").click()}
@@ -367,7 +375,7 @@ const NewDeck = () => {
           disabled={uploading}
         >
           {!uploading && "Generate Flashcards"}
-          {uploading && <CircularWithValueLabel interval = {400} />}
+          {uploading && <CircularWithValueLabel interval={400} />}
         </Button>
       </div>
     </div>,
@@ -380,30 +388,44 @@ const NewDeck = () => {
         <div className="textfields-container">
           <div className="textfield-wrapper1">
             <p className="top">Question</p>
-            <TextField
-              id="reviewTextField1"
-              multiline
-              rows={12}
-              fullWidth
-              className="reviewTextField"
-              style={{ backgroundColor: "white" }}
-              value={currentQuestion.question}
-              onChange={(e) => setCurrentQuestion({ ...currentQuestion, question: e.target.value })}
-            />
+            <div className="question-container">
+              <TextField
+                id="reviewTextFieldQuestion"
+                multiline
+                rows={8}
+                fullWidth
+                className="reviewTextField"
+                style={{ backgroundColor: "white" }}
+                value={currentQuestion.question}
+                onChange={(e) =>
+                  setCurrentQuestion({
+                    ...currentQuestion,
+                    question: e.target.value,
+                  })
+                }
+              />
+            </div>
             <p className="bottom">This will appear on the front of the card</p>
           </div>
           <div className="textfield-wrapper2">
             <p className="top">Answer</p>
-            <TextField
-              id="reviewTextField2"
-              multiline
-              rows={12}
-              fullWidth
-              className="reviewTextField"
-              style={{ backgroundColor: "white" }}
-              value={currentQuestion.answer}
-              onChange={(e) => setCurrentQuestion({ ...currentQuestion, answer: e.target.value })}
-            />
+            <div className="answer-container">
+              <TextField
+                id="reviewTextFieldAnswer"
+                multiline
+                rows={8}
+                fullWidth
+                className="reviewTextField"
+                style={{ backgroundColor: "white" }}
+                value={currentQuestion.answer}
+                onChange={(e) =>
+                  setCurrentQuestion({
+                    ...currentQuestion,
+                    answer: e.target.value,
+                  })
+                }
+              />
+            </div>
             <p className="bottom">This will appear on the back of the card</p>
           </div>
         </div>
