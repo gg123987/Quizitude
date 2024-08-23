@@ -23,6 +23,10 @@
   justify-content: center;
 }
 
+.category:hover {
+  opacity: 0.6;
+}
+
 .name {
   display: flex;
   flex-direction: row;

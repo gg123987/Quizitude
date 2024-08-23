@@ -10,8 +10,17 @@ const Deck = ({ deck }) => {
   const categoryId = categories.id;
   const navigate = useNavigate();
 
+  const handleClickDeck = () => {
+    navigate(`/decks/${deck.id}`);
+  }
+
+  const handleClickCategory = (e) => {
+    e.stopPropagation();
+    navigate(`/categories/${categoryId}`);
+  }
+
   return (
-    <div className="deck-card" onClick={() => navigate(`/decks/${deck.id}`)}>
+    <div className="deck-card" onClick={handleClickDeck}>
       <div className="category">
         <CustomButton
           variant="contained"
@@ -25,7 +34,7 @@ const Deck = ({ deck }) => {
             marginBottom: "0px",
             padding: "2px 10px",
           }}
-          onClick={() => navigate(`/categories/${categoryId}`)}
+          onClick={handleClickCategory}
         >
           {categoryName}
         </CustomButton>
