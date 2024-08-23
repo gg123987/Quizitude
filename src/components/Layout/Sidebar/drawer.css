@@ -1,0 +1,56 @@
+.mainContentWrapper {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+
+.sideBar {
+    min-width: 180px;
+    width: 15%;
+    max-width: 230px;
+    position: fixed; 
+    top: 0; 
+    bottom: 0; 
+    left: 0; 
+    background-color: #303484; 
+    padding: 10px; 
+    color: white; 
+    text-align: left;
+    z-index: 5;
+  }
+  
+  .sideBar-tabs {
+    list-style: none; /* remove bullet points */
+    padding: 0; 
+  }
+  
+  .sideBar-tabs li {
+    margin-bottom: 20px; /* Adjust the space between the items */
+}
+
+.sideBar-tabs li .MuiButton-root {
+    width: 100%;
+    border-radius: 10px; 
+    font-size: 14px;
+    background-color: #303484; 
+    display: flex;
+    justify-content: flex-start; /* align the icon and text to the left */
+    text-transform: none; /* remove uppercase */
+    font-family: 'Inter';
+    font-weight: 500;
+    color: white;
+  }
+  
+  /* Change the background, text, and border colour when tab is active */
+  .sideBar-tabs li.active .MuiButton-root {
+    border-color: white; 
+    background-color: white;
+    color: #303484; 
+  }
+  
+  .sideBar img {
+    margin-bottom: 32px;
+  }

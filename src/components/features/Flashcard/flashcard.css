@@ -1,0 +1,15 @@
+.badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.flashcard-slider {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 10px 30px; /* Adjust padding as needed */
+    border-radius: 5px;
+    max-width: 100%;
+}
