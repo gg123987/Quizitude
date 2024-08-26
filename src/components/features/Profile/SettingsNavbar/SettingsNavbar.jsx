@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import './settingsNavbar.css';
 
-function SettingsNavbar() {
-  const [activeTab, setActiveTab] = useState('streak');
-
+function SettingsNavbar({ activeTab, setActiveTab}) {
   return (
     <nav className="settings-navbar">
       <ul className="settings-navbar-tabs">

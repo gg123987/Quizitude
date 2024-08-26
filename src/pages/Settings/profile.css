@@ -21,7 +21,18 @@
 
 .form-fields {
   flex: 1;
-  margin-right: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-field p {
+  margin: 0; 
 }
 
 .upload-button-container {

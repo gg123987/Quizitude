@@ -5,6 +5,7 @@ import Avatar from '@/components/features/Profile/Avatar/Avatar'
 import PropTypes from 'prop-types';
 import './profile.css'
 import SettingsNavbar from '@/components/features/Profile/SettingsNavbar/SettingsNavbar'
+import GeneralSettings from '@/components/features/Profile/GeneralSettings/GeneralSettings';
 
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true)
@@ -12,6 +13,7 @@ export default function Account({ session }) {
   const [email, setEmail] = useState(null)
   const [avatar_url, setAvatarUrl] = useState(null)
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('streak');
 
   useEffect(() => {
     let ignore = false
@@ -81,35 +83,21 @@ export default function Account({ session }) {
         }}
         />
         <div className="form-fields">
-          <div>
-            {/* <label htmlFor="email">Email</label> */}
-            <input
-              id="email"
-              type="email"
-              value={user.email || ''}
-              onChange={(e) => setEmail(e.target.value)}
-              readOnly
-              />
+          <div className='form-field'>
+            <strong><p id="full_name">{user.user_metadata.full_name || ''}</p></strong>
           </div>
-          <div>
-            {/* <label htmlFor="full_name">Full Name</label> */}
-            <input
-              id="full_name"
-              type="text"
-              required
-              value={user.user_metadata.full_name || ''}
-              onChange={(e) => setFullName(e.target.value)}
-              readOnly
-              />
+          <div className='form-field'>
+            <p id="email">{user.email || ''}</p>
           </div>
         </div>
       <div className='upload-button-container'>
         <button className="button block primary" type="submit" disabled={loading}>
-          {loading ? 'Loading ...' : 'Update'}
+          {loading ? 'Loading ...' : 'Edit Profile'}
         </button>
       </div>
     </form>
-    <SettingsNavbar />
+    <SettingsNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
+    {activeTab === 'general-settings' && <GeneralSettings />}
   </div>
   )
 }
