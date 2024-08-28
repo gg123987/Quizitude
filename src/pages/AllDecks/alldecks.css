@@ -1,0 +1,107 @@
+.decks {
+  display: flex;
+  flex-direction: column;
+  padding: 40px;
+  background-color: #F9FAFB;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.decks-header {
+  margin-bottom: 15px;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  gap: 20px 20px;
+  box-sizing: border-box;
+}
+
+.decks-header h1 {
+  margin: 0;
+}
+
+.count-badge {
+  background-color: #E0EAFF;
+  color: #3538CD;
+  padding: 0px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  height: 20px;
+  margin: 0;
+}
+
+.deck-count {
+  margin: 0;
+}
+
+.col-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.col-right {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  justify-content: end;
+}
+
+.title {
+  color: #101828;
+  text-align: left;
+  font-size: 28px;
+  font-weight: 600;
+  font-family: Inter;
+}
+
+.decks-filter {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.decks-data {
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.decks-data h2 {
+  font-family: 'Inter';
+  font-weight: 600;
+  font-size: 20px;
+  color: #333;
+}
+
+.decks-data p {
+  width: 25%;
+  font-family: 'Inter';
+  font-weight: 400;
+  font-size: 16px;
+  margin-top: 10p;
+  margin-bottom: 40px;
+  color: #666;
+}
+
+.decks-data .MuiButton-root {
+  width: 130px; /* Adjust button width as needed */
+  margin-bottom: 100px;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  margin: auto 40px;
+  align-items: center;
+}
+
+.pagination-text {
+  font-family: 'Inter';
+  font-weight: 500;
+  font-size: 14px;
+  color: #344054;
+}

@@ -1,0 +1,189 @@
+body{
+    background-color: #f8f9fa;
+}
+
+.flashcard-page{
+    padding: 40px;
+}
+
+.flashcard-header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    color: #555;
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 10px 0px;
+    margin-bottom: 30px;
+}
+
+.flashcard-slider-container {
+    overflow-x: auto;
+    width: 100%;
+    padding: 20px 0px;
+    box-sizing: border-box;
+    position: sticky;
+}
+
+.flashcard-container{
+    display: flex;
+    gap: 2rem;
+    flex-direction: column;
+    padding: 30px 10px;
+    border-color: #D0D5DD;
+    border-radius: 5px;
+    border-width: 1px;
+    border-style: solid;
+    width: 50%;
+    margin: 0 auto;
+    margin-bottom: 60px;
+    background-color: #F2F4F7;
+}
+
+.flashcard-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 0px 100px;
+}
+
+.response-buttons {
+    display: flex;
+    align-self: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.toolbar-left,
+.toolbar-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start; /* Align buttons to the flex-start */
+}
+
+.toolbar-right {
+    justify-content: flex-end; /* Align current card count to the flex-end */
+}
+
+.toolbar-left button,
+.toolbar-right button {
+    margin-right: 10px; /* Add spacing between buttons */
+}
+
+
+.flashcard-container .flashcard-navigate{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.card{
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 300px;
+    height: 200px;
+    transform-style: preserve-3d;
+    cursor: pointer;
+    transition: 150ms;
+    transform: perspective(1000px) rotateY(var(--rotate-y, 0));
+}
+
+.card:hover{
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card.flip {
+    --rotate-y: -180deg;
+}
+
+.card .front, .card .back {
+    position: absolute;
+    padding: 1rem;
+    backface-visibility: hidden;
+}
+
+.card .back {
+    transform: rotateY(180deg);
+}
+
+.flashcard-options {
+    margin-top: 0.5rem;
+}
+
+.flashcard-option {
+    margin-top: 0.25rem;
+    color: #555;
+    font-size: 0.8rem;
+}
+
+
+/* Define scrollbar styles */
+.flashcard-slider-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+/* Track styles */
+.flashcard-slider-container::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color of the scrollbar track */
+}
+
+/* Handle styles */
+.flashcard-slider-container::-webkit-scrollbar-thumb {
+    background: #3538CD; /* Color of the scrollbar handle */
+    border-radius: 5px; /* Border radius of the scrollbar handle */
+}
+
+/* Handle on hover styles */
+.flashcard-slider-container::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color of the scrollbar handle on hover */
+}
+
+
+
+.summary-divider{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between; /* Change to space-between */
+    align-items: center;
+    padding: 40px;
+    width: 450px;
+    margin: 0 auto;
+}
+
+.summary-score{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+}
+
+.summary-score-text{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: left;
+    text-align: left;
+    gap: 1.2rem;
+}
+
+.summary-score-value{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.summary-buttons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+}

@@ -1,0 +1,38 @@
+.tabHeader {
+  border: 1px solid #ccc; /* Border under the tabs */
+  border-radius: 10px;
+  overflow:hidden;
+  height: 40px;
+  display: flex;
+  width: fit-content;
+}
+
+.tabLabel:not(.Mui-selected) {
+  border-right: 0.5px solid #D0D5DD;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: none;
+  justify-content: start;
+  min-width: auto;
+  color: #344054;
+  background-color: #FFFFFF;
+}
+
+.tabLabel.Mui-selected {
+  background-color: #E0EAFF;
+  border-right: 0.5px solid #D0D5DD;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: none;
+  justify-content: start;
+  min-width: auto;
+  color: #344054;
+}
+
+.tabLabel:last-child {
+  border-right: none; /* Remove border from the last tab */
+}
+
+.tabLabel:hover {
+  background-color: #E0EAFF;
+}
