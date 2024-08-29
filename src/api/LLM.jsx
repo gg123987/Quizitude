@@ -6,7 +6,7 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
   const text = await getPdfText(pdf);
 
   //const groq = new Groq({ apiKey: "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" ,dangerouslyAllowBrowser: true});
-  const groq = new Groq({ apiKey: "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" ,dangerouslyAllowBrowser: true});
+  //const groq = new Groq({ apiKey: "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" ,dangerouslyAllowBrowser: true});
 
   //This code is to control the message that is sent to the LLM model based on the type of question
   let messages;
@@ -17,7 +17,7 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
       },
       { 
         "role": "user", 
-        "content": `Given the provided data, generate ${noOfQuestions} multiple-choice questions with answers. Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`
+        "content": `Given the provided data, generate ${noOfQuestions} multiple-choice questions with answers. Make sure each question has 4 options. Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`
       }
     ];
   } else if (typeOfQuestion === "short-answer") {
@@ -34,18 +34,15 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
   }
   
   // THIS USES THE OPENROUTER API`
-  /*
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${"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"}`,
+        "Authorization": `Bearer ${"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"}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        //"model": "gryphe/mythomist-7b:free",
-        "model": "meta-llama/llama-3.1-8b-instruct:free",
-        //"response_format": {"type": 'json_object'},
+        "model": "anthropic/claude-3-haiku",
         "messages": messages
       })
     });
@@ -55,33 +52,33 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
     }
     const data = await response.json();
 
-    console.log(data.choices[0].message.content);
+    //console.log(data.choices[0].message.content);
     let thisResponse = JSON.parse(data.choices[0].message.content);
 
 
-    if (typeOfQuestion === "multiple-choice"){
-      // Modify each question in the response array
-      thisResponse.forEach(question => {
-        // Append a new line to the value of the "question" key
-        question.question += '\n';
-        question.question += 'Options:\n';
+    // if (typeOfQuestion === "multiple-choice"){
+    //   // Modify each question in the response array
+    //   thisResponse.forEach(question => {
+    //     // Append a new line to the value of the "question" key
+    //     question.question += '\n';
+    //     question.question += 'Options:\n';
 
-        // Initialize a counter for options
-        let optionCounter = 65; // ASCII value of 'A'
-        // Loop through choices
-        question.choices.forEach(choice => {
-          // Append the letter for the option
-          question.question += `${String.fromCharCode(optionCounter)}. ${choice}\n`;
-          // Increment the counter for the next letter
-          optionCounter++;
-        });
+    //     // Initialize a counter for options
+    //     let optionCounter = 65; // ASCII value of 'A'
+    //     // Loop through choices
+    //     question.choices.forEach(choice => {
+    //       // Append the letter for the option
+    //       question.question += `${String.fromCharCode(optionCounter)}. ${choice}\n`;
+    //       // Increment the counter for the next letter
+    //       optionCounter++;
+    //     });
         
-        // Delete the "choices" key
-        delete question.choices;
-      });
-    }
+    //     // Delete the "choices" key
+    //     delete question.choices;
+    //   });
+    // }
 
-    console.log(thisResponse);
+    //console.log(thisResponse);
     return thisResponse; // Return the content from the response
     
   } catch (error) {
@@ -89,8 +86,8 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
     alert("Error: Issue with the AI model. Please attempt to regenerate the flashcards");
     throw Error("Error fetching data2:", error);
   }
-    */
-
+    
+    /*
   // THIS USES THE LATEST LLAMA MODEL3 AVAILABLE ON GROQ API FOR FREE 
   try {
     const response = await groq.chat.completions.create({
@@ -133,6 +130,7 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
     alert("Error: Issue with the AI model. Please attempt to regenerate the flashcards");
     throw new Error("Error fetching data:", error);
   }
+  */
 }
 
 //export default fetchLLMResponse;

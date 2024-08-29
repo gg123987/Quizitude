@@ -22,7 +22,7 @@ import useCategories from "@/hooks/useCategories";
 import { createCategory } from "@/services/categoryService";
 import NewCategory from "@/components/features/NewCategory/Modal";
 import { uploadFileAndCreateDeck } from "@/services/fileService";
-import { insertDummyFlashcards } from "@/services/flashcardService";
+import { formatAndInsertFlashcardData } from "@/services/flashcardService";
 import "./modal.css";
 
 const NewDeck = () => {
@@ -43,6 +43,9 @@ const NewDeck = () => {
   const [deckName, setDeckName] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [uploading, setUploading] = useState(false);
+  //create a variable to store the response from the LLM
+  const [llmResponse, setLlmResponse] = useState();
+
 
   const handleDeckNameChange = (e) => setDeckName(e.target.value);
 
@@ -133,8 +136,8 @@ const NewDeck = () => {
       // Get the deckId
       const deckId = result.deck.id;
 
-      // Insert dummy flashcards
-      await insertDummyFlashcards(deckId);
+      // Format and insert the flashcard data
+      await formatAndInsertFlashcardData(llmResponse, deckId);
 
       console.log("Deck, file, and flashcards created successfully");
       setCurrentPage(1);
@@ -147,21 +150,29 @@ const NewDeck = () => {
 
   const handleGenerateFlashcards = async () => {
     try {
-      let response;
       if (file && noOfQuestions && questionType && deckName && categoryId) {
         setUploading(true);
 
-        let thisResponse = await fetchLLMResponse(
+        let response = await fetchLLMResponse(
           noOfQuestions,
           file,
           questionType
         );
+        
+        //create a copy of the response to avoid modifying the original response
+        let thisResponse = JSON.parse(JSON.stringify(response));
+        thisResponse = formatFlashcardData(thisResponse);
+
+
         setQuestionList(thisResponse);
         setCurrentQuestion(thisResponse[0]);
         setCurrentPage(1);
 
         setUploading(false);
         setCurrentPage(1);
+
+        setLlmResponse(response);
+
       } else {
         alert("Please enter all the required details to generate flashcards.");
       }
@@ -246,6 +257,37 @@ const NewDeck = () => {
     // Set the newly created category as the selected category
     setCategoryId(category[0].id);
   };
+
+
+  //function to modify the flashcard data to be displayed in the review flashcards page
+  //this function takes in the response for the LLM and formats the Multiple Choice questions options
+  const formatFlashcardData = (response) => {
+
+    let thisResponse = response;
+    //check if the response is for multiple choice questions by checking if it contains the "choices" key
+    if (response[0].choices) {
+      // Modify each question in the response array
+      thisResponse.forEach(question => {
+        // Append a new line to the value of the "question" key
+        question.question += '\n';
+        question.question += 'Options:\n';
+
+        // Initialize a counter for options
+        let optionCounter = 65; // ASCII value of 'A'
+        // Loop through choices
+        question.choices.forEach(choice => {
+          // Append the letter for the option
+          question.question += `${String.fromCharCode(optionCounter)}. ${choice}\n`;
+          // Increment the counter for the next letter
+          optionCounter++;
+        });
+        
+        // Delete the "choices" key
+        delete question.choices;
+      });
+    }
+    return thisResponse;
+  }
 
   const pages = [
     <div className="page1-content" key="page1">
