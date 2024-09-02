@@ -147,7 +147,7 @@ const NewDeck = () => {
 
   const handleGenerateFlashcards = async () => {
     try {
-      let response;
+      //let response;
       if (file && noOfQuestions && questionType && deckName && categoryId) {
         setUploading(true);
 
@@ -315,10 +315,13 @@ const NewDeck = () => {
               sx={{
                 borderRadius: "20px",
                 backgroundColor: "#ddd",
-                left: "70%",
                 padding: "4px 15px",
                 fontSize: "14px",
                 color: "dark-grey",
+                margin: "10px 10px",
+                textAlign: "center",
+                justifyContent: "center",
+                display: "flex",
               }}
               onClick={handleAddNewCategory}
             >
