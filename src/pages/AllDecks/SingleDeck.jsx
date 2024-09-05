@@ -84,7 +84,7 @@ const DeckDetail = () => {
   );
 
   return (
-    <div className="decks">
+    <div className="decks" style={{ paddingBottom: value === 0 ? "0" : "" }}>
       <div className="decks-container">
         <div className="decks-header">
           <h1 className="title">{deck.name}</h1>
