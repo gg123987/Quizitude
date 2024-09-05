@@ -1,8 +1,8 @@
 .profile-container {
   display: flex;
   flex-direction: column;
-
-  gap: 25px;
+  height: 100vh; 
+  overflow: hidden; 
 }
 
 .form-widget {

@@ -14,7 +14,7 @@ export default function Account({ session }) {
   const [email, setEmail] = useState(null)
   const [avatar_url, setAvatarUrl] = useState(null)
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('streak');
+  const [activeTab, setActiveTab] = useState('Streak');
 
   useEffect(() => {
     let ignore = false
@@ -99,8 +99,16 @@ export default function Account({ session }) {
         </form>
         <SettingsNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
-      {activeTab === 'general-settings' && <GeneralSettings />}
-      {activeTab === 'streak' && <Streak />}
+      {activeTab === 'General Settings' && 
+      <GeneralSettings 
+        user={{ email, user_metadata: { full_name } }} 
+        setEmail={setEmail} 
+        setFullName={setFullName} 
+        avatar_url={avatar_url}
+        setAvatarUrl={setAvatarUrl}
+      />
+      }
+      {activeTab === 'Streak' && <Streak />}
     </div>
   )
 }

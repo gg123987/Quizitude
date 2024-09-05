@@ -1,7 +1,11 @@
 .settings-navbar {
   display: flex;
   justify-content: center;
+  width: 100%; /* Full width */
   border-bottom: 1px solid #ddd;
+  background-color: #f9f9f9; 
+  position: sticky; 
+  top: 0;
 }
 
 .settings-navbar-tabs {
@@ -9,9 +13,13 @@
   padding: 0;
   margin: 0;
   display: flex;
+  justify-content: space-around;
+  width: 100%; 
 }
 
 .settings-navbar-tab {
+  flex: 1; 
+  text-align: center; 
   padding: 10px 20px;
   cursor: pointer;
   font-weight: bold;
@@ -21,10 +29,10 @@
 }
 
 .settings-navbar-tab:hover {
-  color: #303484;
+  color: #3538cd;
 }
 
 .settings-navbar-tab.active {
-  color: #303484;
-  border-bottom: 2px solid #303484;
+  color: #3538cd;
+  border-bottom: 2px solid #3538cd;
 }

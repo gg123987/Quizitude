@@ -5,13 +5,13 @@ function SettingsNavbar({ activeTab, setActiveTab}) {
   return (
     <nav className="settings-navbar">
       <ul className="settings-navbar-tabs">
-        {['streak', 'view-score-history', 'pdf-uploads', 'general-settings'].map((tab) => (
+        {['Streak', 'View Score History', 'PDF Uploads', 'General Settings'].map((tab) => (
           <li
             key={tab}
             className={`settings-navbar-tab ${activeTab === tab ? 'active' : ''}`}
             onClick={() => setActiveTab(tab)}
           >
-            {tab.replace(/-/g, ' ').toUpperCase()}
+            {tab}
           </li>
         ))}
       </ul>
