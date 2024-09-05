@@ -8,9 +8,15 @@ export const uploadFileAndCreateDeck = async (file, deckData) => {
     // 1. Upload the file to Supabase Storage and create a file record
     const fileRecord = await uploadFile(file, userId);
 
-    // 2. Create a new deck
+    const file_id = fileRecord[0].id;
+
+    // Add the file_id to the deckData
+    deckData.file_id = file_id;
+
+    // 2. Create a new deck with file_id as a foreign key
     const deck = await createDeck(deckData);
 
+    /* Removed this table for simplicty
     // 3. Link the file to the deck in the deck_files table
     const { error: deckFileError } = await supabase
       .from("deck_files")
@@ -19,6 +25,7 @@ export const uploadFileAndCreateDeck = async (file, deckData) => {
     if (deckFileError) throw deckFileError;
 
     console.log("Deck linked to file");
+    */
 
     return { deck: deck[0], file: fileRecord[0] };
   } catch (error) {
@@ -61,15 +68,30 @@ export const uploadFile = async (file, userId) => {
   }
 };
 
-export const getFilesByDeck = async (deckId) => {
+export const getFileByDeck = async (deckId) => {
+  // Get the file_id from the deck
   const { data, error } = await supabase
-    .from("files")
-    .select("files.*")
-    .join("deck_files", "files.id", "deck_files.file_id")
-    .eq("deck_files.deck_id", deckId);
+    .from("decks")
+    .select("file_id")
+    .eq("id", deckId);
+
   if (error) throw error;
-  return data;
-};
+
+  if (data.length === 0) {
+    throw new Error("Deck not found");
+  }
+
+  // Get the file details using the file_id
+  const fileId = data[0].file_id;
+  const { data: fileData, error: fileError } = await supabase
+    .from("files")
+    .select("*")
+    .eq("id", fileId);
+
+  if (fileError) throw fileError;
+
+  return fileData;
+}
 
 export const deleteFile = async (fileId) => {
   const { data, error } = await supabase

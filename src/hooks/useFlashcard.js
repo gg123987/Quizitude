@@ -1,26 +1,26 @@
 import { useState, useEffect } from 'react';
-import { getFlashcardsByDeck } from '@/services/flashcardService';
+import { getFlashcardById } from '@/services/flashcardService';
 
-const useFlashcards = (deckId) => {
-  const [flashcards, setFlashcards] = useState([]);
+const useFlashcard = (flashcardId) => {
+  const [flashcard, setFlashcard] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchFlashcards = async () => {
+    const fetchFlashcard = async () => {
       try {
-        const data = await getFlashcardsByDeck(deckId);
-        setFlashcards(data);
+        const data = await getFlashcardById(flashcardId);
+        setFlashcard(data);
       } catch (error) {
         setError(error);
       } finally {
         setLoading(false);
       }
     };
-    fetchFlashcards();
-  }, [deckId]);
+    fetchFlashcard();
+  }, [flashcardId]);
 
-  return { flashcards, loading, error };
+  return { flashcard, loading, error };
 };
 
-export default useFlashcards;
+export default useFlashcard;

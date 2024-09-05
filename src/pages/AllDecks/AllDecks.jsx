@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
-import useDeck from "@/hooks/useDeck";
+import useDecks from "@/hooks/useDecks";
 import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
 import SelectSort from "@/components/common/SelectSort";
 import CustomButton from "@/components/common/CustomButton";
@@ -40,7 +40,7 @@ const CustomTextField = styled(TextField)(() => ({
 
 const Decks = () => {
   const { userId } = useOutletContext();
-  const { decks, loading, error } = useDeck(userId);
+  const { decks, loading, error } = useDecks(userId);
   const { openModal } = useModal();
   const [value, setValue] = React.useState(0);
   const [searchQuery, setSearchQuery] = React.useState("");

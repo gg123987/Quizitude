@@ -23,6 +23,7 @@ const Deck = ({ deck }) => {
     <div className="deck-card" onClick={handleClickDeck}>
       <div className="category">
         <CustomButton
+          className="category-button"
           variant="contained"
           fontSize="0.7rem"
           style={{

@@ -1,0 +1,95 @@
+.table-container {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.table-content {
+  margin-bottom: 30px;
+}
+
+.table-spacer {
+  flex-grow: 1;
+}
+
+/* Table Styling */
+.deck-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Inter";
+  margin-bottom: auto;
+}
+
+.deck-table thead th {
+  height: 44px;
+  box-sizing: border-box;
+  font-weight: bold;
+  text-align: left;
+  font-size: 12px;
+  font-family: "Inter";
+  font-weight: 500;
+  color: rgba(71, 84, 103, 1);
+}
+
+.deck-table th,
+.deck-table td {
+  padding: 0px 20px;
+  text-align: left;
+  border-bottom: 1px solid rgba(234, 236, 240, 1);
+  vertical-align: middle;
+}
+
+.deck-table th {
+  font-weight: bold;
+}
+
+.deck-table td {
+  font-size: 14px;
+  font-family: "Inter";
+  font-weight: 400;
+  color: rgba(71, 84, 103, 1);
+  height: 70px;
+}
+
+.even-row {
+  background-color: rgba(249, 250, 251, 1);
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  margin: auto 20px;
+  align-items: center;
+  height: 50px;
+}
+
+.pagination-text {
+  font-family: "Inter";
+  font-weight: 500;
+  font-size: 14px;
+  color: #344054;
+}
+
+.nav-button {
+  transition: background-color 0.3s;
+}
+
+.nav-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.nav-button:hover:not(:disabled) {
+  background-color: #c6c6c6;
+}
+
+.page-info {
+  font-size: 14px;
+}

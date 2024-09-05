@@ -23,7 +23,7 @@
   justify-content: center;
 }
 
-.category:hover {
+.category-button:hover {
   opacity: 0.6;
 }
 

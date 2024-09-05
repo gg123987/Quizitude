@@ -47,6 +47,16 @@ export const getDecksByUser = async (userId) => {
   return processedData;
 };
 
+export const getDeckById = async (deckId) => {
+  const { data, error } = await supabase
+    .from("decks")
+    .select("*")
+    .eq("id", deckId)
+    .single();
+  if (error) throw error;
+  return data;
+};
+
 export const updateDeck = async (deckId, deckData) => {
   const { data, error } = await supabase
     .from("decks")

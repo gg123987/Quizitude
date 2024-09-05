@@ -12,6 +12,12 @@ export const getFlashcardsByDeck = async (deckId) => {
   return data;
 };
 
+export const getFlashcardById = async (flashcardId) => {
+  const { data, error } = await supabase.from('flashcards').select('*').eq('id', flashcardId);
+  if (error) throw error;
+  return data;
+}
+
 export const updateFlashcard = async (flashcardId, flashcardData) => {
   const { data, error } = await supabase.from('flashcards').update(flashcardData).eq('id', flashcardId);
   if (error) throw error;

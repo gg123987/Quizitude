@@ -19,6 +19,7 @@ import useAuth from "@/hooks/useAuth";
 import Fade from "@mui/material/Fade";
 import Backdrop from "@mui/material/Backdrop";
 import useCategories from "@/hooks/useCategories";
+import useDecks from "@/hooks/useDecks";
 import { createCategory } from "@/services/categoryService";
 import NewCategory from "@/components/features/NewCategory/Modal";
 import { uploadFileAndCreateDeck } from "@/services/fileService";
@@ -45,7 +46,8 @@ const NewDeck = () => {
   const [uploading, setUploading] = useState(false);
   //create a variable to store the response from the LLM
   const [llmResponse, setLlmResponse] = useState();
-
+  const [errorp1, setError1] = useState(null);
+  const [errorp2, setError2] = useState(null);
 
   const handleDeckNameChange = (e) => setDeckName(e.target.value);
 
@@ -62,6 +64,8 @@ const NewDeck = () => {
     setCategoryId("");
     setFile(null);
     setCurrentPage(0);
+    setError1(null);
+    setError2(null);
   };
 
   const handleClose = () => {
@@ -122,9 +126,56 @@ const NewDeck = () => {
     }
   };
 
+  const p1Validations = () => {
+    if (!deckName) {
+      setError1("Please enter a deck name.");
+      return false;
+    }
+
+    if (!noOfQuestions) {
+      setError1("Please enter the number of questions.");
+      return false;
+    }
+
+    if (!questionType) {
+      setError1("Please select the type of question.");
+      return false;
+
+    }
+
+    if (!categoryId) {
+      setError1("Please select a category.");
+      return false;
+    }
+
+    if (!file) {
+      setError1("Please upload a PDF file.");
+      return false;
+    }
+
+    // Check if the deck name already exists
+    if (CheckDeckName(deckName)) {
+      setError1("A deck with the same name already exists. Please choose a different name.");
+      return false;
+    }
+
+    return true;
+  };
+
+  //function to get all the decks of the user
+  const { decks } = useDecks(user?.id);
+
+  const CheckDeckName = (deckName) => {
+    //check if the deck name exists in the decks
+    const deckExists = decks.some((deck) => deck.name === deckName);
+
+    return deckExists;
+  };
+
   const handleUpload = async () => {
     try {
       setUploading(true);
+      setError2(null);
       const deckData = {
         name: deckName,
         user_id: user.id,
@@ -140,9 +191,17 @@ const NewDeck = () => {
       await formatAndInsertFlashcardData(llmResponse, deckId);
 
       console.log("Deck, file, and flashcards created successfully");
-      setCurrentPage(1);
+      
+      // Close the modal
+      handleClose();
     } catch (error) {
       console.error("Error during upload:", error);
+      
+      if (error.message.includes("duplicate key value violates unique constraint")) {
+        setError2("A deck with the same name already exists. Please choose a different name.");
+      } else {
+        setError2("An error occurred while uploading the file. Please try again.");
+      }
     } finally {
       setUploading(false);
     }
@@ -150,7 +209,8 @@ const NewDeck = () => {
 
   const handleGenerateFlashcards = async () => {
     try {
-      if (file && noOfQuestions && questionType && deckName && categoryId) {
+      if (p1Validations()) {
+        setError1(null);
         setUploading(true);
 
         let response = await fetchLLMResponse(
@@ -163,18 +223,16 @@ const NewDeck = () => {
         let thisResponse = JSON.parse(JSON.stringify(response));
         thisResponse = formatFlashcardData(thisResponse);
 
-
         setQuestionList(thisResponse);
         setCurrentQuestion(thisResponse[0]);
-        setCurrentPage(1);
 
         setUploading(false);
+        setError1(null);
+        setError2(null);
         setCurrentPage(1);
 
         setLlmResponse(response);
 
-      } else {
-        alert("Please enter all the required details to generate flashcards.");
       }
     } catch (error) {
       console.error("Error during upload:", error);
@@ -423,6 +481,7 @@ const NewDeck = () => {
           {uploading && <CircularWithValueLabel interval={400} />}
         </Button>
       </div>
+      {errorp1 && <p className="error-message">{errorp1}</p>}
     </div>,
     <div className="page2-content" key="page2">
       <div className="header">
@@ -475,13 +534,15 @@ const NewDeck = () => {
           </div>
         </div>
         <div className="navigation">
-          <ArrowBackIcon onClick={handlePreviousFlashcard} />
+          <ArrowBackIcon onClick={handlePreviousFlashcard} style={{cursor: 'pointer'}} />
           <span>
             {currentFlashcard} of {noOfQuestions}
           </span>
-          <ArrowForwardIcon onClick={handleNextFlashcard} />
+          <ArrowForwardIcon onClick={handleNextFlashcard} style={{cursor: 'pointer'}} />
         </div>
       </div>
+      {errorp2 && <p className="error-message">{errorp2}</p>}
+      {uploading && <CircularWithValueLabel />}
       <Button
         id="saveButton"
         style={{
