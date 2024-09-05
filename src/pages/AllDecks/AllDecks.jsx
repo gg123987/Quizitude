@@ -175,8 +175,8 @@ const Decks = () => {
   );
 
   return (
-    <div className="decks">
-      <div className="decks-header">
+    <div className="all-decks">
+      <div className="all-decks-header">
         <h1 className="title">All Decks</h1>
         {decks.length > 0 && (
           <div className="count-badge">
@@ -188,7 +188,7 @@ const Decks = () => {
           </div>
         )}
       </div>
-      <div className="decks-filter">
+      <div className="all-decks-filter">
         <div className="col-left">
           <CustomTextField
             id="outlined-basic"
@@ -244,7 +244,7 @@ const Decks = () => {
         </div>
       </div>
 
-      <div className="decks-data">
+      <div className="all-decks-data">
         {loading && <CircularWithValueLabel />}
         {error && <p className="error-message">{error.message}</p>}
         {!loading && !error && decks.length === 0 && (
