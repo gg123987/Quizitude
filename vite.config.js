@@ -12,7 +12,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',               // Simulate a browser environment for React components
-    include: ['src/**/*.test.{js,ts,jsx,tsx}'],
+    include: ['**/*.test.jsx', '**/*.test.js'],
     setupFiles: './src/setupTests.js',
     coverage: {
       reporter: ['text', 'json'],
