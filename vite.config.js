@@ -19,4 +19,11 @@ export default defineConfig({
       reporter: ["text", "json"],
     },
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      loader: {
+        '.mjs': 'js',
+      },
+    },
+  },
 });

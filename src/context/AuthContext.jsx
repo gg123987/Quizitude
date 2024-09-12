@@ -1,13 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import {
-  login,
-  signOut,
-  passwordReset,
-  updatePassword,
-  signInWithGoogle,
-  register,
-} from "@/services/authService";
+import { login, signOut, passwordReset, updatePassword, signInWithGoogle, register } from "@/services/authService";
 import { supabase } from "@/utils/supabase";
 
 // Define the context type
@@ -30,51 +23,33 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error) throw error;
-        setUser(data.user ?? null);
+        const { data: { user: currentUser } } = await supabase.auth.getSession();
+        setUser(currentUser ?? null);
+        setAuth(!!currentUser);
       } catch (error) {
-        console.error("Error getting user:", error.message);
+        console.error('Error getting user:', error.message);
       } finally {
         setLoading(false);
       }
     };
 
-    const getSessionData = async () => {
-      try {
-        const token = localStorage.getItem("rememberMeToken");
-        if (token) {
-          const { data: sessionData, error } = await supabase.auth.getSession();
-          if (error) throw error;
-          if (sessionData) {
-            setAuth(true);
-            setUser(sessionData.user);
-          }
-        }
-      } catch (error) {
-        console.error("Error getting session data:", error.message);
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN") {
+        setAuth(true);
+        setUser(session.user);
+      } else if (event === "SIGNED_OUT") {
+        setAuth(false);
+        setUser(null);
       }
-    };
+    });
 
-    getSessionData();
+    // Call getUser to check initial session
     getUser();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "SIGNED_IN") {
-          setAuth(true);
-          setUser(session.user);
-        } else if (event === "SIGNED_OUT") {
-          setAuth(false);
-          setUser(null);
-        }
-      }
-    );
-
     return () => {
-      authListener.subscription?.unsubscribe();
+      authListener.subscription.unsubscribe();
     };
-  }, [supabase]);
+  }, []);
 
   return (
     <AuthContext.Provider
