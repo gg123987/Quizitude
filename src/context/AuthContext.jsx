@@ -21,6 +21,10 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return; // Skip if on the server
+    }
+    
     const getUser = async () => {
       try {
         const { data: { user: currentUser } } = await supabase.auth.getSession();
