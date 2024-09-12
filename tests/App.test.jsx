@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import App from '@/App';
-import { ModalProvider } from './context/ModalContext';
+import { ModalProvider } from '@/context/ModalContext';
 
 test('renders the home page route', () => {
   render(

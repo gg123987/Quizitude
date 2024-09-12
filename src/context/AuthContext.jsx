@@ -6,7 +6,7 @@ import {
   passwordReset,
   updatePassword,
   signInWithGoogle,
-  register
+  register,
 } from "@/services/authService";
 import { supabase } from "@/utils/supabase";
 
@@ -30,11 +30,11 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        const { data } = await supabase.auth.getUser();
-        const { user: currentUser } = data;
-        setUser(currentUser ?? null);
+        const { data, error } = await supabase.auth.getUser();
+        if (error) throw error;
+        setUser(data.user ?? null);
       } catch (error) {
-        console.error('Error getting user:', error.message);
+        console.error("Error getting user:", error.message);
       } finally {
         setLoading(false);
       }
@@ -42,7 +42,7 @@ const AuthProvider = ({ children }) => {
 
     const getSessionData = async () => {
       try {
-        const token = localStorage.getItem('rememberMeToken');
+        const token = localStorage.getItem("rememberMeToken");
         if (token) {
           const { data: sessionData, error } = await supabase.auth.getSession();
           if (error) throw error;
@@ -52,27 +52,29 @@ const AuthProvider = ({ children }) => {
           }
         }
       } catch (error) {
-        console.error('Error getting session data:', error.message);
+        console.error("Error getting session data:", error.message);
       }
     };
 
     getSessionData();
     getUser();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN") {
-        setAuth(true);
-        setUser(session.user);
-      } else if (event === "SIGNED_OUT") {
-        setAuth(false);
-        setUser(null);
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === "SIGNED_IN") {
+          setAuth(true);
+          setUser(session.user);
+        } else if (event === "SIGNED_OUT") {
+          setAuth(false);
+          setUser(null);
+        }
       }
-    });
+    );
 
     return () => {
-      authListener.subscription.unsubscribe();
+      authListener.subscription?.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
   return (
     <AuthContext.Provider

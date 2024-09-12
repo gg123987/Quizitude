@@ -137,7 +137,9 @@ export default async function FetchLLMResponse(noOfQuestions, pdf, typeOfQuestio
 
 async function getPdfText(pdf) {
   try {
-    const text = await pdfToText(pdf);
+    // Use dynamic import for pdf.mjs (ES Module)
+    const pdfToText = await import('react-pdftotext');
+    const text = pdfToText.default(pdf);
     return text;
   } catch (error) {
     console.error("Failed to extract text from pdf");
