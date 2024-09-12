@@ -1,4 +1,4 @@
-.decks {
+.all-decks {
   display: flex;
   flex-direction: column;
   padding: 40px;
@@ -7,7 +7,7 @@
   box-sizing: border-box;
 }
 
-.decks-header {
+.all-decks-header {
   margin-bottom: 15px;
   flex-direction: row;
   display: flex;
@@ -56,27 +56,27 @@
   font-family: Inter;
 }
 
-.decks-filter {
+.all-decks-filter {
   display: flex;
   justify-content: space-between;
   margin-bottom: 20px;
 }
 
-.decks-data {
+.all-decks-data {
   flex-grow: 1;
   justify-content: center;
   align-items: center;
   overflow: hidden;
 }
 
-.decks-data h2 {
+.all-decks-data h2 {
   font-family: 'Inter';
   font-weight: 600;
   font-size: 20px;
   color: #333;
 }
 
-.decks-data p {
+.all-decks-data p {
   width: 25%;
   font-family: 'Inter';
   font-weight: 400;
@@ -86,7 +86,7 @@
   color: #666;
 }
 
-.decks-data .MuiButton-root {
+.all-decks-data .MuiButton-root {
   width: 130px; /* Adjust button width as needed */
   margin-bottom: 100px;
 }

@@ -5,7 +5,6 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import IconBreadcrumbs from "./IconBreadcrumbs";
-import { useLocation } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import SettingsIcon from "@mui/icons-material/Settings";
 import NotificationsIcon from "@mui/icons-material/Notifications";
@@ -17,8 +16,6 @@ import useModal from "@/hooks/useModal";
 import "./appbar.css";
 
 const CustomAppBar = ({ handleDrawerToggle, drawerWidth }) => {
-  const location = useLocation();
-  const currentPage = location.pathname;
   const { width } = useWindowDimensions();
   const [buttonText, setButtonText] = useState("New Deck");
   const { modalOpen, openModal, closeModal } = useModal();
@@ -54,8 +51,7 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth }) => {
           >
             <MenuIcon />
           </IconButton>
-
-          {currentPage !== "/" && <IconBreadcrumbs page={currentPage} />}
+          <IconBreadcrumbs />
         </Toolbar>
 
         <Toolbar

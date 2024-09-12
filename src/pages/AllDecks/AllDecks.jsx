@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
-import useDeck from "@/hooks/useDeck";
+import useDecks from "@/hooks/useDecks";
 import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
 import SelectSort from "@/components/common/SelectSort";
 import CustomButton from "@/components/common/CustomButton";
@@ -40,7 +40,7 @@ const CustomTextField = styled(TextField)(() => ({
 
 const Decks = () => {
   const { userId } = useOutletContext();
-  const { decks, loading, error } = useDeck(userId);
+  const { decks, loading, error } = useDecks(userId);
   const { openModal } = useModal();
   const [value, setValue] = React.useState(0);
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -175,8 +175,8 @@ const Decks = () => {
   );
 
   return (
-    <div className="decks">
-      <div className="decks-header">
+    <div className="all-decks">
+      <div className="all-decks-header">
         <h1 className="title">All Decks</h1>
         {decks.length > 0 && (
           <div className="count-badge">
@@ -188,7 +188,7 @@ const Decks = () => {
           </div>
         )}
       </div>
-      <div className="decks-filter">
+      <div className="all-decks-filter">
         <div className="col-left">
           <CustomTextField
             id="outlined-basic"
@@ -244,7 +244,7 @@ const Decks = () => {
         </div>
       </div>
 
-      <div className="decks-data">
+      <div className="all-decks-data">
         {loading && <CircularWithValueLabel />}
         {error && <p className="error-message">{error.message}</p>}
         {!loading && !error && decks.length === 0 && (

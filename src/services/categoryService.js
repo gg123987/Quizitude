@@ -12,3 +12,9 @@ export const getCategoriesByUser = async (userId) => {
   if (error) throw error;
   return data;
 };
+
+export const getCategoryById = async (categoryId) => {
+  const { data, error } = await supabase.from('categories').select('*').eq('id', categoryId).single();
+  if (error) throw error;
+  return data;
+};

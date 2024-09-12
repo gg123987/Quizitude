@@ -1,26 +1,26 @@
 import { useState, useEffect } from 'react';
-import { getDecksByUser } from '@/services/deckService';
+import { getDeckById } from '@/services/deckService';
 
-const useDecks = (userId) => {
-  const [decks, setDecks] = useState([]);
+const useDeck = (deckId) => {
+  const [deck, setDeck] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchDecks = async () => {
+    const fetchDeck = async () => {
       try {
-        const data = await getDecksByUser(userId);
-        setDecks(data);
+        const data = await getDeckById(deckId);
+        setDeck(data);
       } catch (error) {
         setError(error);
       } finally {
         setLoading(false);
       }
     };
-    fetchDecks();
-  }, [userId]);
+    fetchDeck();
+  }, [deckId]);
 
-  return { decks, loading, error };
+  return { deck, loading, error };
 };
 
-export default useDecks;
+export default useDeck;
