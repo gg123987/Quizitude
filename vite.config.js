@@ -11,6 +11,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',               // Simulate a browser environment for React components
-    setupFiles: './src/setupTests.js'
+    setupFiles: './src/setupTests.js',
+    coverage: {
+      reporter: ['text', 'json'],
+    },
   }
 });
