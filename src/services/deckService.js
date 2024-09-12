@@ -50,11 +50,37 @@ export const getDecksByUser = async (userId) => {
 export const getDeckById = async (deckId) => {
   const { data, error } = await supabase
     .from("decks")
-    .select("*")
-    .eq("id", deckId)
+    .select(`
+      id,
+      name,
+      created_at,
+      updated_at,
+      is_favourite,
+      is_reviewed,
+      categories:categories!decks_category_id_fkey (
+        id,
+        name
+      ),
+      flashcards (
+        id
+      )
+    `)
+    .eq('id', deckId)
     .single();
-  if (error) throw error;
-  return data;
+
+  if (error) {
+    console.error('Error fetching deck:', error);
+    return null;
+  }
+
+  // Process the data to include the flashcards count
+  const processedData = {
+    ...data,
+    categories: data.categories || { id: 0, name: 'Uncategorised' },
+    flashcards_count: data.flashcards.length
+  };
+
+  return processedData;
 };
 
 export const updateDeck = async (deckId, deckData) => {

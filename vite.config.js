@@ -8,4 +8,9 @@ export default defineConfig({
       '@': '/src', 
     },
   },
+  test: {
+    globals: true,
+    environment: 'jsdom',               // Simulate a browser environment for React components
+    setupFiles: './src/setupTests.js'
+  }
 });

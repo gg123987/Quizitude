@@ -7,7 +7,6 @@ import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import useDeck from "@/hooks/useDeck";
 import useFlashcards from "@/hooks/useFlashcards";
-import useCategory from "@/hooks/useCategory";
 import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
 import CustomButton from "@/components/common/CustomButton";
 import AddIcon from "@mui/icons-material/Add";
@@ -42,7 +41,6 @@ const DeckDetail = () => {
   const { id } = useParams();
   const { deck, loading, error } = useDeck(id);
   const { flashcards } = useFlashcards(id);
-  const { category } = useCategory(deck.category_id);
   const { openModal } = useModal();
   const [value, setValue] = React.useState(0);
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -88,9 +86,11 @@ const DeckDetail = () => {
       <div className="decks-container">
         <div className="decks-header">
           <h1 className="title">{deck.name}</h1>
-          <div className="count-badge">
-            <p className="deck-count">{category.name}</p>
-          </div>
+          {deck.categories && (
+            <div className="count-badge">
+              <p className="deck-count">{deck.categories.name}</p>
+            </div>
+          )}
           <p className="deck-count">{flashcards.length} cards</p>
         </div>
         <div className="decks-filter">

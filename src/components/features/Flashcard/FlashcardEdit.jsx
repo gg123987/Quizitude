@@ -14,14 +14,14 @@ const FlashcardEdit = ({ flashcard }) => {
 
   return (
     <div className="container">
-      <div className="row">
-        <div className="col">
+      <div className="text-row">
+        <div className="text-col">
           <div className="question-box">
             <div className="box-label">Question</div>
             <div className="box-text">{flashcard.question}</div>
           </div>
         </div>
-        <div className="col">
+        <div className="text-col">
           <div className="answer-box">
             <div className="box-label">Answer</div>
             <div className="box-text">{flashcard.answer}</div>

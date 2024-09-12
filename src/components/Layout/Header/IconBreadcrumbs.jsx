@@ -1,101 +1,110 @@
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import HomeIcon from "@/assets/home.svg";
-import { useNavigate } from "react-router-dom";
-import Box from "@mui/material/Box";
-import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
+import { Link, useLocation } from "react-router-dom";
+import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
+import useDeck from "@/hooks/useDeck";
+import useCategory from "@/hooks/useCategory";
 
-function handleClick(event, navigate, path) {
-  event.preventDefault();
-  navigate(path); // Navigate to the specified path
-}
+// Static mapping for fixed segments
+const staticMappings = {
+  flashcards: "Flashcards",
+  decks: "All Decks",
+  scores: "Scores",
+  settings: "Settings",
+  notifications: "Notifications",
+  // Add other static mappings as needed
+};
 
-import PropTypes from "prop-types";
+export default function IconBreadcrumbs() {
+  const location = useLocation();
 
-export default function IconBreadcrumbs({ parentPage = "", page = "" }) {
-  const navigate = useNavigate();
+  // Get the current pathname and split it into segments
+  const pathnames = location.pathname.split("/").filter((x) => x);
 
-  parentPage = parentPage.replace("/", "");
-  page = page.replace("/", "");
+  // If pathnames are empty, return null
+  if (pathnames.length === 0) {
+    return null;
+  }
+
+  // Extract the type and ID from pathnames
+  const [type, id] = pathnames;
+
+  // Fetch the deck and category details based on type
+  const { deck, loading: deckLoading } = useDeck(type === "decks" ? id : null);
+  const { category, loading: categoryLoading } = useCategory(
+    type === "categories" ? id : null
+  );
+
+  // Handle loading states
+  if (deckLoading || categoryLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // Function to get the name from an ID or static mapping
+  const getNameFromId = (type, id) => {
+    if (type === "decks" && deck) return deck.name;
+    if (type === "categories" && category) return category.name;
+    return staticMappings[type] || id;
+  };
+
+  // Map pathnames to display names
+  const formattedPathnames = pathnames.map((segment, index) => {
+    if (index === 0) {
+      // First segment, use static mapping
+      return staticMappings[segment] || segment;
+    } else if (index === 1) {
+      // Second segment, use dynamic data based on type
+      return getNameFromId(pathnames[0], segment);
+    }
+    return segment;
+  });
 
   return (
-    <div role="presentation">
-      {parentPage === "" ? (
-        <Breadcrumbs separator={<ChevronRightOutlinedIcon fontSize="small" color="disabled" />} aria-label="breadcrumb">
-          <span
-            onClick={(event) => handleClick(event, navigate, "/")}
+    <Breadcrumbs
+      separator={<ChevronRightOutlinedIcon fontSize="small" color="disabled" />}
+      aria-label="breadcrumb"
+      style={{
+        whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        display: "flex",
+        flexWrap: "nowrap",
+      }}
+    >
+      <Link
+        to="/"
+        style={{
+          textDecoration: "none",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        <img src={HomeIcon} alt="home" className="home" width={"15px"} />
+      </Link>
+
+      {pathnames.map((segment, index) => {
+        const to = `/${pathnames.slice(0, index + 1).join("/")}`;
+
+        return (
+          <Link
+            key={to}
+            to={to}
             style={{
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
               display: "flex",
               alignItems: "center",
-              textDecoration: "none",
-              color: "inherit",
-              cursor: "pointer",
             }}
           >
-            <Box sx={{ mr: 0.5, ml: 4, }} >
-              <img src={HomeIcon} alt="home" className="home" width={"15px"} />
-            </Box>
-          </span>
-          <Typography
-            sx={{ display: "flex", alignItems: "center" }}
-            color="#3538CD"
-            fontFamily={"Inter"}
-            fontWeight={500}
-          >
-            {page === "decks"
-              ? "All Decks"
-              : page === "categories"
-              ? "Categories"
-              : ""}
-          </Typography>
-        </Breadcrumbs>
-      ) : (
-        <Breadcrumbs separator=">" aria-label="breadcrumb">
-          <span
-            onClick={(event) => handleClick(event, navigate, "/")}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              textDecoration: "none",
-              color: "inherit",
-              cursor: "pointer",
-            }}
-          >
-            <Box sx={{ mr: 0.5, ml: 4, }} >
-              <img src={HomeIcon} alt="home" className="home" width={"15px"} />
-            </Box>
-          </span>
-          <span
-            onClick={(event) => handleClick(event, navigate, `/${parentPage}`)}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              textDecoration: "none",
-              color: "inherit",
-              cursor: "pointer",
-            }}
-          >
-            {parentPage === "decks"
-              ? "All Decks"
-              : parentPage === "categories"
-              ? "Categories"
-              : ""}
-          </span>
-          <Typography
-            sx={{ display: "flex", alignItems: "center" }}
-            color="#3538CD"
-            fontFamily={"Inter"}
-            fontWeight={500}
-          >
-            {page}
-          </Typography>
-        </Breadcrumbs>
-      )}
-    </div>
+            <Typography color="#3538CD" fontFamily={"Inter"} fontWeight={500}>
+              {formattedPathnames[index]}{" "}
+            </Typography>
+          </Link>
+        );
+      })}
+    </Breadcrumbs>
   );
 }
-
-IconBreadcrumbs.propTypes = {
-  parentPage: PropTypes.string,
-  page: PropTypes.string,
-};
