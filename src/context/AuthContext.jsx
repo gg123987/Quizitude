@@ -1,6 +1,13 @@
 import { createContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { login, signOut, passwordReset, updatePassword, signInWithGoogle, register } from "@/services/authService";
+import {
+  login,
+  signOut,
+  passwordReset,
+  updatePassword,
+  signInWithGoogle,
+  register
+} from "@/services/authService";
 import { supabase } from "@/utils/supabase";
 
 // Define the context type
@@ -21,21 +28,36 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return; // Skip if on the server
-    }
-    
     const getUser = async () => {
       try {
-        const { data: { user: currentUser } } = await supabase.auth.getSession();
+        const { data } = await supabase.auth.getUser();
+        const { user: currentUser } = data;
         setUser(currentUser ?? null);
-        setAuth(!!currentUser);
       } catch (error) {
         console.error('Error getting user:', error.message);
       } finally {
         setLoading(false);
       }
     };
+
+    const getSessionData = async () => {
+      try {
+        const token = localStorage.getItem('rememberMeToken');
+        if (token) {
+          const { data: sessionData, error } = await supabase.auth.getSession();
+          if (error) throw error;
+          if (sessionData) {
+            setAuth(true);
+            setUser(sessionData.user);
+          }
+        }
+      } catch (error) {
+        console.error('Error getting session data:', error.message);
+      }
+    };
+
+    getSessionData();
+    getUser();
 
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN") {
@@ -47,13 +69,10 @@ const AuthProvider = ({ children }) => {
       }
     });
 
-    // Call getUser to check initial session
-    getUser();
-
     return () => {
-      authListener.subscription.unsubscribe();
+      authListener.subscription?.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
   return (
     <AuthContext.Provider
