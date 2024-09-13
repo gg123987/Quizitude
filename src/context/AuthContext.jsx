@@ -70,9 +70,9 @@ const AuthProvider = ({ children }) => {
     });
 
     return () => {
-      authListener.subscription.unsubscribe();
+      authListener.subscription?.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
   return (
     <AuthContext.Provider

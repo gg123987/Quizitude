@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
-import "./flashcard.css";
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { Typography } from "@mui/material";
+import './flashcard.css';
 
 const Flashcard = ({
   flashcard,
@@ -19,7 +20,7 @@ const Flashcard = ({
     if (flipped !== flip) {
       setFlip(flipped);
     }
-  }, [flipped]);
+  }, [flip, flipped]);
 
   const handleClick = () => {
     if (
@@ -96,6 +97,21 @@ const Flashcard = ({
       )}
     </div>
   );
+};
+
+Flashcard.propTypes = {
+  flashcard: PropTypes.shape({
+    question: PropTypes.string.isRequired,
+    answer: PropTypes.string.isRequired,
+    options: PropTypes.array,
+    score: PropTypes.oneOf(["correct", "incorrect"]),
+    answered: PropTypes.bool,
+  }).isRequired,
+  mode: PropTypes.oneOf(["default", "studying"]),
+  isCurrentCard: PropTypes.bool,
+  width: PropTypes.string,
+  height: PropTypes.string,
+  flipped: PropTypes.bool,
 };
 
 export default Flashcard;

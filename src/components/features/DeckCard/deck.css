@@ -1,0 +1,51 @@
+.deck-card {
+  border-radius: 8px;
+  padding: 40px 30px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center contents vertically */
+  align-items: center; /* Center contents horizontally */
+  cursor: pointer;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  border-bottom: 4px solid #E0EAFF;
+}
+
+.deck-card:hover {
+  transform: scale(1.02);
+}
+
+.category {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+}
+
+.category-button:hover {
+  opacity: 0.6;
+}
+
+.name {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin: 5px 0px;
+}
+
+.flashcards {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  gap: 5px;
+  margin-top: -5px;
+}
+
+.flashcards span {
+  margin-right: 5px; /* Space between flashcard count and text */
+}

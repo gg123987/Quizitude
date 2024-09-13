@@ -1,0 +1,29 @@
+.cat-popup {
+  background-color: white;
+  border-radius: 10px; /* Round corners */
+  width: 20%;
+  height: 300px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1500;
+  padding-top: 25px;
+}
+
+.popup-content {
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  padding: 40px;
+}
+
+.close {
+  position: absolute; /* Change to absolute positioning */
+  top: 10px; /* Adjust distance from the top */
+  right: 10px; /* Adjust distance from the right */
+}
+
+h2 {
+  text-align: left;
+  font-size: 25px;
+}

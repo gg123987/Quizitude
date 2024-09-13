@@ -1,5 +1,5 @@
-import { Modal, Box } from "@mui/material";
 import { useState } from "react";
+import { Modal, Box } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import TextField from "@mui/material/TextField";
@@ -10,41 +10,83 @@ import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
-import PropTypes from 'prop-types';
 import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import fetchLLMResponse from "@/api/LLM";
+import useModal from "@/hooks/useModal";
+import useAuth from "@/hooks/useAuth";
+import Fade from "@mui/material/Fade";
+import Backdrop from "@mui/material/Backdrop";
+import useCategories from "@/hooks/useCategories";
+import useDecks from "@/hooks/useDecks";
+import { createCategory } from "@/services/categoryService";
+import NewCategory from "@/components/features/NewCategory/Modal";
+import { uploadFileAndCreateDeck } from "@/services/fileService";
+import { formatAndInsertFlashcardData } from "@/services/flashcardService";
 import "./modal.css";
 
-const NewDeck = ({ open, handleClose }) => { 
+const NewDeck = () => {
+  const { user } = useAuth();
+  const { categories, categoriesLoading, categoriesError, refreshCategories } =
+    useCategories(user?.id);
+
+  const { modalOpen, closeModal } = useModal();
   const [currentPage, setCurrentPage] = useState(0);
   const [currentFlashcard, setCurrentFlashcard] = useState(1);
-  const [cardTitle, setCardTitle] = useState("");
+  const [questionList, setQuestionList] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState("");
   const [noOfQuestions, setNoOfQuestions] = useState("");
   const [questionType, setQuestionType] = useState("");
-  const [categoryType, setCategoryType] = useState("");
-  const [pdf, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
   const maxPDFSize = 30 * 1024 * 1024; // 30 MB in bytes
+  const [file, setFile] = useState(null);
+  const [deckName, setDeckName] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [uploading, setUploading] = useState(false);
+  //create a variable to store the response from the LLM
+  const [llmResponse, setLlmResponse] = useState();
+  const [errorp1, setError1] = useState(null);
+  const [errorp2, setError2] = useState(null);
 
-  const handleCardTitleChange = (event) => {
-    setCardTitle(event.target.value);
-  };
+  const handleDeckNameChange = (e) => setDeckName(e.target.value);
 
   const handleNoOfQuestionsChange = (event) => {
-    setNoOfQuestions(event.target.value);
+    if (event.target.value > 0) {
+      setNoOfQuestions(event.target.value);
+    }
   };
 
-  const handleQuestionTypeChange = (event) => {
+  const resetComponent = () => {
+    setDeckName("");
+    setNoOfQuestions("");
+    setQuestionType("");
+    setCategoryId("");
+    setFile(null);
+    setCurrentPage(0);
+    setError1(null);
+    setError2(null);
+  };
+
+  const handleClose = () => {
+    resetComponent();
+    closeModal();
+  };
+
+  const handleQuestionTypeChange = (event) =>
     setQuestionType(event.target.value);
+
+  const handleCategoryChange = (event) => {
+    const selectedValue = event.target.value;
+
+    if (selectedValue === "add-new-category") {
+      handleAddNewCategory();
+    } else {
+      setCategoryId(selectedValue);
+    }
   };
 
-  const handleCategoryTypeChange = (event) => {
-    setCategoryType(event.target.value);
-  };
-
-  const handlePDFChange = (event) => {
+  const handleFileChange = (event) => {
     const uploadedPDF = event.target.files[0];
     if (uploadedPDF) {
       if (uploadedPDF.size <= maxPDFSize) {
@@ -84,29 +126,226 @@ const NewDeck = ({ open, handleClose }) => {
     }
   };
 
-  const handleGenerateFlashcards = async () => {
-        
-    if (pdf && noOfQuestions && questionType && cardTitle && categoryType) {
-      setLoading(true);
-      await fetchLLMResponse(noOfQuestions, pdf, questionType);
-      setLoading(false);
-      setCurrentPage(1);
-    } else {
-      alert("Please enter all the required details to generate flashcards.");
+  const p1Validations = () => {
+    if (!deckName) {
+      setError1("Please enter a deck name.");
+      return false;
     }
+
+    if (!noOfQuestions) {
+      setError1("Please enter the number of questions.");
+      return false;
+    }
+
+    if (!questionType) {
+      setError1("Please select the type of question.");
+      return false;
+
+    }
+
+    if (!categoryId) {
+      setError1("Please select a category.");
+      return false;
+    }
+
+    if (!file) {
+      setError1("Please upload a PDF file.");
+      return false;
+    }
+
+    // Check if the deck name already exists
+    if (CheckDeckName(deckName)) {
+      setError1("A deck with the same name already exists. Please choose a different name.");
+      return false;
+    }
+
+    return true;
+  };
+
+  //function to get all the decks of the user
+  const { decks } = useDecks(user?.id);
+
+  const CheckDeckName = (deckName) => {
+    //check if the deck name exists in the decks
+    const deckExists = decks.some((deck) => deck.name === deckName);
+
+    return deckExists;
+  };
+
+  const handleUpload = async () => {
+    try {
+      setUploading(true);
+      setError2(null);
+      const deckData = {
+        name: deckName,
+        user_id: user.id,
+        category_id: categoryId === "" ? null : categoryId,
+      };
+      const result = await uploadFileAndCreateDeck(file, deckData);
+      console.log("Upload and deck creation successful:", result);
+
+      // Get the deckId
+      const deckId = result.deck.id;
+
+      // Format and insert the flashcard data
+      await formatAndInsertFlashcardData(llmResponse, deckId);
+
+      console.log("Deck, file, and flashcards created successfully");
+      
+      // Close the modal
+      handleClose();
+    } catch (error) {
+      console.error("Error during upload:", error);
+      
+      if (error.message.includes("duplicate key value violates unique constraint")) {
+        setError2("A deck with the same name already exists. Please choose a different name.");
+      } else {
+        setError2("An error occurred while uploading the file. Please try again.");
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleGenerateFlashcards = async () => {
+    try {
+      if (p1Validations()) {
+        setError1(null);
+        setUploading(true);
+
+        let response = await fetchLLMResponse(
+          noOfQuestions,
+          file,
+          questionType
+        );
+        
+        //create a copy of the response to avoid modifying the original response
+        let thisResponse = JSON.parse(JSON.stringify(response));
+        thisResponse = formatFlashcardData(thisResponse);
+
+        setQuestionList(thisResponse);
+        setCurrentQuestion(thisResponse[0]);
+
+        setUploading(false);
+        setError1(null);
+        setError2(null);
+        setCurrentPage(1);
+
+        setLlmResponse(response);
+
+      }
+    } catch (error) {
+      console.error("Error during upload:", error);
+      setUploading(false);
+    }
+  };
+
+  const updateCurrentQuestionForward = () => {
+    // Fetch the updated values from the DOM
+    const updatedQuestion = document.getElementById(
+      "reviewTextFieldQuestion"
+    ).value;
+    const updatedAnswer = document.getElementById(
+      "reviewTextFieldAnswer"
+    ).value;
+
+    // Update the currentQuestion state with the updated values
+    setCurrentQuestion({ question: updatedQuestion, answer: updatedAnswer });
+    //console.log(currentQuestion.question);
+
+    // Update questionsList with the amended question
+    const updatedQuestionList = [...questionList];
+    updatedQuestionList[currentFlashcard - 1] = currentQuestion;
+    setQuestionList(updatedQuestionList);
+
+    // Move to the next question
+    //(using -1 + 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
+    setCurrentQuestion(questionList[currentFlashcard - 1 + 1]);
+  };
+
+  const updateCurrentQuestionBackward = () => {
+    // Fetch the updated values from the DOM
+    const updatedQuestion = document.getElementById(
+      "reviewTextFieldQuestion"
+    ).value;
+    const updatedAnswer = document.getElementById(
+      "reviewTextFieldAnswer"
+    ).value;
+
+    // Update the currentQuestion state with the updated values
+    setCurrentQuestion({ question: updatedQuestion, answer: updatedAnswer });
+
+    // Update questionsList with the amended question
+    const updatedQuestionList = [...questionList];
+    updatedQuestionList[currentFlashcard - 1] = currentQuestion;
+    setQuestionList(updatedQuestionList);
+
+    // Move to the previous question
+    //(using -1 - 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
+    setCurrentQuestion(questionList[currentFlashcard - 1 - 1]);
   };
 
   const handleNextFlashcard = () => {
     if (currentFlashcard < noOfQuestions) {
       setCurrentFlashcard(currentFlashcard + 1);
+      updateCurrentQuestionForward();
     }
   };
 
   const handlePreviousFlashcard = () => {
     if (currentFlashcard > 1) {
       setCurrentFlashcard(currentFlashcard - 1);
+      updateCurrentQuestionBackward();
+      //console.log(document.getElementById('reviewTextFieldQuestion').value);
     }
   };
+
+  const handleAddNewCategory = async () => {
+    setNewCategoryModalOpen(true);
+  };
+
+  const handleSaveNewCategory = async (categoryName) => {
+    const newCategory = { name: categoryName, user_id: user.id };
+    const category = await createCategory(newCategory);
+    setNewCategoryModalOpen(false); // Close the modal after saving
+
+    // Refresh the categories
+    await refreshCategories();
+
+    // Set the newly created category as the selected category
+    setCategoryId(category[0].id);
+  };
+
+
+  //function to modify the flashcard data to be displayed in the review flashcards page
+  //this function takes in the response for the LLM and formats the Multiple Choice questions options
+  const formatFlashcardData = (response) => {
+
+    let thisResponse = response;
+    //check if the response is for multiple choice questions by checking if it contains the "choices" key
+    if (response[0].choices) {
+      // Modify each question in the response array
+      thisResponse.forEach(question => {
+        // Append a new line to the value of the "question" key
+        question.question += '\n';
+        question.question += 'Options:\n';
+
+        // Initialize a counter for options
+        let optionCounter = 65; // ASCII value of 'A'
+        // Loop through choices
+        question.choices.forEach(choice => {
+          // Append the letter for the option
+          question.question += `${String.fromCharCode(optionCounter)}. ${choice}\n`;
+          // Increment the counter for the next letter
+          optionCounter++;
+        });
+        
+        // Delete the "choices" key
+        delete question.choices;
+      });
+    }
+    return thisResponse;
+  }
 
   const pages = [
     <div className="page1-content" key="page1">
@@ -120,10 +359,11 @@ const NewDeck = ({ open, handleClose }) => {
         <div className="textfield-wrapper">
           <TextField
             id="titleOfCard"
-            value={cardTitle}
-            label="Title of Card"
+            type="text"
+            value={deckName}
+            placeholder="Deck Name"
             className="titleOfCard"
-            onChange={handleCardTitleChange}
+            onChange={handleDeckNameChange}
             fullWidth
           />
         </div>
@@ -140,53 +380,78 @@ const NewDeck = ({ open, handleClose }) => {
         </div>
       </div>
       <div className="textfields-container">
-      <FormControl fullWidth>
-        <InputLabel id="typeOfQuestion">Type of Question</InputLabel>
-        <Select
-          id="typeOfQuestion"
-          value={questionType}
-          label="Type of Question"
-          onChange={handleQuestionTypeChange}
+        <FormControl fullWidth>
+          <InputLabel id="typeOfQuestion">Type of Question</InputLabel>
+          <Select
+            id="typeOfQuestion"
+            value={questionType}
+            label="Type of Question"
+            onChange={handleQuestionTypeChange}
           >
-          <MenuItem value="multiple-choice">Multiple Choice</MenuItem>
-          <MenuItem value="short-answer">Short Answer</MenuItem>
-        </Select>
-      </FormControl>
+            <MenuItem value="multiple-choice">Multiple Choice</MenuItem>
+            <MenuItem value="short-answer">Short Answer</MenuItem>
+          </Select>
+        </FormControl>
 
-      <FormControl fullWidth>
-        <InputLabel id="typeOfCategory">Category</InputLabel>
-        <Select
-          id="typeOfCategory"
-          value={categoryType}
-          label="Type of Category"
-          onChange={handleCategoryTypeChange}
+        <FormControl fullWidth>
+          <InputLabel id="typeOfCategory">Category</InputLabel>
+          <Select
+            id="typeOfCategory"
+            value={categoryId}
+            label="Type of Category"
+            onChange={handleCategoryChange}
+            disabled={categoriesLoading || categoriesError}
           >
-          <MenuItem value="maths">Maths</MenuItem>
-          <MenuItem value="science">Science</MenuItem>
-        </Select>
-      </FormControl>
+            <MenuItem value="">
+              <em>None</em>
+            </MenuItem>
+            {categories.map((category) => (
+              <MenuItem key={category.id} value={category.id}>
+                {category.name}
+              </MenuItem>
+            ))}
+            <MenuItem
+              value="add-new-category"
+              sx={{
+                borderRadius: "20px",
+                backgroundColor: "#ddd",
+                padding: "4px 15px",
+                fontSize: "14px",
+                color: "dark-grey",
+                margin: "10px 10px",
+                textAlign: "center",
+                justifyContent: "center",
+                display: "flex",
+              }}
+              onClick={handleAddNewCategory}
+            >
+              + Add New Category
+            </MenuItem>
+          </Select>
+        </FormControl>
       </div>
+
       <div
-        className={`upload-container ${pdf ? "has-pdf" : ""}`}
+        className={`upload-container ${file ? "has-pdf" : ""}`}
         onClick={() => document.getElementById("pdf-upload").click()}
         onDragOver={(e) => e.preventDefault()}
         onDragLeave={(e) => e.preventDefault()}
         onDrop={handleDrop}
       >
-        {!pdf && (
+        {!file && (
           <>
             <CloudUploadIcon className="upload-icon" />
             <div className="upload-text">Click to upload or drag and drop</div>
             <div className="upload-text">PDF only (max. 30MB)</div>
           </>
         )}
-        {pdf && (
+        {file && (
           <div className="pdf-info">
-            <strong>{pdf.name}</strong>
+            <strong>{file.name}</strong>
             <br />
-            {pdf.size > 1024 * 1024
-              ? `${(pdf.size / (1024 * 1024)).toFixed(2)} MB`
-              : `${Math.round(pdf.size / 1024)} KB`}
+            {file.size > 1024 * 1024
+              ? `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+              : `${Math.round(file.size / 1024)} KB`}
             <IconButton className="deleteButton" onClick={handleDelete}>
               <DeleteIcon />
             </IconButton>
@@ -196,7 +461,7 @@ const NewDeck = ({ open, handleClose }) => {
           type="file"
           id="pdf-upload"
           accept=".pdf"
-          onChange={handlePDFChange}
+          onChange={handleFileChange}
           style={{ display: "none" }}
         />
       </div>
@@ -210,11 +475,13 @@ const NewDeck = ({ open, handleClose }) => {
             minHeight: "40px",
           }}
           onClick={handleGenerateFlashcards}
+          disabled={uploading}
         >
-          {!loading && "Generate Flashcards"}
-          {loading && <CircularWithValueLabel />}
+          {!uploading && "Generate Flashcards"}
+          {uploading && <CircularWithValueLabel interval={400} />}
         </Button>
       </div>
+      {errorp1 && <p className="error-message">{errorp1}</p>}
     </div>,
     <div className="page2-content" key="page2">
       <div className="header">
@@ -225,37 +492,57 @@ const NewDeck = ({ open, handleClose }) => {
         <div className="textfields-container">
           <div className="textfield-wrapper1">
             <p className="top">Question</p>
-            <TextField
-              id="reviewTextField1"
-              multiline
-              rows={12}
-              fullWidth
-              className="reviewTextField"
-              style={{ backgroundColor: "white" }}
-            />
+            <div className="question-container">
+              <TextField
+                id="reviewTextFieldQuestion"
+                multiline
+                rows={8}
+                fullWidth
+                className="reviewTextField"
+                style={{ backgroundColor: "white" }}
+                value={currentQuestion.question}
+                onChange={(e) =>
+                  setCurrentQuestion({
+                    ...currentQuestion,
+                    question: e.target.value,
+                  })
+                }
+              />
+            </div>
             <p className="bottom">This will appear on the front of the card</p>
           </div>
           <div className="textfield-wrapper2">
             <p className="top">Answer</p>
-            <TextField
-              id="reviewTextField2"
-              multiline
-              rows={12}
-              fullWidth
-              className="reviewTextField"
-              style={{ backgroundColor: "white" }}
-            />
+            <div className="answer-container">
+              <TextField
+                id="reviewTextFieldAnswer"
+                multiline
+                rows={8}
+                fullWidth
+                className="reviewTextField"
+                style={{ backgroundColor: "white" }}
+                value={currentQuestion.answer}
+                onChange={(e) =>
+                  setCurrentQuestion({
+                    ...currentQuestion,
+                    answer: e.target.value,
+                  })
+                }
+              />
+            </div>
             <p className="bottom">This will appear on the back of the card</p>
           </div>
         </div>
         <div className="navigation">
-          <ArrowBackIcon onClick={handlePreviousFlashcard} />
+          <ArrowBackIcon onClick={handlePreviousFlashcard} style={{cursor: 'pointer'}} />
           <span>
             {currentFlashcard} of {noOfQuestions}
           </span>
-          <ArrowForwardIcon onClick={handleNextFlashcard} />
+          <ArrowForwardIcon onClick={handleNextFlashcard} style={{cursor: 'pointer'}} />
         </div>
       </div>
+      {errorp2 && <p className="error-message">{errorp2}</p>}
+      {uploading && <CircularWithValueLabel />}
       <Button
         id="saveButton"
         style={{
@@ -265,6 +552,8 @@ const NewDeck = ({ open, handleClose }) => {
           width: "60%",
           marginTop: "20px",
         }}
+        onClick={handleUpload}
+        disabled={uploading}
       >
         Save Flashcards
       </Button>
@@ -284,30 +573,38 @@ const NewDeck = ({ open, handleClose }) => {
   ];
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-    >
-      <Box className="popup">
-        <div className="close">
-          <IconButton
-            className="close-button"
-            onClick={handleClose}
-          >
-            <CloseIcon fontSize="large" />
-          </IconButton>
-        </div>
-        <div className="popup-content">{pages[currentPage]}</div>
-      </Box>
-    </Modal>
+    <div className="new-deck">
+      <Modal
+        open={modalOpen}
+        onClose={handleClose}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+        aria-labelledby="modal-title"
+        aria-describedby="modal-description"
+      >
+        <Fade in={modalOpen}>
+          <Box className="popup">
+            <div className="close">
+              <IconButton className="close-button" onClick={handleClose}>
+                <CloseIcon fontSize="large" />
+              </IconButton>
+            </div>
+            <div className="popup-content">{pages[currentPage]}</div>
+          </Box>
+        </Fade>
+      </Modal>
+      <NewCategory
+        open={newCategoryModalOpen}
+        onClose={() => setNewCategoryModalOpen(false)}
+        onSave={handleSaveNewCategory}
+      />
+    </div>
   );
-};
-
-NewDeck.propTypes = {
-  open: PropTypes.bool.isRequired,
-  handleClose: PropTypes.func.isRequired,
 };
 
 export default NewDeck;

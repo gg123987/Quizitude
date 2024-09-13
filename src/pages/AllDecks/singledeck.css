@@ -1,0 +1,124 @@
+.decks {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  height: 93vh;
+  box-sizing: border-box;
+  background-color: #F9FAFB;
+}
+
+.decks-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  background-color: rgba(255, 255, 255, 1);
+  overflow-y: auto;
+  /* Hide scrollbar for WebKit browsers (Chrome, Safari) */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.decks-container::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+.content {
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 15px;
+  padding-bottom: 10px;
+}
+
+.decks-header {
+  padding: 25px 30px;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  margin-bottom: 0px;
+  border-bottom: 1px solid rgba(234, 236, 240, 1);
+}
+
+.decks-header h1 {
+  margin: 0;
+}
+
+.count-badge {
+  background-color: #e0eaff;
+  color: #3538cd;
+  padding: 0px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  height: 20px;
+  margin: 0;
+}
+
+.deck-count {
+  margin: 0;
+}
+
+.title {
+  color: #101828;
+  text-align: left;
+  font-size: 28px;
+  font-weight: 600;
+  font-family: Inter;
+}
+
+.decks-filter {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  border-bottom: 1px solid rgba(234, 236, 240, 1);
+  margin-bottom: 0;
+  padding: 15px 20px;
+}
+
+.col-left,
+.col-right {
+  flex: 0 1 auto;
+  margin: 0;
+  height: auto;
+}
+
+.deck-data {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.deck-data h2 {
+  font-family: "Inter";
+  font-weight: 600;
+  font-size: 20px;
+  color: #333;
+}
+
+.deck-data p {
+  width: 25%;
+  font-family: "Inter";
+  font-weight: 400;
+  font-size: 16px;
+  margin-top: 10p;
+  margin-bottom: 40px;
+  color: #666;
+}
+
+.deck-data .MuiButton-root {
+  width: 130px; /* Adjust button width as needed */
+  margin-bottom: 100px;
+}
+
+.flashcard-edit-list {
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.deck-table {
+  width: 100%;
+  height: 100%;
+}
