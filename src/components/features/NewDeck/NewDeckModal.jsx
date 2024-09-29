@@ -21,10 +21,10 @@ import Backdrop from "@mui/material/Backdrop";
 import useCategories from "@/hooks/useCategories";
 import useDecks from "@/hooks/useDecks";
 import { createCategory } from "@/services/categoryService";
-import NewCategory from "@/components/features/NewCategory/Modal";
+import NewCategory from "@/components/features/NewCategory/NewCatModal";
 import { uploadFileAndCreateDeck } from "@/services/fileService";
 import { formatAndInsertFlashcardData } from "@/services/flashcardService";
-import "./modal.css";
+import "./newdeck.css";
 
 const NewDeck = () => {
   const { user } = useAuth();
@@ -140,7 +140,6 @@ const NewDeck = () => {
     if (!questionType) {
       setError1("Please select the type of question.");
       return false;
-
     }
 
     if (!categoryId) {
@@ -155,7 +154,9 @@ const NewDeck = () => {
 
     // Check if the deck name already exists
     if (CheckDeckName(deckName)) {
-      setError1("A deck with the same name already exists. Please choose a different name.");
+      setError1(
+        "A deck with the same name already exists. Please choose a different name."
+      );
       return false;
     }
 
@@ -191,16 +192,22 @@ const NewDeck = () => {
       await formatAndInsertFlashcardData(llmResponse, deckId);
 
       console.log("Deck, file, and flashcards created successfully");
-      
+
       // Close the modal
       handleClose();
     } catch (error) {
       console.error("Error during upload:", error);
-      
-      if (error.message.includes("duplicate key value violates unique constraint")) {
-        setError2("A deck with the same name already exists. Please choose a different name.");
+
+      if (
+        error.message.includes("duplicate key value violates unique constraint")
+      ) {
+        setError2(
+          "A deck with the same name already exists. Please choose a different name."
+        );
       } else {
-        setError2("An error occurred while uploading the file. Please try again.");
+        setError2(
+          "An error occurred while uploading the file. Please try again."
+        );
       }
     } finally {
       setUploading(false);
@@ -218,7 +225,7 @@ const NewDeck = () => {
           file,
           questionType
         );
-        
+
         //create a copy of the response to avoid modifying the original response
         let thisResponse = JSON.parse(JSON.stringify(response));
         thisResponse = formatFlashcardData(thisResponse);
@@ -232,7 +239,6 @@ const NewDeck = () => {
         setCurrentPage(1);
 
         setLlmResponse(response);
-
       }
     } catch (error) {
       console.error("Error during upload:", error);
@@ -316,36 +322,36 @@ const NewDeck = () => {
     setCategoryId(category[0].id);
   };
 
-
   //function to modify the flashcard data to be displayed in the review flashcards page
   //this function takes in the response for the LLM and formats the Multiple Choice questions options
   const formatFlashcardData = (response) => {
-
     let thisResponse = response;
     //check if the response is for multiple choice questions by checking if it contains the "choices" key
     if (response[0].choices) {
       // Modify each question in the response array
-      thisResponse.forEach(question => {
+      thisResponse.forEach((question) => {
         // Append a new line to the value of the "question" key
-        question.question += '\n';
-        question.question += 'Options:\n';
+        question.question += "\n";
+        question.question += "Options:\n";
 
         // Initialize a counter for options
         let optionCounter = 65; // ASCII value of 'A'
         // Loop through choices
-        question.choices.forEach(choice => {
+        question.choices.forEach((choice) => {
           // Append the letter for the option
-          question.question += `${String.fromCharCode(optionCounter)}. ${choice}\n`;
+          question.question += `${String.fromCharCode(
+            optionCounter
+          )}. ${choice}\n`;
           // Increment the counter for the next letter
           optionCounter++;
         });
-        
+
         // Delete the "choices" key
         delete question.choices;
       });
     }
     return thisResponse;
-  }
+  };
 
   const pages = [
     <div className="page1-content" key="page1">
@@ -534,11 +540,17 @@ const NewDeck = () => {
           </div>
         </div>
         <div className="navigation">
-          <ArrowBackIcon onClick={handlePreviousFlashcard} style={{cursor: 'pointer'}} />
+          <ArrowBackIcon
+            onClick={handlePreviousFlashcard}
+            style={{ cursor: "pointer" }}
+          />
           <span>
             {currentFlashcard} of {noOfQuestions}
           </span>
-          <ArrowForwardIcon onClick={handleNextFlashcard} style={{cursor: 'pointer'}} />
+          <ArrowForwardIcon
+            onClick={handleNextFlashcard}
+            style={{ cursor: "pointer" }}
+          />
         </div>
       </div>
       {errorp2 && <p className="error-message">{errorp2}</p>}

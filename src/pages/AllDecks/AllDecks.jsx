@@ -12,7 +12,7 @@ import CustomButton from "@/components/common/CustomButton";
 import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
 import useModal from "@/hooks/useModal";
-import NewDeck from "@/components/features/NewDeck/Modal";
+import NewDeck from "@/components/features/NewDeck/NewDeckModal";
 import BasicTabs from "@/components/features/DisplayDecks/TabSelect";
 import ClearIcon from "@mui/icons-material/Clear";
 import FilteredDecks from "@/components/features/DisplayDecks/FilteredDecks";
@@ -181,9 +181,9 @@ const Decks = () => {
         {decks.length > 0 && (
           <div className="count-badge">
             {totalDecks === 1 ? (
-            <p className="deck-count">{totalDecks} deck</p>
+              <p className="deck-count">{totalDecks} deck</p>
             ) : (
-            <p className="deck-count">{totalDecks} decks</p>
+              <p className="deck-count">{totalDecks} decks</p>
             )}
           </div>
         )}

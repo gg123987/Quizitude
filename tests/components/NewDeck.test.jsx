@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { vi } from "vitest";
-import NewDeck from "@/components/NewDeck";
+import NewDeck from "@/components/NewDeck/NewDeckModal";
 import useAuth from "@/hooks/useAuth";
 import useCategories from "@/hooks/useCategories";
 import useModal from "@/hooks/useModal";

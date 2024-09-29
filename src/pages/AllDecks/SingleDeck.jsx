@@ -12,7 +12,7 @@ import CustomButton from "@/components/common/CustomButton";
 import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
 import useModal from "@/hooks/useModal";
-import NewDeck from "@/components/features/NewDeck/Modal";
+import NewDeck from "@/components/features/NewDeck/NewDeckModal";
 import BasicTabs from "@/components/features/DisplayDecks/TabSelect";
 import ClearIcon from "@mui/icons-material/Clear";
 import FlashcardEditList from "@/components/features/Flashcard/FlashcardEditList";
