@@ -18,6 +18,10 @@ export default defineConfig({
     coverage: {
       reporter: ["text", "json"],
     },
+    transform: {
+      // Allow mjs extensions
+      "^.+\\.mjs$": "babel-jest",
+    },
   },
   optimizeDeps: {
     include: ["pdfjs-dist"],
