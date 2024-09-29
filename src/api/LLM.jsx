@@ -144,6 +144,7 @@ export default async function FetchLLMResponse(
 
 async function getPdfText(pdf) {
   try {
+    const pdfjsLib = await import("pdfjs-dist/build/pdf.mjs");
     const text = await pdfToText(pdf);
     return text;
   } catch (error) {
