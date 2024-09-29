@@ -4,9 +4,11 @@ name: React CI
 on:
   push:
     branches:
+      - demo
       - main
   pull_request:
     branches:
+      - demo
       - main
 
 jobs:
