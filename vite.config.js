@@ -8,6 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "pdfjs-dist/build/pdf": "pdfjs-dist/build/pdf.mjs",
     },
   },
   test: {
