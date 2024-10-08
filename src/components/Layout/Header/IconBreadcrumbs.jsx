@@ -10,6 +10,7 @@ import useCategory from "@/hooks/useCategory";
 const staticMappings = {
   flashcards: "Flashcards",
   decks: "All Decks",
+  categories: "Categories",
   scores: "Scores",
   settings: "Settings",
   notifications: "Notifications",
