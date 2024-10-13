@@ -40,6 +40,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
@@ -54,7 +55,7 @@
     "material-ui-search-bar": "^1.0.1",
     "vite": "^5.3.5",
     "vite-plugin-static-copy": "^1.0.6",
-    "vitest": "^2.0.5"
+    "vitest": "^2.1.2"
   },
   "description": "This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.",
   "main": "vite.config.js",

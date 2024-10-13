@@ -393,16 +393,18 @@ const NewDeck = () => {
             value={questionType}
             label="Type of Question"
             onChange={handleQuestionTypeChange}
+            data-testid="question-type-select"
           >
-            <MenuItem value="multiple-choice">Multiple Choice</MenuItem>
-            <MenuItem value="short-answer">Short Answer</MenuItem>
+            <MenuItem value={"multiple-choice"}>Multiple Choice</MenuItem>
+            <MenuItem value={"short-answer"}>Short Answer</MenuItem>
           </Select>
         </FormControl>
 
         <FormControl fullWidth>
-          <InputLabel id="typeOfCategory">Category</InputLabel>
+          <InputLabel id="typeOfCategory-label">Category</InputLabel>
           <Select
             id="typeOfCategory"
+            labelId="typeOfCategory-label"
             value={categoryId}
             label="Type of Category"
             onChange={handleCategoryChange}
@@ -469,6 +471,7 @@ const NewDeck = () => {
           accept=".pdf"
           onChange={handleFileChange}
           style={{ display: "none" }}
+          data-testid="pdf-upload"
         />
       </div>
       <div className="generateButton">

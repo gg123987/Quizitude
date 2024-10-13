@@ -1,5 +1,6 @@
+// tests/setupTests.js
 import { expect, vi } from "vitest";
-import { beforeAll } from "vitest";
+import "@testing-library/jest-dom";
 
 // Mock Supabase client
 beforeAll(() => {
@@ -25,31 +26,51 @@ beforeAll(() => {
     };
   });
 
-  // Mocking fetch API
-  global.fetch = vi.fn((url) => {
-    if (url === "https://openrouter.ai/api/v1/chat/completions") {
-      return Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            choices: [
-              {
-                message: {
-                  content: JSON.stringify([
-                    {
-                      question: "What is the capital of France?",
-                      choices: ["Berlin", "Madrid", "Paris", "Rome"],
-                      answer: "Paris",
-                    },
-                  ]),
-                },
-              },
-            ],
-          }),
-      });
-    }
+  // Mock the LLM API for now
+  vi.mock("@/api/LLM", () => ({
+    __esModule: true, // Indicate that this is an ES module
+    default: vi.fn(() => Promise.resolve([])), // Mock the default function
+  }));
 
-    // Handle other URLs if necessary
-    return Promise.reject(new Error("Unknown URL"));
-  });
+  vi.mock("react-pdf", () => ({
+    pdfjs: {
+      GlobalWorkerOptions: {
+        workerSrc: "",
+      },
+    },
+  }));
+
+  vi.mock("react-pdftotext", () => ({
+    __esModule: true,
+    default: vi.fn().mockResolvedValue("Mocked PDF text"), // Mock PDF text extraction
+  }));
+
+  // Mock the required hooks
+  vi.mock("@/hooks/useAuth", () => ({
+    default: vi.fn(),
+  }));
+
+  vi.mock("@/hooks/useCategories", () => ({
+    default: vi.fn(),
+  }));
+
+  vi.mock("@/hooks/useDecks", () => ({
+    default: vi.fn(),
+  }));
+
+  vi.mock("@/hooks/useModal", () => ({
+    default: vi.fn(),
+  }));
+
+  vi.mock("@/services/fileService", () => ({
+    uploadFileAndCreateDeck: vi.fn(),
+  }));
+
+  vi.mock("@/services/deckService", () => ({
+    createDeck: vi.fn(),
+  }));
+
+  vi.mock("@/services/categoryService", () => ({
+    createCategory: vi.fn(),
+  }));
 });
