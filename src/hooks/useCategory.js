@@ -7,6 +7,11 @@ const useCategory = (categoryId) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!categoryId) {
+      setLoading(false);
+      return;
+    }
+
     const fetchCategory = async () => {
       try {
         const data = await getCategoryById(categoryId);

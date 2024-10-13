@@ -11,17 +11,18 @@ import SelectSort from "@/components/common/SelectSort";
 import CustomButton from "@/components/common/CustomButton";
 import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
-import useModal from "@/hooks/useModal";
 import NewCategory from "@/components/features/NewCategory/NewCatModal";
+import { createCategory } from "@/services/categoryService";
 import ClearIcon from "@mui/icons-material/Clear";
 import FilteredCategories from "@/components/features/DisplayCategories/FilteredCategories";
 import { useMediaQuery } from "@mui/material";
+import useModal from "@/hooks/useModal";
 import "./categories.css";
 
 const CustomTextField = styled(TextField)(() => ({
   width: "280px",
   backgroundColor: "white",
-  marginBottom: "20px",
+  marginBottom: "0px",
   borderRadius: "8px",
   border: "1px solid #D0D5DD",
   "& .MuiOutlinedInput-root": {
@@ -39,13 +40,15 @@ const CustomTextField = styled(TextField)(() => ({
 
 const Categories = () => {
   const { userId } = useOutletContext();
-  const { categories, loading, error } = useCategories(userId);
+  const { categories, loading, error, refreshCategories } =
+    useCategories(userId);
   const { openModal } = useModal();
   const [value, setValue] = React.useState(0);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [showClearIcon, setShowClearIcon] = useState("none");
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOption, setSortOption] = useState("Recently Created"); // Default sort option
+  const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
 
   const isLargeScreen = useMediaQuery("(min-width: 1630px)");
   const isMediumScreen = useMediaQuery("(min-width: 1247px)");
@@ -58,8 +61,12 @@ const Categories = () => {
     : isSmallScreen
     ? 2
     : 1;
-  const rows = 3; // Fixed number of rows per page
+  const rows = 6; // Fixed number of rows per page
   const categoriesPerPage = rows * columns;
+
+  const handleRefreshCategories = async () => {
+    await refreshCategories(); // Fetch categories again
+  };
 
   const filteredCategories = React.useMemo(() => {
     if (searchQuery.trim() === "") {
@@ -71,7 +78,7 @@ const Categories = () => {
   }, [categories, searchQuery]);
 
   const handleOpenModal = () => {
-    openModal(<NewCategory />);
+    setNewCategoryModalOpen(true);
   };
 
   const handleChange = (event) => {
@@ -139,10 +146,19 @@ const Categories = () => {
     }
   };
 
+  const handleSaveNewCategory = async (categoryName) => {
+    const newCategory = { name: categoryName, user_id: userId };
+    const category = await createCategory(newCategory);
+    setNewCategoryModalOpen(false); // Close the modal after saving
+
+    // Refresh the categories
+    handleRefreshCategories();
+  };
+
   return (
-    <div className="all-decks">
-      <div className="all-decks-header">
-        <h1 className="title">Categories</h1>
+    <div className="all-categories">
+      <div className="all-categories-header">
+        <h1 className="categories-title">Categories</h1>
         {categories.length > 0 && (
           <div className="count-badge">
             {totalCategories === 1 ? (
@@ -153,7 +169,7 @@ const Categories = () => {
           </div>
         )}
       </div>
-      <div className="all-decks-filter">
+      <div className="all-categories-filter">
         <div className="col-left">
           <CustomTextField
             id="outlined-basic"
@@ -198,11 +214,23 @@ const Categories = () => {
         </div>
 
         <div className="col-right">
+          <CustomButton
+            onClick={handleOpenModal}
+            icon={<AddIcon />}
+            style={{
+              color: "#3538CD",
+              backgroundColor: "transparent",
+              width: "150px",
+              border: "1.4px solid #3538CD",
+            }}
+          >
+            {"New Category"}
+          </CustomButton>
           <SelectSort onSortChange={handleSortChange} />
         </div>
       </div>
 
-      <div className="all-decks-data">
+      <div className="all-categories-data">
         {loading && <CircularWithValueLabel />}
         {error && <p className="error-message">{error.message}</p>}
         {!loading && !error && categories.length === 0 && (
@@ -225,7 +253,12 @@ const Categories = () => {
             </Box>
           </Box>
         )}
-        <FilteredCategories filteredAndSortedCategories={currentCategories} />
+        <div>
+          <FilteredCategories
+            filteredAndSortedCategories={currentCategories}
+            onRefreshCategories={handleRefreshCategories}
+          />
+        </div>
       </div>
       {totalPages > 1 && (
         <div className="footer">
@@ -263,6 +296,13 @@ const Categories = () => {
             </CustomButton>
           </div>
         </div>
+      )}
+      {newCategoryModalOpen && (
+        <NewCategory
+          open={newCategoryModalOpen}
+          onClose={() => setNewCategoryModalOpen(false)}
+          onSave={handleSaveNewCategory}
+        />
       )}
     </div>
   );

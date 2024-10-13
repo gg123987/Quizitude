@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { getDeckById } from '@/services/deckService';
+import { useState, useEffect } from "react";
+import { getDeckById } from "@/services/deckService";
 
 const useDeck = (deckId) => {
   const [deck, setDeck] = useState([]);
@@ -7,6 +7,11 @@ const useDeck = (deckId) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!deckId) {
+      setLoading(false);
+      return;
+    }
+
     const fetchDeck = async () => {
       try {
         const data = await getDeckById(deckId);

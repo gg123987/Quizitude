@@ -1,6 +1,6 @@
-.deck-card {
-  border-radius: 8px;
-  padding: 40px 30px;
+.category-card {
+  border-radius: 4px;
+  padding: 20px 30px;
   background-color: #ffffff;
   display: flex;
   flex-direction: row;
@@ -9,10 +9,12 @@
   cursor: pointer;
   transition: transform 0.3s;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-  border-bottom: 4px solid #E0EAFF;
+  border-bottom: 1.5px solid #A4BCFD;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.deck-card:hover {
+.category-card:hover {
   transform: scale(1.02);
 }
 
@@ -27,7 +29,7 @@
   opacity: 0.6;
 }
 
-.name {
+.category-name {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;

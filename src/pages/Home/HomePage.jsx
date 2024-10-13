@@ -1,44 +1,222 @@
-import * as React from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
+import { Link } from "react-router-dom";
+import Button from "@mui/material/Button";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import FilteredDecks from "@/components/features/DisplayDecks/FilteredDecks";
+import FilteredCategories from "@/components/features/DisplayCategories/FilteredCategories";
+import useDecks from "@/hooks/useDecks";
+import useCategories from "@/hooks/useCategories";
+import useAuth from "@/hooks/useAuth";
+import { useMediaQuery } from "@mui/material";
+import flame from "@/assets/flame.png";
+import WeekIndicator from "@/components/features/Streaks/WeekIndicator";
+import "./home.css"; // Add your CSS styles here
 
-const HomePage = () => {
-  const navigate = useNavigate();
+const Home = () => {
+  const { userId } = useOutletContext(); // Get user ID from context
+  const { decks, loading, error } = useDecks(userId); // Assuming useDecks fetches both recent and pinned decks
+  const {
+    categories,
+    loading: categoriesLoading,
+    error: categoriesError,
+  } = useCategories(userId);
+  const { user } = useAuth(); // Get user data from context
 
-  const handleSeeAll = () => {
-    navigate("/categories")
-  }
-  return (
-    <Box padding={3}>  
-      <Typography variant="h2" component="h2">Home</Typography>
-      <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={2}>
-        <Typography variant="h4">
-          Browse All Categories
-        </Typography>
-        <Link href="categories" onClick={handleSeeAll}>
-          See all
-        </Link>
-      </Box>
-      <Grid container spacing={2}>
-        {Array.from(Array(6)).map((_, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card>
-              <CardContent>
-                Placeholder Subjects
-                <br />
-                50 Decks
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+  const [currentRecentIndex, setCurrentRecentIndex] = useState(0);
+  const [currentPinnedIndex, setCurrentPinnedIndex] = useState(0);
+
+  const isLargeScreen = useMediaQuery("(min-width: 1630px)");
+  const isMediumScreen = useMediaQuery("(min-width: 1247px)");
+  const isSmallScreen = useMediaQuery("(min-width: 450px)");
+
+  const decksPerRow = isLargeScreen
+    ? 4
+    : isMediumScreen
+    ? 3
+    : isSmallScreen
+    ? 2
+    : 1;
+
+  const categoriesPerRow = isLargeScreen
+    ? 4
+    : isMediumScreen
+    ? 3
+    : isSmallScreen
+    ? 2
+    : 1;
+
+  const rowsToShow = 3;
+  const categoriesLimit = categoriesPerRow * rowsToShow;
+
+  // Filter and sort decks
+  const recentDecks = React.useMemo(() => {
+    return decks
+      .filter((deck) => !deck.is_pinned) // Only recent decks that are not pinned
+      .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at)) // Sort by updated_at
+      .slice(0, decksPerRow); // Take only the most recent decks based on decksPerRow
+  }, [decks]);
+
+  const displayedCategories = React.useMemo(() => {
+    return categories.slice(0, categoriesLimit);
+  }, [categories]);
+
+  const pinnedDecks = React.useMemo(() => {
+    return decks.filter((deck) => deck.is_pinned); // Only pinned decks
+  }, [decks]);
+
+  const handleNextPinned = () => {
+    if (currentPinnedIndex < Math.ceil(pinnedDecks.length / decksPerRow) - 1) {
+      setCurrentPinnedIndex(currentPinnedIndex + 1);
+    }
+  };
+
+  const handlePreviousPinned = () => {
+    if (currentPinnedIndex > 0) {
+      setCurrentPinnedIndex(currentPinnedIndex - 1);
+    }
+  };
+
+  const displayedPinnedDecks = pinnedDecks.slice(
+    currentPinnedIndex * decksPerRow,
+    (currentPinnedIndex + 1) * decksPerRow
   );
-}
 
-export default HomePage;
+  const userFirstName = user.user_metadata.name.split(" ")[0];
+  const streakCount = 40; // Change to actual streak count
+
+  return (
+    <div className="home">
+      <h1 className="title">Welcome back, {userFirstName}</h1>
+      <p className="subtitle">Keep going, you are making progress</p>
+
+      <section className="streak-section">
+        <div className="streak-box">
+          <div className="streak-col left">
+            <div className="streak-graphic">
+              <img src={flame} alt="Streak" />
+              <div className="streak-count-group">
+                <h4 className="streak-count">{streakCount}</h4>
+                <h2 className="streak-day">Day Streak</h2>
+              </div>
+            </div>
+          </div>
+          <div className="streak-sep" />
+          <div className="streak-col right">
+            <div className="streak-info">
+              <WeekIndicator streakCount={streakCount} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="deck-section">
+        <h2>Recent</h2>
+        <div className="deck-row">
+          {loading && <p>Loading...</p>}
+          {error && <p className="error-message">{error.message}</p>}
+          {!loading && recentDecks.length === 0 && (
+            <p>No recent decks available.</p>
+          )}
+          <FilteredDecks filteredAndSortedDecks={recentDecks} />
+        </div>
+      </section>
+
+      <section className="deck-section">
+        <div className="deck-header">
+          <h2>Pinned Decks</h2>
+          {!loading && displayedPinnedDecks.length !== 0 && (
+            <div className="pagination">
+              <Button
+                onClick={handlePreviousPinned}
+                variant="contained"
+                disabled={currentPinnedIndex === 0}
+                aria-label="Previous"
+                sx={{
+                  height: "36px",
+                  backgroundColor: "rgba(255, 255, 255, 1)",
+                  boxShadow: "none",
+                  border: "0.8px solid rgba(208, 213, 221, 1)",
+                  "&:disabled": {
+                    backgroundColor: "rgba(255, 255, 255, 1)", // Background when disabled
+                    color: "rgba(150, 150, 150, 1)", // Text color when disabled
+                  },
+                }}
+              >
+                <ArrowBackIosIcon
+                  fontSize="small"
+                  sx={{ color: "rgba(0, 0, 0, 1)" }}
+                />
+              </Button>
+              <Button
+                onClick={handleNextPinned}
+                variant="contained"
+                disabled={
+                  currentPinnedIndex >=
+                  Math.ceil(pinnedDecks.length / decksPerRow) - 1
+                }
+                aria-label="Next"
+                sx={{
+                  height: "36px",
+                  marginLeft: "10px",
+                  backgroundColor: "rgba(255, 255, 255, 1)",
+                  boxShadow: "none",
+                  border: "0.8px solid rgba(208, 213, 221, 1)",
+                  "&:disabled": {
+                    backgroundColor: "rgba(255, 255, 255, 1)",
+                    color: "rgba(150, 150, 150, 1)",
+                  },
+                }}
+              >
+                <ArrowForwardIosIcon
+                  sx={{ color: "rgba(0, 0, 0, 1)" }}
+                  fontSize="small"
+                />
+              </Button>
+            </div>
+          )}
+        </div>
+        <div className="deck-row">
+          {loading && <p>Loading...</p>}
+          {error && <p className="error-message">{error.message}</p>}
+          {!loading && displayedPinnedDecks.length === 0 && (
+            <p>No pinned decks available.</p>
+          )}
+          <FilteredDecks filteredAndSortedDecks={displayedPinnedDecks} />
+        </div>
+      </section>
+      <section
+        style={{ marginTop: displayedPinnedDecks.length === 0 ? 0 : "20px" }}
+      >
+        <div className="category-header">
+          <h2>Browse All Categories</h2>
+          {/* See All Button */}
+          <Link
+            to="/categories"
+            style={{
+              marginTop: "0px",
+              color: "#3538CD",
+              textDecoration: "none",
+              cursor: "pointer",
+            }}
+          >
+            See All
+          </Link>
+        </div>
+        <div className="categories-row">
+          {categoriesLoading && <p>Loading categories...</p>}
+          {categoriesError && <p>{categoriesError.message}</p>}
+          {!categoriesLoading && displayedCategories.length === 0 && (
+            <p>No categories available</p>
+          )}
+          <FilteredCategories
+            filteredAndSortedCategories={displayedCategories}
+          />
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Home;

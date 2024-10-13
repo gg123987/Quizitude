@@ -1,22 +1,151 @@
 .home {
-    display: grid;
-    grid-template-rows: auto 1fr;  /* First row auto height, second row takes remaining space */
-    grid-template-columns: 15% 1fr;  /* First column takes 15% (same as side bar width), second column takes the rest */
-    background-color: #fffcfc;
-    min-width: 1150px;
-  } 
-  
-  .deck-content {
-    display: flex; 
-  }
-  
-  .title {
-    color: black;
-    text-align: left; 
-    padding: 20px;
-    grid-column: 2 / span 1;  /* Title spans from the second column and takes up 1 column */
-    grid-row: 1; /* Title appears in the first row */
-    margin-top: 40px; 
-    font-size: 28px;
-    font-weight: bold;
-  }
+  padding: 20px 50px;
+  background-color: #f9fafb;
+  height: 93.2vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+.streak-section {
+  margin-top: 20px;
+  margin-bottom: 40px;
+  background-color: white;
+  border-radius: 10px;
+  border: 1px solid #eaecf0;
+  box-shadow: 0px 0px 1px rgba(16, 24, 40, 0.06);
+}
+
+.streak-box {
+  padding: 15px 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  height: 100%;
+}
+
+.streak-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.left {
+  flex: 1;
+}
+
+.right {
+  flex: 2;
+}
+
+.streak-sep {
+  width: 1px;
+  height: 55px;
+  background-color: rgba(152, 162, 179, 0.6);
+  align-self: center;
+}
+
+.streak-graphic {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.streak-info {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.streak-count-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0px;
+}
+
+.streak-count {
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 36px;
+  color: #101828;
+  margin: 0;
+}
+
+.streak-day {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #101828;
+  margin: 0;
+}
+
+.deck-section {
+  margin-bottom: 30px;
+}
+
+.deck-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pagination {
+  margin-bottom: 10px;
+}
+
+.deck-row {
+  flex-direction: row;
+  justify-content: space-evenly;
+  overflow: hidden;
+}
+
+.title {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 30px;
+  color: #101828;
+  margin: 0;
+}
+
+.subtitle {
+  text-align: left;
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #475467;
+}
+
+h2 {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: rgba(16, 24, 40, 1);
+  margin: 0;
+  margin-bottom: 15px;
+}
+
+p {
+  text-align: left;
+}
+
+/* Category Rows */
+.category-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.categories-row {
+  margin-bottom: 30px;
+}

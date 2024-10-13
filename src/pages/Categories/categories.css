@@ -1,4 +1,4 @@
-.all-decks {
+.all-categories {
     display: flex;
     flex-direction: column;
     padding: 40px;
@@ -7,7 +7,7 @@
     box-sizing: border-box;
   }
   
-  .all-decks-header {
+  .all-categories-header {
     margin-bottom: 15px;
     flex-direction: row;
     display: flex;
@@ -16,7 +16,7 @@
     box-sizing: border-box;
   }
   
-  .decks-header h1 {
+  .categories-header h1 {
     margin: 0;
   }
   
@@ -35,20 +35,15 @@
     margin: 0;
   }
   
-  .col-left {
-    display: flex;
-    flex-direction: column;
+  .col-right {
+    flex-direction: row;
+    margin-left: 10px;
+    justify-content: end;
+    align-items: center;
     gap: 10px;
   }
   
-  .col-right {
-    display: flex;
-    flex-direction: column;
-    margin-left: 20px;
-    justify-content: end;
-  }
-  
-  .title {
+  .categories-title {
     color: #101828;
     text-align: left;
     font-size: 28px;
@@ -56,27 +51,29 @@
     font-family: Inter;
   }
   
-  .all-decks-filter {
+  .all-categories-filter {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
   }
   
-  .all-decks-data {
+  .all-categories-data {
     flex-grow: 1;
     justify-content: center;
     align-items: center;
     overflow: hidden;
   }
   
-  .all-decks-data h2 {
+  .all-categories-data h2 {
     font-family: 'Inter';
     font-weight: 600;
     font-size: 20px;
     color: #333;
   }
   
-  .all-decks-data p {
+  .all-categories-data p {
     width: 25%;
     font-family: 'Inter';
     font-weight: 400;
@@ -86,7 +83,7 @@
     color: #666;
   }
   
-  .all-decks-data .MuiButton-root {
+  .all-categories-data .MuiButton-root {
     width: 130px; /* Adjust button width as needed */
     margin-bottom: 100px;
   }

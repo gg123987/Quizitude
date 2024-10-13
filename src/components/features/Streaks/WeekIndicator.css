@@ -1,0 +1,70 @@
+.week-indicator {
+  width: 80%;
+  max-width: 650px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.days,
+.numbers {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.day,
+.number {
+  text-align: center;
+  width: 14.28%;
+  position: relative;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+}
+
+.day {
+  font-weight: 700;
+  color: #101828;
+  margin-bottom: 10px;
+}
+
+.number {
+  font-weight: 500;
+  color: #101828;
+  background-color: transparent;
+  padding: 5px;
+}
+
+/* Streak days */
+.number.streak {
+  background-color: rgba(
+    224,
+    234,
+    255,
+    1
+  );
+  padding: 5px;
+  color: rgba(53, 56, 205, 1);
+}
+
+.streak-start {
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px; 
+}
+
+.streak-end {
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px; /
+}
+
+.dot-indicator {
+  width: 5px;
+  height: 5px;
+  background-color: rgba(53, 56, 205, 1);
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -10px;
+}
