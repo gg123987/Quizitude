@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -40,7 +41,8 @@ const CustomTextField = styled(TextField)(() => ({
 
 const Decks = () => {
   const { userId } = useOutletContext();
-  const { decks, loading, error } = useDecks(userId);
+  const location = useLocation();
+  const { decks: allDecks, loading, error } = useDecks(userId);
   const { openModal } = useModal();
   const [value, setValue] = React.useState(0);
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -51,6 +53,16 @@ const Decks = () => {
   const isLargeScreen = useMediaQuery("(min-width: 1630px)");
   const isMediumScreen = useMediaQuery("(min-width: 1247px)");
   const isSmallScreen = useMediaQuery("(min-width: 450px)");
+
+  const query = new URLSearchParams(location.search);
+  const categoryId = query.get("categoryId");
+  const categoryName = query.get("categoryName");
+
+  const decks = categoryId
+    ? allDecks.filter(
+        (deck) => deck.category_id == (categoryId == 0 ? null : categoryId)
+      )
+    : allDecks;
 
   const columns = isLargeScreen
     ? 4
@@ -69,7 +81,7 @@ const Decks = () => {
     return decks.filter((deck) =>
       deck.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [decks, searchQuery]);
+  }, [decks, searchQuery, categoryId]);
 
   const handleTabChange = React.useCallback((event, newValue) => {
     setValue(newValue);
@@ -177,7 +189,7 @@ const Decks = () => {
   return (
     <div className="all-decks">
       <div className="all-decks-header">
-        <h1 className="title">All Decks</h1>
+        <h1 className="title">{categoryName ? categoryName : "All Decks"}</h1>
         {decks.length > 0 && (
           <div className="count-badge">
             {totalDecks === 1 ? (

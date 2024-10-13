@@ -1,7 +1,7 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import Flashcard from "./Flashcard";
 
-const FlashcardList = ({ flashcards, flipped=false }) => {
+const FlashcardList = ({ flashcards, flipped = false }) => {
   return (
     <div className="card-grid">
       {flashcards.map((flashcard) => {
@@ -19,7 +19,7 @@ const FlashcardList = ({ flashcards, flipped=false }) => {
 
 FlashcardList.propTypes = {
   flashcards: PropTypes.array.isRequired,
-  flipped: PropTypes.bool
+  flipped: PropTypes.bool,
 };
 
 export default FlashcardList;

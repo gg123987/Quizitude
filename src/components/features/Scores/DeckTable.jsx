@@ -105,7 +105,7 @@ const DeckTable = () => {
       <div className="table-content">
         <table className="deck-table">
           <thead>
-            <tr className="deck-header">
+            <tr className="deck-header-table">
               <th>Deck</th>
               <th>Date Reviewed</th>
               <th>Time</th>

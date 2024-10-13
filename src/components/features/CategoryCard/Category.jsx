@@ -52,7 +52,10 @@ const Category = ({ category, onRefreshCategories }) => {
   };
 
   const handleClickCategory = () => {
-    navigate(`/categories/${category.id}`);
+    const params = new URLSearchParams();
+    params.append("categoryId", category.id);
+    params.append("categoryName", category.name);
+    navigate(`/decks?${params.toString()}`);
   };
 
   const handleRenameDialogClose = () => {

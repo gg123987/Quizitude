@@ -17,7 +17,8 @@ export const getCategoriesByUser = async (userId) => {
       `
       *,
       decks:decks!left (
-        id
+        id,
+        category_id
       )
     `
     )
@@ -33,6 +34,34 @@ export const getCategoriesByUser = async (userId) => {
     ...category,
     decks_count: category.decks.length,
   }));
+
+  console.log("Categories fetched:", processedData);
+
+  // Fetch all decks belonging to the user
+  const { data: decksData, error: decksError } = await supabase
+    .from("decks")
+    .select("id, category_id")
+    .eq("user_id", userId);
+
+  if (decksError) {
+    console.error("Error fetching decks:", decksError);
+    return processedData;
+  }
+
+  // Find uncategorized decks (decks with no associated category)
+  const uncategorizedDecks = decksData.filter(
+    (deck) => deck.category_id === null
+  );
+
+  // Add the "Uncategorized" category manually if there are uncategorized decks
+  if (uncategorizedDecks.length > 0) {
+    processedData.push({
+      id: 0, // Assign a unique ID for the uncategorized category
+      name: "Uncategorised", // Display name
+      decks_count: uncategorizedDecks.length, // Number of uncategorized decks
+      decks: uncategorizedDecks, // The actual uncategorized decks
+    });
+  }
 
   return processedData;
 };

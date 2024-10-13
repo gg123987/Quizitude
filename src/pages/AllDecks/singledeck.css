@@ -33,12 +33,30 @@
 .decks-header {
   padding: 25px 30px;
   flex-direction: row;
+  justify-content: space-between;
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  flex: 0 0 auto;
-  margin-bottom: 0px;
   border-bottom: 1px solid rgba(234, 236, 240, 1);
+}
+
+.deck-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.deck-titles {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.deck-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
 }
 
 .decks-header h1 {

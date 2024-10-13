@@ -12,4 +12,9 @@
     padding: 10px 30px; /* Adjust padding as needed */
     border-radius: 5px;
     max-width: 100%;
+    text-align: center;
+}
+
+.flashcard-question, .flashcard-answer {
+    text-align: center;
 }

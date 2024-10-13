@@ -12,17 +12,28 @@ import useAuth from "@/hooks/useAuth";
 import { useMediaQuery } from "@mui/material";
 import flame from "@/assets/flame.png";
 import WeekIndicator from "@/components/features/Streaks/WeekIndicator";
+import CircularProgress from "@mui/material/CircularProgress";
 import "./home.css"; // Add your CSS styles here
 
 const Home = () => {
   const { userId } = useOutletContext(); // Get user ID from context
-  const { decks, loading, error } = useDecks(userId); // Assuming useDecks fetches both recent and pinned decks
+  const { decks, loading: decksLoading, error } = useDecks(userId); // Assuming useDecks fetches both recent and pinned decks
   const {
     categories,
     loading: categoriesLoading,
     error: categoriesError,
   } = useCategories(userId);
   const { user } = useAuth(); // Get user data from context
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // If loading decks or categories, show loading spinner
+    if (decksLoading || categoriesLoading) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+    }
+  }, [decksLoading, categoriesLoading]);
 
   const [currentRecentIndex, setCurrentRecentIndex] = useState(0);
   const [currentPinnedIndex, setCurrentPinnedIndex] = useState(0);
@@ -111,110 +122,118 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="deck-section">
-        <h2>Recent</h2>
-        <div className="deck-row">
-          {loading && <p>Loading...</p>}
-          {error && <p className="error-message">{error.message}</p>}
-          {!loading && recentDecks.length === 0 && (
-            <p>No recent decks available.</p>
-          )}
-          <FilteredDecks filteredAndSortedDecks={recentDecks} />
+      {loading ? (
+        <div className="loading-spinner">
+          <CircularProgress color="inherit" />
         </div>
-      </section>
-
-      <section className="deck-section">
-        <div className="deck-header">
-          <h2>Pinned Decks</h2>
-          {!loading && displayedPinnedDecks.length !== 0 && (
-            <div className="pagination">
-              <Button
-                onClick={handlePreviousPinned}
-                variant="contained"
-                disabled={currentPinnedIndex === 0}
-                aria-label="Previous"
-                sx={{
-                  height: "36px",
-                  backgroundColor: "rgba(255, 255, 255, 1)",
-                  boxShadow: "none",
-                  border: "0.8px solid rgba(208, 213, 221, 1)",
-                  "&:disabled": {
-                    backgroundColor: "rgba(255, 255, 255, 1)", // Background when disabled
-                    color: "rgba(150, 150, 150, 1)", // Text color when disabled
-                  },
-                }}
-              >
-                <ArrowBackIosIcon
-                  fontSize="small"
-                  sx={{ color: "rgba(0, 0, 0, 1)" }}
-                />
-              </Button>
-              <Button
-                onClick={handleNextPinned}
-                variant="contained"
-                disabled={
-                  currentPinnedIndex >=
-                  Math.ceil(pinnedDecks.length / decksPerRow) - 1
-                }
-                aria-label="Next"
-                sx={{
-                  height: "36px",
-                  marginLeft: "10px",
-                  backgroundColor: "rgba(255, 255, 255, 1)",
-                  boxShadow: "none",
-                  border: "0.8px solid rgba(208, 213, 221, 1)",
-                  "&:disabled": {
-                    backgroundColor: "rgba(255, 255, 255, 1)",
-                    color: "rgba(150, 150, 150, 1)",
-                  },
-                }}
-              >
-                <ArrowForwardIosIcon
-                  sx={{ color: "rgba(0, 0, 0, 1)" }}
-                  fontSize="small"
-                />
-              </Button>
+      ) : (
+        <>
+          <section className="deck-section">
+            <h2>Recent</h2>
+            <div className="deck-row">
+              {decksLoading && <p>Loading...</p>}
+              {error && <p className="error-message">{error.message}</p>}
+              {!decksLoading && recentDecks.length === 0 && (
+                <p>No recent decks available.</p>
+              )}
+              <FilteredDecks filteredAndSortedDecks={recentDecks} />
             </div>
-          )}
-        </div>
-        <div className="deck-row">
-          {loading && <p>Loading...</p>}
-          {error && <p className="error-message">{error.message}</p>}
-          {!loading && displayedPinnedDecks.length === 0 && (
-            <p>No pinned decks available.</p>
-          )}
-          <FilteredDecks filteredAndSortedDecks={displayedPinnedDecks} />
-        </div>
-      </section>
-      <section
-        style={{ marginTop: displayedPinnedDecks.length === 0 ? 0 : "20px" }}
-      >
-        <div className="category-header">
-          <h2>Browse All Categories</h2>
-          {/* See All Button */}
-          <Link
-            to="/categories"
+          </section>
+
+          <section className="deck-section">
+            <div className="deck-header">
+              <h2>Pinned Decks</h2>
+              {!decksLoading && displayedPinnedDecks.length !== 0 && (
+                <div className="pagination">
+                  <Button
+                    onClick={handlePreviousPinned}
+                    variant="contained"
+                    disabled={currentPinnedIndex === 0}
+                    aria-label="Previous"
+                    sx={{
+                      height: "36px",
+                      backgroundColor: "rgba(255, 255, 255, 1)",
+                      boxShadow: "none",
+                      border: "0.8px solid rgba(208, 213, 221, 1)",
+                      "&:disabled": {
+                        backgroundColor: "rgba(255, 255, 255, 1)", // Background when disabled
+                        color: "rgba(150, 150, 150, 1)", // Text color when disabled
+                      },
+                    }}
+                  >
+                    <ArrowBackIosIcon
+                      fontSize="small"
+                      sx={{ color: "rgba(0, 0, 0, 1)" }}
+                    />
+                  </Button>
+                  <Button
+                    onClick={handleNextPinned}
+                    variant="contained"
+                    disabled={
+                      currentPinnedIndex >=
+                      Math.ceil(pinnedDecks.length / decksPerRow) - 1
+                    }
+                    aria-label="Next"
+                    sx={{
+                      height: "36px",
+                      marginLeft: "10px",
+                      backgroundColor: "rgba(255, 255, 255, 1)",
+                      boxShadow: "none",
+                      border: "0.8px solid rgba(208, 213, 221, 1)",
+                      "&:disabled": {
+                        backgroundColor: "rgba(255, 255, 255, 1)",
+                        color: "rgba(150, 150, 150, 1)",
+                      },
+                    }}
+                  >
+                    <ArrowForwardIosIcon
+                      sx={{ color: "rgba(0, 0, 0, 1)" }}
+                      fontSize="small"
+                    />
+                  </Button>
+                </div>
+              )}
+            </div>
+            <div className="deck-row">
+              {error && <p className="error-message">{error.message}</p>}
+              {!loading && displayedPinnedDecks.length === 0 && (
+                <p>No pinned decks available.</p>
+              )}
+              <FilteredDecks filteredAndSortedDecks={displayedPinnedDecks} />
+            </div>
+          </section>
+          <section
             style={{
-              marginTop: "0px",
-              color: "#3538CD",
-              textDecoration: "none",
-              cursor: "pointer",
+              marginTop: displayedPinnedDecks.length === 0 ? 0 : "20px",
             }}
           >
-            See All
-          </Link>
-        </div>
-        <div className="categories-row">
-          {categoriesLoading && <p>Loading categories...</p>}
-          {categoriesError && <p>{categoriesError.message}</p>}
-          {!categoriesLoading && displayedCategories.length === 0 && (
-            <p>No categories available</p>
-          )}
-          <FilteredCategories
-            filteredAndSortedCategories={displayedCategories}
-          />
-        </div>
-      </section>
+            <div className="category-header">
+              <h2>Browse All Categories</h2>
+              {/* See All Button */}
+              <Link
+                to="/categories"
+                style={{
+                  marginTop: "0px",
+                  color: "#3538CD",
+                  textDecoration: "none",
+                  cursor: "pointer",
+                }}
+              >
+                See All
+              </Link>
+            </div>
+            <div className="categories-row">
+              {categoriesError && <p>{categoriesError.message}</p>}
+              {!loading && displayedCategories.length === 0 && (
+                <p>No categories available</p>
+              )}
+              <FilteredCategories
+                filteredAndSortedCategories={displayedCategories}
+              />
+            </div>
+          </section>
+        </>
+      )}
     </div>
   );
 };

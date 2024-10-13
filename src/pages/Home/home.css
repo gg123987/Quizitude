@@ -138,6 +138,10 @@ p {
   text-align: left;
 }
 
+.loading-screen {
+  color: rgba(53, 56, 205, 1);
+}
+
 /* Category Rows */
 .category-header {
   display: flex;
