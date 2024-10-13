@@ -23,9 +23,14 @@
 }
 
 .header {
-  text-align: center;
+  display: flex;
+  flex-direction: column; /* Stacks h2 and p vertically */
+  justify-content: center; /* Centers content vertically if necessary */
+  align-items: center; /* Centers content horizontally */
   margin-bottom: 20px;
+  text-align: center; /* Centers text inside the elements */
 }
+
 
 .textfield-wrapper {
   width: 100%;

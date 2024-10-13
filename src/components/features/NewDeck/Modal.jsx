@@ -361,7 +361,7 @@ const NewDeck = () => {
             id="titleOfCard"
             type="text"
             value={deckName}
-            placeholder="Deck Name"
+            label="Deck Name"
             className="titleOfCard"
             onChange={handleDeckNameChange}
             fullWidth
