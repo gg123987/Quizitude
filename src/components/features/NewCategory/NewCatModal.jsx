@@ -1,8 +1,15 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
-import { Modal, Box, TextField, Button, IconButton, Typography } from "@mui/material";
+import {
+  Modal,
+  Box,
+  TextField,
+  Button,
+  IconButton,
+  Typography,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import "./modal.css";
+import "./newcat.css";
 
 const NewCategory = ({ open, onClose, onSave }) => {
   const [categoryName, setCategoryName] = useState("");
@@ -52,7 +59,11 @@ const NewCategory = ({ open, onClose, onSave }) => {
             margin="normal"
           />
           {error && (
-            <Typography color="error" variant="body2" style={{ marginTop: "10px" }}>
+            <Typography
+              color="error"
+              variant="body2"
+              style={{ marginTop: "10px" }}
+            >
               {error}
             </Typography>
           )}

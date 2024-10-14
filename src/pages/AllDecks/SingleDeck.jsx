@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import React from "react";
 import { useState } from "react";
 import Box from "@mui/material/Box";
@@ -12,11 +13,12 @@ import CustomButton from "@/components/common/CustomButton";
 import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
 import useModal from "@/hooks/useModal";
-import NewDeck from "@/components/features/NewDeck/Modal";
+import NewDeck from "@/components/features/NewDeck/NewDeckModal";
 import BasicTabs from "@/components/features/DisplayDecks/TabSelect";
 import ClearIcon from "@mui/icons-material/Clear";
 import FlashcardEditList from "@/components/features/Flashcard/FlashcardEditList";
 import DeckTable from "@/components/features/Scores/DeckTable";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 import "./singledeck.css";
 
 const CustomTextField = styled(TextField)(() => ({
@@ -45,6 +47,7 @@ const DeckDetail = () => {
   const [value, setValue] = React.useState(0);
   const [searchQuery, setSearchQuery] = React.useState("");
   const [showClearIcon, setShowClearIcon] = useState("none");
+  const navigate = useNavigate();
 
   const handleTabChange = React.useCallback((event, newValue) => {
     setValue(newValue);
@@ -57,6 +60,17 @@ const DeckDetail = () => {
   const handleChange = (event) => {
     setShowClearIcon(event.target.value === "" ? "none" : "flex");
     setSearchQuery(event.target.value);
+  };
+
+  const handleStudyCard = () => {
+    console.log("Study Card");
+    navigate("/study", {
+      state: { flashcards: flashcards, deckName: deck.name },
+    });
+  };
+
+  const handleMoreOptions = () => {
+    console.log("More Options");
   };
 
   const tabsData = React.useMemo(
@@ -85,13 +99,33 @@ const DeckDetail = () => {
     <div className="decks" style={{ paddingBottom: value === 0 ? "0" : "" }}>
       <div className="decks-container">
         <div className="decks-header">
-          <h1 className="title">{deck.name}</h1>
-          {deck.categories && (
-            <div className="count-badge">
-              <p className="deck-count">{deck.categories.name}</p>
+          <div className="deck-info">
+            <div className="deck-titles">
+              <h1 className="title">{deck.name}</h1>
+              {deck.categories && (
+                <div className="count-badge">
+                  <p className="deck-count">{deck.categories.name}</p>
+                </div>
+              )}
             </div>
-          )}
-          <p className="deck-count">{flashcards.length} cards</p>
+            <p className="deck-count">{flashcards.length} cards generated</p>
+          </div>
+          <div className="deck-actions">
+            <CustomButton onClick={handleStudyCard} icon={null}>
+              {"Study Deck"}
+            </CustomButton>
+            <CustomButton
+              onClick={handleMoreOptions}
+              icon={<MoreVertIcon />}
+              style={{
+                color: "#1D2939",
+                backgroundColor: "rgba(255, 255, 255, 1)",
+                border: "1px solid rgba(208, 213, 221, 1)",
+              }}
+            >
+              {""}
+            </CustomButton>
+          </div>
         </div>
         <div className="decks-filter">
           <div className="col-left">

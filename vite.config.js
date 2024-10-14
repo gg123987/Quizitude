@@ -1,13 +1,31 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vite'
+import path from "node:path";
+import { createRequire } from "node:module";
+
+import { defineConfig, normalizePath } from "vite";
+import { viteStaticCopy } from "vite-plugin-static-copy";
 import react from "@vitejs/plugin-react";
-import path from "path";
+
+const require = createRequire(import.meta.url);
+
+const pdfjsDistPath = path.dirname(require.resolve("pdfjs-dist/package.json"));
+const cMapsDir = normalizePath(path.join(pdfjsDistPath, "cmaps"));
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    viteStaticCopy({
+      targets: [
+        {
+          src: cMapsDir,
+          dest: "",
+        },
+      ],
+    }),
+    react(),
+  ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "src"),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
   test: {
@@ -18,11 +36,16 @@ export default defineConfig({
     coverage: {
       reporter: ["text", "json"],
     },
+    transform: {
+      // Allow mjs extensions
+      "^.+\\.mjs$": "babel-jest",
+    },
   },
   optimizeDeps: {
+    include: ["pdfjs-dist"],
     esbuildOptions: {
       loader: {
-        '.mjs': 'js',
+        ".mjs": "js",
       },
     },
   },

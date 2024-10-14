@@ -1,6 +1,6 @@
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import HomeIcon from "@/assets/home.svg";
+import home from "@/assets/home.svg";
 import { Link, useLocation } from "react-router-dom";
 import ChevronRightOutlinedIcon from "@mui/icons-material/ChevronRightOutlined";
 import useDeck from "@/hooks/useDeck";
@@ -10,6 +10,7 @@ import useCategory from "@/hooks/useCategory";
 const staticMappings = {
   flashcards: "Flashcards",
   decks: "All Decks",
+  categories: "Categories",
   scores: "Scores",
   settings: "Settings",
   notifications: "Notifications",
@@ -61,50 +62,62 @@ export default function IconBreadcrumbs() {
   });
 
   return (
-    <Breadcrumbs
-      separator={<ChevronRightOutlinedIcon fontSize="small" color="disabled" />}
-      aria-label="breadcrumb"
+    <div
       style={{
-        whiteSpace: "nowrap",
-        overflow: "hidden",
-        textOverflow: "ellipsis",
         display: "flex",
-        flexWrap: "nowrap",
+        height: "20px",
+        alignItems: "center",
+        overflow: "hidden",
+        marginLeft: "18px",
       }}
     >
-      <Link
-        to="/"
+      <Breadcrumbs
+        separator={
+          <ChevronRightOutlinedIcon fontSize="small" color="disabled" />
+        }
+        aria-label="breadcrumb"
         style={{
-          textDecoration: "none",
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
           display: "flex",
-          alignItems: "center",
+          flexWrap: "nowrap",
         }}
       >
-        <img src={HomeIcon} alt="home" className="home" width={"15px"} />
-      </Link>
+        <Link
+          to="/"
+          style={{
+            textDecoration: "none",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <img src={home} alt="home" width="15px" height="30px" />
+        </Link>
 
-      {pathnames.map((segment, index) => {
-        const to = `/${pathnames.slice(0, index + 1).join("/")}`;
+        {pathnames.map((segment, index) => {
+          const to = `/${pathnames.slice(0, index + 1).join("/")}`;
 
-        return (
-          <Link
-            key={to}
-            to={to}
-            style={{
-              textDecoration: "none",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <Typography color="#3538CD" fontFamily={"Inter"} fontWeight={500}>
-              {formattedPathnames[index]}{" "}
-            </Typography>
-          </Link>
-        );
-      })}
-    </Breadcrumbs>
+          return (
+            <Link
+              key={to}
+              to={to}
+              style={{
+                textDecoration: "none",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Typography color="#3538CD" fontFamily={"Inter"} fontWeight={500}>
+                {formattedPathnames[index]}{" "}
+              </Typography>
+            </Link>
+          );
+        })}
+      </Breadcrumbs>
+    </div>
   );
 }

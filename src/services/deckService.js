@@ -13,14 +13,10 @@ export const createDeck = async (deckData) => {
 
 export const getDecksByUser = async (userId) => {
   const { data, error } = await supabase
-    .from('decks')
-    .select(`
-      id,
-      name,
-      created_at,
-      updated_at,
-      is_favourite,
-      is_reviewed,
+    .from("decks")
+    .select(
+      `
+      *,
       categories:categories!decks_category_id_fkey (
         id,
         name
@@ -28,20 +24,21 @@ export const getDecksByUser = async (userId) => {
       flashcards (
         id
       )
-    `)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false });
+    `
+    )
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
 
   if (error) {
-    console.error('Error fetching decks:', error);
+    console.error("Error fetching decks:", error);
     return [];
   }
 
   // Process the data to include the flashcards count
-  const processedData = data.map(deck => ({
+  const processedData = data.map((deck) => ({
     ...deck,
-    categories: deck.categories || { id: 0, name: 'Uncategorised' },
-    flashcards_count: deck.flashcards.length
+    categories: deck.categories || { id: 0, name: "Uncategorised" },
+    flashcards_count: deck.flashcards.length,
   }));
 
   return processedData;
@@ -50,7 +47,8 @@ export const getDecksByUser = async (userId) => {
 export const getDeckById = async (deckId) => {
   const { data, error } = await supabase
     .from("decks")
-    .select(`
+    .select(
+      `
       id,
       name,
       created_at,
@@ -64,20 +62,21 @@ export const getDeckById = async (deckId) => {
       flashcards (
         id
       )
-    `)
-    .eq('id', deckId)
+    `
+    )
+    .eq("id", deckId)
     .single();
 
   if (error) {
-    console.error('Error fetching deck:', error);
+    console.error("Error fetching deck:", error);
     return null;
   }
 
   // Process the data to include the flashcards count
   const processedData = {
     ...data,
-    categories: data.categories || { id: 0, name: 'Uncategorised' },
-    flashcards_count: data.flashcards.length
+    categories: data.categories || { id: 0, name: "Uncategorised" },
+    flashcards_count: data.flashcards.length,
   };
 
   return processedData;
