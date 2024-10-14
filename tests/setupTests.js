@@ -1,6 +1,5 @@
 // tests/setupTests.js
 import { expect, vi } from "vitest";
-import "@testing-library/jest-dom";
 
 // Mock Supabase client
 beforeAll(() => {
