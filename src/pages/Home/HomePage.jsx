@@ -94,7 +94,10 @@ const Home = () => {
     (currentPinnedIndex + 1) * decksPerRow
   );
 
-  const userFirstName = user.user_metadata.name.split(" ")[0];
+  const userFirstName =
+    user && user.user_metadata.name
+      ? user.user_metadata.name.split(" ")[0]
+      : "User";
   const streakCount = 40; // Change to actual streak count
 
   return (
