@@ -268,6 +268,8 @@ const Decks = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              height: "100%",
+              justifyContent: "center",
             }}
           >
             <h2>You have no flashcards yet</h2>

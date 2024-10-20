@@ -214,18 +214,20 @@ const Categories = () => {
         </div>
 
         <div className="col-right">
-          <CustomButton
-            onClick={handleOpenModal}
-            icon={<AddIcon />}
-            style={{
-              color: "#3538CD",
-              backgroundColor: "transparent",
-              width: "150px",
-              border: "1.4px solid #3538CD",
-            }}
-          >
-            {"New Category"}
-          </CustomButton>
+          {categories.length > 0 && (
+            <CustomButton
+              onClick={handleOpenModal}
+              icon={<AddIcon />}
+              style={{
+                color: "#3538CD",
+                backgroundColor: "transparent",
+                width: "150px",
+                border: "1.4px solid #3538CD",
+              }}
+            >
+              {"New Category"}
+            </CustomButton>
+          )}
           <SelectSort onSortChange={handleSortChange} />
         </div>
       </div>
@@ -236,18 +238,30 @@ const Categories = () => {
         {!loading && !error && categories.length === 0 && (
           <Box
             sx={{
-              textAlign: "center",
               padding: "20px",
               flex: 1,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              height: "100%",
+              justifyContent: "center",
             }}
           >
-            <h2>You have no flashcards yet</h2>
-            <p>Upload your first PDF to get started. Click the button below</p>
+            <h2>You have no categories yet</h2>
+            <p style={{ textAlign: "center" }}>
+              Create your first category by clicking the button below
+            </p>
             <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <CustomButton onClick={handleOpenModal} icon={<AddIcon />}>
+              <CustomButton
+                onClick={handleOpenModal}
+                icon={<AddIcon />}
+                style={{
+                  color: "#3538CD",
+                  backgroundColor: "transparent",
+                  width: "150px",
+                  border: "1.4px solid #3538CD",
+                }}
+              >
                 {"New Category"}
               </CustomButton>
             </Box>
