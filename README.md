@@ -69,7 +69,7 @@ This will serve the production build at [http://localhost:5000](http://localhost
 
 ## Project Structure
 Key directories:
-Key directories:
+```
 ├── src/               # Main source code
 │   ├── api/           # API-related files and integrations
 │   │   └── llm.js     # File for large language model interactions
@@ -84,6 +84,7 @@ Key directories:
 │   └── main.jsx        # Application entry point
 ├── tests/             # Unit and integration tests
 └── dist/              # Built production files
+```
 
 ## Contributing
 This a private project, so contributions will be limited.
