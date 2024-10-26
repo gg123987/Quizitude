@@ -7,7 +7,7 @@ export const uploadFileAndCreateDeck = async (file, deckData) => {
 
     // 1. Upload the file to Supabase Storage and create a file record
     const fileRecord = await uploadFile(file, userId);
-
+    console.log(fileRecord)
     const file_id = fileRecord[0].id;
 
     // Add the file_id to the deckData

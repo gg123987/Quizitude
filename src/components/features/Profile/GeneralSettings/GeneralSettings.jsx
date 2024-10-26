@@ -1,9 +1,20 @@
-import PropTypes from 'prop-types';
-import Avatar from '@/components/features/Profile/Avatar/Avatar'; // Ensure this path is correct
-import './generalSettings.css';
+import PropTypes from "prop-types";
+import Avatar from "@/components/features/Profile/Avatar/Avatar"; // Ensure this path is correct
+import "./generalSettings.css";
 
-const GeneralSettings = ({ user, setEmail, setFullName, avatar_url, setAvatarUrl }) => {
-  console.log('GeneralSettings Props:', { user, setEmail, setFullName, avatar_url }); // Debugging line
+const GeneralSettings = ({
+  user,
+  setEmail,
+  setFullName,
+  avatar_url,
+  setAvatarUrl,
+}) => {
+  console.log("GeneralSettings Props:", {
+    user,
+    setEmail,
+    setFullName,
+    avatar_url,
+  }); // Debugging line
 
   return (
     <div className="settings-page">
@@ -14,7 +25,9 @@ const GeneralSettings = ({ user, setEmail, setFullName, avatar_url, setAvatarUrl
           <p>Upgrade your account</p>
           <div className="upgrade-box">
             <div className="upgrade-text">
-              <strong><p>You are on a free plan</p></strong>
+              <strong>
+                <p>You are on a free plan</p>
+              </strong>
               <p>Upgrade to our premium plan to enjoy more features</p>
             </div>
             <div className="upgrade-button">
@@ -29,7 +42,7 @@ const GeneralSettings = ({ user, setEmail, setFullName, avatar_url, setAvatarUrl
             <label>Email address</label>
             <input
               type="email"
-              value={user.email || ''}
+              value={user.email || ""}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
@@ -38,7 +51,7 @@ const GeneralSettings = ({ user, setEmail, setFullName, avatar_url, setAvatarUrl
             <label>Full Name</label>
             <input
               type="text"
-              value={user.user_metadata.full_name || ''}
+              value={user.user_metadata.full_name || ""}
               onChange={(e) => setFullName(e.target.value)}
               required
             />
