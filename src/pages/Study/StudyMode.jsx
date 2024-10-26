@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import FlashcardList from "@/components/features/Flashcard/FlashcardList";
 import "./studymode.css";
 import Button from "@mui/material/Button";
@@ -11,29 +12,93 @@ import ShuffleIcon from "@mui/icons-material/Shuffle";
 import CompareIcon from "@mui/icons-material/Compare";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
+import useAuth from "@/hooks/useAuth";
+import { createSession } from "@/services/sessionService";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import confetti from "@/assets/confetti.svg";
 
 const StudyMode = () => {
-  const [cards, setCards] = useState(SAMPLE_CARDS_LONG); // Array of flashcards
+  const { user } = useAuth();
+  const [cards, setCards] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentCardIndex, setCurrentCardIndex] = useState(0); // Index of the current flashcard
   const [flipped, setFlipped] = useState(false); // Boolean to track if the flashcard is flipped
   const [showSummary, setShowSummary] = useState(false);
+  const [deckName, setDeckName] = useState("");
+  const [deckId, setDeckId] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const [correctCount, setCorrectCount] = useState(0);
+  const [incorrectCount, setIncorrectCount] = useState(0);
+  const [scorePercentage, setScorePercentage] = useState(0);
 
   useEffect(() => {
+    // Get flashcards from location state
+    const { flashcards, deckName, deckId } = location.state || {};
+
+    if (flashcards && deckName && deckId) {
+      const flashcardsWithScore = flashcards.map((card) => ({
+        ...card,
+        score: undefined,
+        answered: undefined,
+      }));
+      setCards(flashcardsWithScore);
+      setDeckName(deckName);
+      setDeckId(deckId);
+      setLoading(false);
+    } else {
+      // loading state
+      setLoading(true);
+    }
+  }, [location.state]);
+
+  useEffect(() => {
+    if (loading) {
+      return;
+    }
     // Check if all cards have been answered
     const allAnswered = cards.every((card) => card.score !== undefined);
     if (allAnswered) {
-      setShowSummary(true);
+      logSession();
     }
   }, [cards]);
 
   useEffect(() => {
     // Set flipped to false when the current card changes
     setFlipped(false);
-  }, [currentCardIndex]);  
+  }, [currentCardIndex]);
+
+  const logSession = async () => {
+    // Log session into supabase using sessionService
+    console.log("All cards have been answered");
+
+    const correctCount = cards.filter(
+      (card) => card.score === "correct"
+    ).length;
+    const incorrectCount = cards.length - correctCount;
+    const scorePercentage = (correctCount / cards.length) * 100;
+
+    setCorrectCount(correctCount);
+    setIncorrectCount(incorrectCount);
+    setScorePercentage(scorePercentage);
+
+    const sessionData = {
+      deck_id: deckId,
+      deck_name: deckName,
+      date_reviewed: new Date().toISOString(),
+      correct: correctCount,
+      incorrect: incorrectCount,
+      score: scorePercentage,
+      user_id: user.id,
+    };
+
+    const result = await createSession(sessionData);
+    console.log("Session created:", result);
+
+    // Show the summary screen
+    setShowSummary(true);
+  };
 
   const handleShuffle = () => {
     const shuffledCards = [...cards];
@@ -80,10 +145,12 @@ const StudyMode = () => {
 
     console.log("Flipped:", !flipped);
 
+    console.log("Answered card index is", cards[currentCardIndex]);
     // if flipped = true now, and no answer was given for option, set answered to -1 and score to incorrect
     if (
       !flipped &&
-      cards[currentCardIndex].options.length > 0 &&
+      cards[currentCardIndex].options != null &&
+      cards[currentCardIndex].options?.length > 0 &&
       cards[currentCardIndex].answered === undefined
     ) {
       setCards((prevCards) => {
@@ -142,7 +209,13 @@ const StudyMode = () => {
   const handleReviewAgain = () => {
     // Logic to reset the study session
     setShowSummary(false);
-    setCards(SAMPLE_CARDS_LONG); // Reset cards to initial state
+    setCards((prevCards) =>
+      prevCards.map((card) => ({
+        ...card,
+        score: undefined,
+        answered: undefined,
+      }))
+    );
     setCurrentCardIndex(0); // Reset current card index
   };
 
@@ -180,12 +253,6 @@ const StudyMode = () => {
   };
 
   const renderSummary = () => {
-    const correctCount = cards.filter(
-      (card) => card.score === "correct"
-    ).length;
-    const incorrectCount = cards.length - correctCount;
-    const scorePercentage = (correctCount / cards.length) * 100;
-
     return (
       <div className="summary-container">
         <Box sx={{ mt: "100px", mb: "30px" }}>
@@ -197,12 +264,24 @@ const StudyMode = () => {
           />
         </Box>
         <Typography
-          sx={{ mb: 2, fontSize: 22, fontFamily: "Inter", fontWeight: 600 }}
+          sx={{
+            mb: 2,
+            fontSize: 22,
+            fontFamily: "Inter",
+            fontWeight: 600,
+            textAlign: "center",
+          }}
         >
           Congratulations!
         </Typography>
         <Typography
-          sx={{ mb: 2, fontSize: 16, fontFamily: "Inter", fontWeight: 400 }}
+          sx={{
+            mb: 2,
+            fontSize: 16,
+            fontFamily: "Inter",
+            fontWeight: 400,
+            textAlign: "center",
+          }}
         >
           You reviewed all your cards. You are making great <br />
           progress. Check out your results!
@@ -211,12 +290,33 @@ const StudyMode = () => {
           <div className="summary-progress">
             <Box
               sx={{
-                position: "relative",
-                display: "inline-flex",
-                mt: 2,
-                borderRadius: "50%",
+                position: "relative", // Allows us to layer elements inside the Box
+                display: "inline-flex", // Ensures content inside the Box aligns properly
               }}
             >
+              <Box
+                sx={{
+                  position: "absolute", // Positioned behind the CircularProgress
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <svg width="100" height="100" viewBox="0 0 36 36">
+                  <circle
+                    cx="18"
+                    cy="18"
+                    r="16"
+                    fill="none"
+                    stroke="rgba(234, 236, 240, 1)"
+                    strokeWidth="3"
+                  />
+                </svg>
+              </Box>
               <CircularProgress
                 variant="determinate"
                 value={scorePercentage}
@@ -327,19 +427,24 @@ const StudyMode = () => {
   };
 
   return (
-    <div className="flashcard-page">
-      <div className="flashcard-header">
-        <Typography sx={{ fontWeight: "bold" }}>Study Mode</Typography>
-        <Typography sx={{ fontWeight: "600", fontSize: "1.2rem" }}>
-          Category | {cards.length} cards
-        </Typography>
-        <Button variant="text" onClick={handleclose}>
-          <CloseIcon />
-        </Button>
-      </div>
-      {showSummary ? (
-        renderSummary()
+    <div className="study-page">
+      {loading ? (
+        <div className="loading-container">
+          <CircularProgress />
+        </div>
       ) : (
+        <div className="flashcard-header">
+          <Typography sx={{ fontWeight: "bold" }}>Study Mode</Typography>
+          <Typography sx={{ fontWeight: "600", fontSize: "1.2rem" }}>
+            {deckName} | {cards.length} cards
+          </Typography>
+          <Button variant="text" onClick={handleclose}>
+            <CloseIcon sx={{ color: "black" }} />
+          </Button>
+        </div>
+      )}
+      {!loading && showSummary && renderSummary()}
+      {!loading && !showSummary && (
         <>
           <div className="flashcard-container">
             <AppBar
@@ -431,7 +536,7 @@ const StudyMode = () => {
             {/* Response buttons */}
             <div className="response-buttons">
               {/* Conditionally render multiple-choice options or "I knew this" and "I don't know this" buttons */}
-              {cards[currentCardIndex]?.options.length > 0 ? (
+              {cards[currentCardIndex]?.options?.length > 0 ? (
                 // Render multiple-choice options
                 cards[currentCardIndex]?.options?.map((option, index) => (
                   <Button
@@ -524,7 +629,7 @@ const StudyMode = () => {
                       },
                     }}
                   >
-                    Dont know this
+                    Didn't know this
                   </Button>
                 </>
               )}

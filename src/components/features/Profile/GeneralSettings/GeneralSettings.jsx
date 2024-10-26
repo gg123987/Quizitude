@@ -1,11 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import useAuth from "@/hooks/useAuth";
-import PropTypes from 'prop-types';
-import Avatar from '@/components/features/Profile/Avatar/Avatar'; // Ensure this path is correct
-import { supabase } from '@/utils/supabase'
-import './generalSettings.css';
+import PropTypes from "prop-types";
+import Avatar from "@/components/features/Profile/Avatar/Avatar"; // Ensure this path is correct
+import { supabase } from "@/utils/supabase";
+import ProVersion from "@/components/features/Payment/ProVersion/ProVersion";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import "./generalSettings.css";
 
-const GeneralSettings = ({ user, setEmail, setFullName, avatar_url, setAvatarUrl, updateProfile, isGoogleUser }) => {
+const GeneralSettings = ({
+  user,
+  setEmail,
+  setFullName,
+  avatar_url,
+  setAvatarUrl,
+  updateProfile,
+  isGoogleUser,
+}) => {
+  const [showProVersion, setShowProVersion] = useState(false); // State to control ProVersion visibility
+
+  const handleUpgradeClick = () => {
+    setShowProVersion(true); // Set state to show ProVersion
+  };
+
+  if (showProVersion) {
+    return <ProVersion setShowProVersion={setShowProVersion} />; // Return ProVersion component if showProVersion is true
+  }
 
   const [showDeletePopup, setShowDeletePopup] = useState(false); // For popup visibility state
   const { passwordReset } = useAuth();
@@ -13,117 +33,172 @@ const GeneralSettings = ({ user, setEmail, setFullName, avatar_url, setAvatarUrl
   //const [tempEmail, setTempEmail] = useState(user.email || '');
   //const [tempFullName, setTempFullName] = useState(user.user_metadata.full_name || '');
 
-  
   const handleSaveChanges = (event) => {
     setLoading(true);
     event.preventDefault();
 
-    console.log('new name:', user.user_metadata.tempFullName);
+    console.log("new name:", user.user_metadata.tempFullName);
     setLoading(false);
-    updateProfile(new Event('submit'));
-  }
+    updateProfile(new Event("submit"));
+  };
 
   const resetPassword = async () => {
     setLoading(true);
     const { error } = await passwordReset(user.tempEmail);
     if (error) {
-      console.error('Error sending password reset email:', error.message);
+      console.error("Error sending password reset email:", error.message);
     } else {
       setLoading(false);
-      alert('Password reset email sent');
+      alert("Password reset email sent");
     }
-  }
+  };
 
   const handleDeleteAccount = async () => {
-    console.log('Deleting account...');
-    try{
+    console.log("Deleting account...");
+    try {
       const response = await supabase
-        .from('users')
+        .from("users")
         .delete()
-        .eq('id', user.userID);
+        .eq("id", user.userID);
 
-      console.log('Account successfully deleted:', response);
-      alert('Account successfully deleted');
+      console.log("Account successfully deleted:", response);
+      alert("Account successfully deleted");
       //redirect the user to the login page
-      window.location.href = '/login';
-      
-    } catch(error){
-      console.error('Error deleting account:', error.message);
-      alert('Failed to delete the account');
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Error deleting account:", error.message);
+      alert("Failed to delete the account");
     }
   };
 
   return (
     <div className="settings-page">
       <div className="settings-container">
-        <h4>General Settings</h4>
+        <div className="section">
+          <h4 className="left-aligned">General Settings</h4>
+        </div>
 
         <div className="section">
-          <p>Upgrade your account</p>
-          <div className="upgrade-box">
-            <div className="upgrade-text">
-              <strong><p>You are on a free plan</p></strong>
+          <h6 className="left-aligned">Upgrade your Account</h6>
+          <div className="box">
+            <div className="text">
+              <strong>
+                <p>You are on a free plan</p>
+              </strong>
               <p>Upgrade to our premium plan to enjoy more features</p>
             </div>
             <div className="upgrade-button">
-              <button className="upgrade-btn">Upgrade Plan</button>
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: "#3538cd",
+                }}
+                onClick={handleUpgradeClick}
+              >
+                Upgrade Plan
+              </Button>
             </div>
           </div>
         </div>
 
-        <div className="section profile-section">
-          <h3>Profile</h3>
-          <div className="input-group">
-            <label>Email address</label>
-            <input
-              type="email"
-              //value={tempEmail}
-              //onChange={(e) => setTempEmail(e.target.value)}
-              value={user.tempEmail}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="input-group">
-            <label>Full Name</label>
-            <input
-              type="text"
-              //value={tempFullName}
-              //onChange={(e) => setTempFullName(e.target.value)}
-              value={user.user_metadata.tempFullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-            />
-          </div>
-          <button className="save-changes-btn" onClick={handleSaveChanges}>{loading ? 'Loading ...' : 'Save changes'}</button>
+        <div className="section">
+          <h6 className="left-aligned">Profile</h6>
+          <p className="left-aligned">
+            Update your profile and personal details
+          </p>
+          <TextField
+            id="email-address"
+            label="Email address"
+            variant="outlined"
+            type="email"
+            value={user.tempEmail}
+            onChange={(e) => setEmail(e.target.value)}
+            fullWidth
+            required
+            sx={{ marginBottom: "1rem" }}
+          />
+          <TextField
+            id="full-name"
+            label="Full name"
+            variant="outlined"
+            type="text"
+            value={user.user_metadata.tempFullName}
+            onChange={(e) => setFullName(e.target.value)}
+            fullWidth
+            required
+            sx={{ marginBottom: "1rem" }}
+          />
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: "#ffffff",
+              color: "black",
+              marginRight: "1rem",
+              ":hover": {
+                backgroundColor: "#e0e0e0e0",
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleSaveChanges}
+            sx={{
+              backgroundColor: "#3538cd",
+            }}
+          >
+            {loading ? "Loading ..." : "Save changes"}
+          </Button>
         </div>
 
         <div className="section">
-          <h3>Profile Photo</h3>
-          <div className="profile-photo-upload">
-            <Avatar
-              userId={user.userID}
-              url={avatar_url}
-              size={150}
-              onUpload={(filePath) => {
-                setAvatarUrl(filePath); // Set the avatar URL when upload is complete
-              }}
-            />
-          </div>
+          <h6 className="left-aligned">Profile Photo</h6>
+          <p className="left-aligned">Update your profile photo</p>
+          <Avatar
+            userId={user.userID}
+            url={avatar_url}
+            size={150}
+            onUpload={(filePath) => {
+              setAvatarUrl(filePath); // Set the avatar URL when upload is complete
+            }}
+          />
         </div>
         {/* Password Reset Section */}
         {!isGoogleUser && (
-          <div className="section password-section">
-            <h3>Password Reset</h3>
-            <p>To reset your password, click below to receive a reset link to your email.</p>
-            <button className="reset-password-btn" onClick={resetPassword}>{loading ? 'Loading ...' : 'Reset Password'}</button>
+          <div className="section">
+            <h6 className="left-aligned">Password Reset</h6>
+            <p className="left-aligned">
+              To reset your password, click below to receive a reset link to
+              your email.
+            </p>
+            <Button
+              variant="contained"
+              onClick={resetPassword}
+              sx={{
+                backgroundColor: "#3538cd",
+              }}
+            >
+              {loading ? "Loading ..." : "Reset Password"}
+            </Button>
           </div>
         )}
-        
+
         {/* Delete Account Section */}
         <div className="section">
-          <h3>Deactivate your account</h3>
-          <button className="delete-account-btn" onClick={() => setShowDeletePopup(true)}>Delete Account</button>
+          <h6 className="left-aligned">Deactivate your account</h6>
+          <div className="box">
+            <p className="text">You will lose access to all your information</p>
+            <Button
+              variant="contained"
+              onClick={() => setShowDeletePopup(true)}
+              sx={{
+                backgroundColor: "#b32318",
+              }}
+            >
+              Delete Account
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -133,8 +208,18 @@ const GeneralSettings = ({ user, setEmail, setFullName, avatar_url, setAvatarUrl
           <div className="popup-content">
             <h4>Are you sure you want to delete your account?</h4>
             <p>This action cannot be undone.</p>
-            <button onClick={handleDeleteAccount} className="confirm-delete-btn">Yes, Delete</button>
-            <button onClick={() => setShowDeletePopup(false)} className="cancel-btn">Cancel</button>
+            <button
+              onClick={handleDeleteAccount}
+              className="confirm-delete-btn"
+            >
+              Yes, Delete
+            </button>
+            <button
+              onClick={() => setShowDeletePopup(false)}
+              className="cancel-btn"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}

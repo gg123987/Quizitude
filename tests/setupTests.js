@@ -1,20 +1,18 @@
-import { expect, vi } from 'vitest';
-import { beforeAll } from 'vitest';
+// tests/setupTests.js
+import { expect, vi } from "vitest";
 
 // Mock Supabase client
 beforeAll(() => {
-  vi.mock('@supabase/supabase-js', () => {
-    const actualModule = vi.importActual('@supabase/supabase-js');
+  vi.mock("@supabase/supabase-js", () => {
+    const actualModule = vi.importActual("@supabase/supabase-js");
 
     return {
       ...actualModule,
       createClient: vi.fn(() => ({
         auth: {
-          signIn: vi
-            .fn()
-            .mockResolvedValue({
-              user: { id: '123', email: 'test@example.com' },
-            }),
+          signIn: vi.fn().mockResolvedValue({
+            user: { id: "123", email: "test@example.com" },
+          }),
           signOut: vi.fn().mockResolvedValue({}),
         },
         from: vi.fn(() => ({
@@ -26,4 +24,52 @@ beforeAll(() => {
       })),
     };
   });
+
+  // Mock the LLM API for now
+  vi.mock("@/api/LLM", () => ({
+    __esModule: true, // Indicate that this is an ES module
+    default: vi.fn(() => Promise.resolve([])), // Mock the default function
+  }));
+
+  vi.mock("react-pdf", () => ({
+    pdfjs: {
+      GlobalWorkerOptions: {
+        workerSrc: "",
+      },
+    },
+  }));
+
+  vi.mock("react-pdftotext", () => ({
+    __esModule: true,
+    default: vi.fn().mockResolvedValue("Mocked PDF text"), // Mock PDF text extraction
+  }));
+
+  // Mock the required hooks
+  vi.mock("@/hooks/useAuth", () => ({
+    default: vi.fn(),
+  }));
+
+  vi.mock("@/hooks/useCategories", () => ({
+    default: vi.fn(),
+  }));
+
+  vi.mock("@/hooks/useDecks", () => ({
+    default: vi.fn(),
+  }));
+
+  vi.mock("@/hooks/useModal", () => ({
+    default: vi.fn(),
+  }));
+
+  vi.mock("@/services/fileService", () => ({
+    uploadFileAndCreateDeck: vi.fn(),
+  }));
+
+  vi.mock("@/services/deckService", () => ({
+    createDeck: vi.fn(),
+  }));
+
+  vi.mock("@/services/categoryService", () => ({
+    createCategory: vi.fn(),
+  }));
 });

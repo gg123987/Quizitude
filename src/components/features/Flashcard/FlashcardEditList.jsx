@@ -1,18 +1,27 @@
-import PropTypes from 'prop-types';
-import FlashcardEdit from './FlashcardEdit';
+import PropTypes from "prop-types";
+import FlashcardEdit from "./FlashcardEdit";
 
-const FlashcardEditList = ({ flashcards }) => {
-	return (
-		<div className="list-container">
-			{flashcards.map(flashcard => (
-				<FlashcardEdit key={flashcard.id} flashcard={flashcard} />
-			))}
-		</div>
-	);
+const FlashcardEditList = ({ flashcards, refreshFlashcards }) => {
+  const handleChange = () => {
+    refreshFlashcards();
+  };
+
+  return (
+    <div className="list-container">
+      {flashcards.map((flashcard) => (
+        <FlashcardEdit
+          key={flashcard.id}
+          flashcard={flashcard}
+          onChange={handleChange}
+        />
+      ))}
+    </div>
+  );
 };
 
 FlashcardEditList.propTypes = {
-	flashcards: PropTypes.array.isRequired,
+  flashcards: PropTypes.array.isRequired,
+  refreshFlashcards: PropTypes.func.isRequired,
 };
 
 export default FlashcardEditList;

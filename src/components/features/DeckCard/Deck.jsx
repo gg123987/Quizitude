@@ -12,12 +12,16 @@ const Deck = ({ deck }) => {
 
   const handleClickDeck = () => {
     navigate(`/decks/${deck.id}`);
-  }
+  };
 
   const handleClickCategory = (e) => {
     e.stopPropagation();
-    navigate(`/categories/${categoryId}`);
-  }
+
+    const params = new URLSearchParams();
+    params.append("categoryId", categoryId);
+    params.append("categoryName", categoryName);
+    navigate(`/decks?${params.toString()}`);
+  };
 
   return (
     <div className="deck-card" onClick={handleClickDeck}>

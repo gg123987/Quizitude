@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
-import './settingsNavbar.css';
+import React, { useState } from "react";
+import "./settingsNavbar.css";
 
-function SettingsNavbar({ activeTab, setActiveTab}) {
+function SettingsNavbar({ activeTab, setActiveTab }) {
   return (
     <nav className="settings-navbar">
       <ul className="settings-navbar-tabs">
-        {['Streak', 'View Score History', 'PDF Uploads', 'General Settings'].map((tab) => (
+        {[
+          "Streak",
+          "View Score History",
+          "PDF Uploads",
+          "General Settings",
+        ].map((tab) => (
           <li
             key={tab}
-            className={`settings-navbar-tab ${activeTab === tab ? 'active' : ''}`}
+            className={`settings-navbar-tab ${
+              activeTab === tab ? "active" : ""
+            }`}
             onClick={() => setActiveTab(tab)}
           >
             {tab}

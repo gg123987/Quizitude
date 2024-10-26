@@ -1,9 +1,7 @@
-body{
-    background-color: #f8f9fa;
-}
-
-.flashcard-page{
+.study-page {
     padding: 40px;
+    background-color: rgba(249, 250, 251, 1);
+    min-height: 100vh;
 }
 
 .flashcard-header{
@@ -94,6 +92,7 @@ body{
     cursor: pointer;
     transition: 150ms;
     transform: perspective(1000px) rotateY(var(--rotate-y, 0));
+    text-align: center;
 }
 
 .card:hover{
@@ -124,6 +123,11 @@ body{
     font-size: 0.8rem;
 }
 
+.flashcard-slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 /* Define scrollbar styles */
 .flashcard-slider-container::-webkit-scrollbar {
@@ -146,9 +150,7 @@ body{
     background: #555; /* Color of the scrollbar handle on hover */
 }
 
-
-
-.summary-divider{
+.summary-divider {
     display: flex;
     flex-direction: row;
     justify-content: space-between; /* Change to space-between */
@@ -158,7 +160,7 @@ body{
     margin: 0 auto;
 }
 
-.summary-score{
+.summary-score {
     display: flex;
     flex-direction: row;
     gap: 1rem;

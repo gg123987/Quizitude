@@ -8,7 +8,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Logout from "@mui/icons-material/Logout";
 import useAuth from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import QuizIcon from '@mui/icons-material/Quiz';
+import QuizIcon from "@mui/icons-material/Quiz";
 
 export default function AccountMenu() {
   const { auth, signOut } = useAuth();
@@ -76,9 +76,6 @@ export default function AccountMenu() {
       >
         <MenuItem onClick={handlProfile}>
           <Avatar /> Profile
-        </MenuItem>
-        <MenuItem onClick={handleStudy}>
-          <QuizIcon fontSize="large" color="disabled" sx={{ mr: "5px", ml: "-5px" }} /> Study Mode
         </MenuItem>
         <Divider />
         {auth && (

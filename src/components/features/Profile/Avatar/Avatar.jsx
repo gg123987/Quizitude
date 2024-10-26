@@ -1,7 +1,7 @@
-import { useEffect, useState, memo } from 'react';
-import PropTypes from 'prop-types';
-import { supabase } from '@/utils/supabase';
-import './avatar.css'
+import { useEffect, useState, memo } from "react";
+import PropTypes from "prop-types";
+import { supabase } from "@/utils/supabase";
+import "./avatar.css";
 
 export default function Avatar({ userId, url, size, onUpload }) {
   const [avatarUrl, setAvatarUrl] = useState(url);
@@ -10,29 +10,27 @@ export default function Avatar({ userId, url, size, onUpload }) {
 
   useEffect(() => {
     if (url) {
-      
       downloadImage(url); // attempt to download from storage
-      
-    }
-    else {
-      console.log('url is null')
-      setAvatarUrl(null)
+    } else {
+      console.log("url is null");
+      setAvatarUrl(null);
       setLoading(false); // Mark loading as done
     }
   }, [url]);
 
-
   async function downloadImage(path) {
     try {
       setLoading(true); // Mark loading as in progress
-      const { data, error } = await supabase.storage.from('files').download(path);
+      const { data, error } = await supabase.storage
+        .from("files")
+        .download(path);
       if (error) {
         throw error;
       }
       const downloadedUrl = URL.createObjectURL(data);
       setAvatarUrl(downloadedUrl);
     } catch (error) {
-      console.log('Error downloading image: ', error.message);
+      console.log("Error downloading image: ", error.message);
     } finally {
       setLoading(false); // Mark loading as done once download is complete
     }
@@ -41,17 +39,19 @@ export default function Avatar({ userId, url, size, onUpload }) {
   async function uploadAvatar(event) {
     try {
       setUploading(true);
-      console.log('Uploading new avatar...');
+      console.log("Uploading new avatar...");
       if (!event.target.files || event.target.files.length === 0) {
-        throw new Error('You must select an image to upload.');
+        throw new Error("You must select an image to upload.");
       }
 
       const file = event.target.files[0];
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split(".").pop();
       const fileName = `${Math.random()}.${fileExt}`;
       const filePath = `${userId}/avatars/${fileName}`; // Use userId as the top-level folder
 
-      const { error: uploadError } = await supabase.storage.from('files').upload(filePath, file);
+      const { error: uploadError } = await supabase.storage
+        .from("files")
+        .upload(filePath, file);
 
       if (uploadError) {
         throw uploadError;
@@ -62,20 +62,38 @@ export default function Avatar({ userId, url, size, onUpload }) {
       alert(error.message);
     } finally {
       setUploading(false);
-      console.log('Avatar update complete');
+      console.log("Avatar update complete");
     }
   }
 
   function handleAvatarClick() {
     if (!uploading) {
-      document.getElementById('avatar-upload-input').click();
+      document.getElementById("avatar-upload-input").click();
     }
   }
 
   return (
-    <div className="avatar-container" onClick={handleAvatarClick} style={{ position: 'relative', display: 'inline-block', width: size, height: size }}>
+    <div
+      className="avatar-container"
+      onClick={handleAvatarClick}
+      style={{
+        position: "relative",
+        display: "inline-block",
+        width: size,
+        height: size,
+      }}
+    >
       {loading ? (
-        <div className="avatar loading" style={{ height: size, width: size, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div
+          className="avatar loading"
+          style={{
+            height: size,
+            width: size,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <span>Loading...</span> {/* Display loading message */}
         </div>
       ) : avatarUrl ? (
@@ -86,8 +104,18 @@ export default function Avatar({ userId, url, size, onUpload }) {
           style={{ height: size, width: size }}
         />
       ) : (
-        <div className="avatar no-image" style={{ height: size, width: size, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <span>Click here to set up avatar</span> {/* This only shows if there's no avatar */}
+        <div
+          className="avatar no-image"
+          style={{
+            height: size,
+            width: size,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <span>Click here to set up avatar</span>{" "}
+          {/* This only shows if there's no avatar */}
         </div>
       )}
       <input
@@ -95,7 +123,7 @@ export default function Avatar({ userId, url, size, onUpload }) {
         id="avatar-upload-input"
         accept="image/*"
         onChange={uploadAvatar}
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         disabled={uploading}
       />
     </div>

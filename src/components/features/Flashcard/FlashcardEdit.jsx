@@ -1,15 +1,56 @@
+import React, { useState } from "react";
+import { Icon, TextField } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import styled from "@mui/material/styles/styled";
 import PropTypes from "prop-types";
 import "./flashcardedit.css";
 import TrashIcon from "@/assets/trash-icon";
 import EditIcon from "@/assets/edit-icon";
+import DoneIcon from "@mui/icons-material/Done";
+import { deleteFlashcard, updateFlashcard } from "@/services/flashcardService";
 
-const FlashcardEdit = ({ flashcard }) => {
-  const handleDelete = () => {
-    // TODO: Implement delete functionality
+const CssTextField = styled(TextField)({
+  "& label.Mui-focused": {
+    color: "green",
+  },
+  "& .MuiInput-underline:after": {
+    borderBottomColor: "green",
+  },
+  "& .MuiOutlinedInput-root": {
+    "& fieldset": {
+      borderColor: "transparent",
+    },
+    "&:hover fieldset": {
+      borderColor: "transparent",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "transparent",
+    },
+  },
+});
+
+const FlashcardEdit = ({ flashcard, onChange }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedQuestion, setEditedQuestion] = useState(flashcard.question);
+  const [editedAnswer, setEditedAnswer] = useState(flashcard.answer);
+
+  const handleDelete = async () => {
+    await deleteFlashcard(flashcard.id);
+    onChange();
   };
 
   const handleEdit = () => {
-    // TODO: Implement edit functionality
+    setIsEditing(true);
+  };
+
+  const handleSave = async () => {
+    const flashcardData = {
+      question: editedQuestion,
+      answer: editedAnswer,
+    };
+    await updateFlashcard(flashcard.id, flashcardData);
+    setIsEditing(false);
+    onChange();
   };
 
   return (
@@ -18,23 +59,51 @@ const FlashcardEdit = ({ flashcard }) => {
         <div className="text-col">
           <div className="question-box">
             <div className="box-label">Question</div>
-            <div className="box-text">{flashcard.question}</div>
+            {isEditing ? (
+              <CssTextField
+                variant="outlined"
+                value={editedQuestion}
+                onChange={(e) => setEditedQuestion(e.target.value)}
+                fullWidth
+                multiline
+                rows={6}
+              />
+            ) : (
+              <div className="box-text">{flashcard.question}</div>
+            )}
           </div>
         </div>
         <div className="text-col">
           <div className="answer-box">
             <div className="box-label">Answer</div>
-            <div className="box-text">{flashcard.answer}</div>
+            {isEditing ? (
+              <CssTextField
+                variant="outlined"
+                value={editedAnswer}
+                onChange={(e) => setEditedAnswer(e.target.value)}
+                fullWidth
+                multiline
+                rows={6}
+              />
+            ) : (
+              <div className="box-text">{flashcard.answer}</div>
+            )}
           </div>
         </div>
       </div>
       <div className="delete-edit-icons">
-        <div className="delete-icon" onClick={handleDelete}>
+        <IconButton onClick={handleDelete}>
           <TrashIcon />
-        </div>
-        <div className="edit-icon" onClick={handleEdit}>
-          <EditIcon />
-        </div>
+        </IconButton>
+        {isEditing ? (
+          <IconButton onClick={handleSave}>
+            <DoneIcon />
+          </IconButton>
+        ) : (
+          <IconButton onClick={handleEdit}>
+            <EditIcon />
+          </IconButton>
+        )}
       </div>
     </div>
   );
@@ -45,6 +114,7 @@ FlashcardEdit.propTypes = {
     question: PropTypes.string.isRequired,
     answer: PropTypes.string.isRequired,
   }).isRequired,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default FlashcardEdit;

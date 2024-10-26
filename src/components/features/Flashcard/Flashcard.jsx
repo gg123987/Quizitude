@@ -4,7 +4,7 @@ import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { Typography } from "@mui/material";
-import './flashcard.css';
+import "./flashcard.css";
 
 const Flashcard = ({
   flashcard,
@@ -20,12 +20,14 @@ const Flashcard = ({
     if (flipped !== flip) {
       setFlip(flipped);
     }
-  }, [flip, flipped]);
+  }, [flipped]);
 
   const handleClick = () => {
     if (
       status === "default" &&
-      (flashcard.options.length === 0 || flashcard.answered !== undefined)
+      (flashcard.options == null ||
+        flashcard.options?.length === 0 ||
+        flashcard.answered !== undefined)
     ) {
       setFlip(!flip);
     }
@@ -105,7 +107,7 @@ Flashcard.propTypes = {
     answer: PropTypes.string.isRequired,
     options: PropTypes.array,
     score: PropTypes.oneOf(["correct", "incorrect"]),
-    answered: PropTypes.bool,
+    answered: PropTypes.number,
   }).isRequired,
   mode: PropTypes.oneOf(["default", "studying"]),
   isCurrentCard: PropTypes.bool,

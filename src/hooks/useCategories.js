@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { getCategoriesByUser } from '@/services/categoryService';
+import { useState, useEffect, useCallback } from "react";
+import { getCategoriesByUser } from "@/services/categoryService";
 
 const useCategories = (userId) => {
   const [categories, setCategories] = useState([]);

@@ -1,0 +1,51 @@
+.category-card {
+  border-radius: 4px;
+  padding: 20px 30px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  border-bottom: 1.5px solid #A4BCFD;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.category-card:hover {
+  transform: scale(1.02);
+}
+
+.category {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+}
+
+.category-button:hover {
+  opacity: 0.6;
+}
+
+.category-name {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0px;
+  gap: 5px;
+}
+
+.right {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+
+.menu:hover {
+  opacity: 0.3;
+}
