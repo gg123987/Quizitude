@@ -71,10 +71,6 @@ const GeneralSettings = ({
     <div className="settings-page">
       <div className="settings-container">
         <div className="section">
-          <h4 className="left-aligned">General Settings</h4>
-        </div>
-
-        <div className="section">
           <h6 className="left-aligned">Upgrade your Account</h6>
           <div className="box">
             <div className="text">
@@ -201,7 +197,7 @@ const GeneralSettings = ({
       {/* Delete Confirmation Popup */}
       {showDeletePopup && (
         <div className="popup-overlay">
-          <div className="popup-content">
+          <div className="sett-popup-content">
             <h4>Are you sure you want to delete your account?</h4>
             <p>This action cannot be undone.</p>
             <button

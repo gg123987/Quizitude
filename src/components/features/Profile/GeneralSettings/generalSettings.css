@@ -1,31 +1,29 @@
-html,
-body {
-  height: 100%;
-  margin: 0;
-}
-
 .settings-page {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100vh;
-  background-color: #f4f5f7;
-  overflow: auto;
+  height: 74vh;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.settings-container::-webkit-scrollbar {
+  display: none;
+}
+
+.settings-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .settings-container {
   flex: 1;
   width: 100%;
   max-width: 1200px;
-  padding: 20px;
+  padding: 0px;
   margin: 0 auto;
-  background-color: #f4f5f7;
-  overflow: auto;
-}
-
-h2,
-h3 {
-  margin-bottom: 20px;
+  overflow-y: auto;
 }
 
 .left-aligned {
@@ -157,7 +155,7 @@ input {
   align-items: center;
 }
 
-.popup-content {
+.sett-popup-content {
   background: white;
   padding: 20px;
   border-radius: 8px;

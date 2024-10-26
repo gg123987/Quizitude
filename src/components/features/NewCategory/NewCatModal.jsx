@@ -49,7 +49,7 @@ const NewCategory = ({ open, onClose, onSave }) => {
             <CloseIcon fontSize="large" />
           </IconButton>
         </div>
-        <div className="popup-content">
+        <div className="cat-popup-content">
           <h2 id="new-category-modal-title">Add New Category</h2>
           <TextField
             label="Category Name"

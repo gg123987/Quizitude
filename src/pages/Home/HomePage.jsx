@@ -94,7 +94,9 @@ const Home = () => {
 
   const checkStudyToday = () => {
     const today = new Date();
-    const lastSession = user.last_session ? new Date(user.last_session) : null;
+    const lastSession = userDetails.last_session
+      ? new Date(userDetails.last_session)
+      : null;
     if (lastSession) {
       const lastSessionDate = new Date(
         lastSession.getFullYear(),
@@ -142,7 +144,7 @@ const Home = () => {
             <div className="streak-info">
               <WeekIndicator
                 streakCount={streakCount}
-                studiedToday={checkStudyToday}
+                studiedToday={checkStudyToday()}
               />
             </div>
           </div>

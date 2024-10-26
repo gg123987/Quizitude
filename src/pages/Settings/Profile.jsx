@@ -4,6 +4,7 @@ import { supabase } from "@/utils/supabase";
 import Avatar from "@/components/features/Profile/Avatar/Avatar";
 import PropTypes from "prop-types";
 import "./profile.css";
+import CustomButton from "@/components/common/CustomButton";
 import SettingsNavbar from "@/components/features/Profile/SettingsNavbar/SettingsNavbar";
 import GeneralSettings from "@/components/features/Profile/GeneralSettings/GeneralSettings";
 import Streak from "@/components/features/Profile/Streak/Streak";
@@ -116,38 +117,42 @@ export default function Account({ session }) {
   return (
     <div className="profile-container">
       <div>
-        <form onSubmit={updateAvatarUrl} className="form-widget">
-          <Avatar
-            userId={userID}
-            url={avatar_url}
-            size={150}
-            onUpload={(filePath) => {
-              setAvatarUrl(filePath);
-              updateAvatarUrl(new Event("submit"), filePath);
-            }}
-          />
+        <div className="profile-header">
+          <form onSubmit={updateAvatarUrl} className="form-widget">
+            <Avatar
+              userId={userID}
+              url={avatar_url}
+              size={100}
+              onUpload={(filePath) => {
+                setAvatarUrl(filePath);
+                updateAvatarUrl(new Event("submit"), filePath);
+              }}
+            />
 
-          <div className="form-fields">
-            <div className="form-field">
-              <strong>
+            <div className="form-fields">
+              <div className="form-field">
                 <p id="full_name">{full_name || ""}</p>
-              </strong>
+              </div>
+              <div className="form-field">
+                <p id="email">{email || ""}</p>
+              </div>
             </div>
-            <div className="form-field">
-              <p id="email">{email || ""}</p>
+            <div className="upload-button-container">
+              <CustomButton
+                disabled={loading}
+                onClick={() => setActiveTab("General Settings")}
+                style={{
+                  color: "#3538CD",
+                  backgroundColor: "transparent",
+                  width: "120px",
+                  border: "1.4px solid #3538CD",
+                }}
+              >
+                {loading ? "Loading ..." : "Edit Profile"}
+              </CustomButton>
             </div>
-          </div>
-          <div className="upload-button-container">
-            <button
-              className="button block primary"
-              type="button"
-              disabled={loading}
-              onClick={() => setActiveTab("General Settings")}
-            >
-              {loading ? "Loading ..." : "Edit Profile"}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
         <SettingsNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
       {activeTab === "General Settings" && (

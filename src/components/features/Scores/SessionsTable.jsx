@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import CustomButton from "@/components/common/CustomButton";
-import "./decktable.css";
+import "./sessionstable.css";
 
-const DeckTable = ({ sessions }) => {
+const SessionsTable = ({ sessions }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const rowsPerPage = 7;
+  console.log(sessions);
 
   const totalPages = Math.ceil(sessions.length / rowsPerPage);
 
@@ -71,7 +72,7 @@ const DeckTable = ({ sessions }) => {
                 <td>{formatTime(score.date_reviewed)}</td>
                 <td>{score.correct}</td>
                 <td>{score.incorrect}</td>
-                <td>{score.score}%</td>
+                <td>{score.score.toFixed(2)}%</td>
               </tr>
             ))}
           </tbody>
@@ -119,4 +120,4 @@ const DeckTable = ({ sessions }) => {
   );
 };
 
-export default DeckTable;
+export default SessionsTable;

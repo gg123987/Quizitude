@@ -1,20 +1,89 @@
-.container {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    box-shadow: 0 2px 4px 2px rgba(0,0,0,0.1);
-    border-radius: 12px;
-    height: 100%;  
-    width: 60%;
+.streak-container {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 80px 20px;
+  align-items: flex-start;
+  height: 100%;
+  width: 100%;
 }
 
-.written-streak {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
+.month-streak-section {
+  margin-top: 20px;
+  margin-bottom: 40px;
+  background-color: white;
+  border-radius: 10px;
+  border: 1px solid #eaecf0;
+  box-shadow: 0px 0px 1px rgba(16, 24, 40, 0.06);
 }
 
-.written-streak-text {
-    display: flex;
-    flex-direction: column;
+.month-streak-box {
+  padding: 25px 30px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+  height: 100%;
+}
+
+.streak-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 40px;
+}
+
+.left {
+  flex: 1;
+}
+
+.right {
+  flex: 2;
+}
+
+.month-streak-sep {
+  width: 1px;
+  height: 280px;
+  background-color: rgba(152, 162, 179, 0.6);
+  align-self: center;
+}
+
+.streak-graphic {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+}
+
+.streak-info {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.streak-count-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0px;
+}
+
+.streak-count {
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 36px;
+  color: #101828;
+  margin: 0;
+}
+
+.streak-day {
+  font-family: "Inter", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #101828;
+  margin: 0;
 }

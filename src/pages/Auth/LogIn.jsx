@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
-import Alert from '@mui/material/Alert';
+import Alert from "@mui/material/Alert";
 import { useNavigate } from "react-router-dom";
-import useAuth from '@/hooks/useAuth';
+import useAuth from "@/hooks/useAuth";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -37,35 +37,37 @@ export default function SignInSide() {
     try {
       setErrorMsg("");
       setLoading(true);
-      
+
       if (!passwordRef.current?.value || !emailRef.current?.value) {
         setErrorMsg("Please fill in the fields");
         setLoading(false);
         return;
       }
-      const { user, session , error } = await login(emailRef.current.value, passwordRef.current.value);
+      const { user, session, error } = await login(
+        emailRef.current.value,
+        passwordRef.current.value
+      );
 
-      console.log('Login data:', user, session, error);
+      console.log("Login data:", user, session, error);
 
-      if (error) {        
-        if(error.message === 'Invalid login credentials'){
+      if (error) {
+        if (error.message === "Invalid login credentials") {
           const { data: users } = await supabase
-            .from('users')
-            .select('email')
-            .eq('email', emailRef.current.value)
-            .single()
+            .from("users")
+            .select("email")
+            .eq("email", emailRef.current.value)
+            .single();
 
           const count = users ? 1 : 0;
 
           if (count > 0) {
             setEmailError(false);
             setPasswordError(true);
-          } else{
+          } else {
             setEmailError(true);
             setPasswordError(false);
           }
         }
-          
       } else {
         if (user && session) {
           if (rememberMe) {
@@ -75,11 +77,11 @@ export default function SignInSide() {
         }
       }
     } catch (error) {
-      console.error('Login error:', error.message);
+      console.error("Login error:", error.message);
       setErrorMsg("An unexpected error occurred. Please try again later.");
     }
     setLoading(false);
-  };  
+  };
 
   const { signInWithGoogle } = useAuth();
 
@@ -143,6 +145,7 @@ export default function SignInSide() {
               fontFamily={"Inter"}
               marginTop="40px"
               fontWeight={300}
+              color="white"
               gutterBottom
             >
               Study Smarter <br />
@@ -160,7 +163,7 @@ export default function SignInSide() {
               padding: "20px 100px",
               width: "100%",
               maxWidth: "570px",
-              justifyContent: "center"
+              justifyContent: "center",
             }}
           >
             <img src={logoSmall} alt="logo" width="23px" height="23px" />
@@ -183,12 +186,9 @@ export default function SignInSide() {
             >
               Welcome back! Please enter your details.
             </Typography>
-            
-            <Button
-              onClick={handleGoogleSignIn}
-              fullWidth
-            >
-              <img src={GoogleLogin} alt="Google Login"/>
+
+            <Button onClick={handleGoogleSignIn} fullWidth>
+              <img src={GoogleLogin} alt="Google Login" />
             </Button>
 
             <Typography
@@ -206,7 +206,7 @@ export default function SignInSide() {
               component="form"
               noValidate
               onSubmit={handleSubmit}
-              sx={{ mt: 1, textAlign: 'left' }}
+              sx={{ mt: 1, textAlign: "left" }}
             >
               {errorMsg && (
                 <Alert
@@ -217,7 +217,7 @@ export default function SignInSide() {
                   {errorMsg}
                 </Alert>
               )}
-              <Typography 
+              <Typography
                 fontFamily="Inter"
                 fontWeight={400}
                 fontSize={"0.9em"}
@@ -236,11 +236,15 @@ export default function SignInSide() {
                 autoComplete="email"
                 autoFocus
                 inputRef={emailRef}
-                helperText={emailError ? "We do not recognize this email. Please try again" : ""}
+                helperText={
+                  emailError
+                    ? "We do not recognize this email. Please try again"
+                    : ""
+                }
                 sx={{ borderColor: emailError ? "red" : "" }}
                 disabled={loading}
               />
-              <Typography 
+              <Typography
                 fontFamily="Inter"
                 fontWeight={400}
                 fontSize={"0.9em"}
@@ -263,20 +267,38 @@ export default function SignInSide() {
                 sx={{ borderColor: passwordError ? "red" : "" }}
                 disabled={loading}
               />
-              <Grid container sx={{ marginTop: '10px' }}>
+              <Grid container sx={{ marginTop: "10px" }}>
                 <Grid item xs>
                   <FormControlLabel
-                    control={<Checkbox value={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} color="primary" />}
-                    label={<Typography
-                      fontFamily="Inter"
-                      fontWeight="500"
-                      fontSize="14px"
-                    > Remember me
-                    </Typography>}
-                />
+                    control={
+                      <Checkbox
+                        value={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        color="primary"
+                      />
+                    }
+                    label={
+                      <Typography
+                        fontFamily="Inter"
+                        fontWeight="500"
+                        fontSize="14px"
+                      >
+                        {" "}
+                        Remember me
+                      </Typography>
+                    }
+                  />
                 </Grid>
-                <Grid item sx={{ marginTop: '10px' }}>
-                  <Link href="/passwordreset" variant="body2" sx={{ fontWeight: 'bold', color: '#3538CD', textDecoration: 'none' }}>
+                <Grid item sx={{ marginTop: "10px" }}>
+                  <Link
+                    href="/passwordreset"
+                    variant="body2"
+                    sx={{
+                      fontWeight: "bold",
+                      color: "#3538CD",
+                      textDecoration: "none",
+                    }}
+                  >
                     Forgot password?
                   </Link>
                 </Grid>
@@ -285,28 +307,46 @@ export default function SignInSide() {
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2, backgroundColor: '#3538CD', color: '#FFFFFF', borderRadius: '10px'}}
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  backgroundColor: "#3538CD",
+                  color: "#FFFFFF",
+                  borderRadius: "10px",
+                }}
               >
                 Sign In
               </Button>
             </Box>
-              <Box sx={{ display: 'flex', alignSelf: 'center', marginTop: '20px', marginBottom: '4px' }}>
-                <Typography 
-                  fontFamily="Inter"
-                  fontWeight={400}
-                  fontSize={"0.9em"}
-                  textAlign="center"
-                >
-                  Dont have an account?
-                </Typography>
-                <Link 
-                  href="/register" 
-                  variant="body2" 
-                  sx={{ fontWeight: 'bold', color: '#3538CD', textDecoration: 'none', marginLeft: '4px' }}
-                >
-                  Sign Up
-                </Link>
-              </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignSelf: "center",
+                marginTop: "20px",
+                marginBottom: "4px",
+              }}
+            >
+              <Typography
+                fontFamily="Inter"
+                fontWeight={400}
+                fontSize={"0.9em"}
+                textAlign="center"
+              >
+                Dont have an account?
+              </Typography>
+              <Link
+                href="/register"
+                variant="body2"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#3538CD",
+                  textDecoration: "none",
+                  marginLeft: "4px",
+                }}
+              >
+                Sign Up
+              </Link>
+            </Box>
           </Box>
         </Grid>
       </Grid>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal, Box } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
@@ -22,7 +22,11 @@ import useCategories from "@/hooks/useCategories";
 import useDecks from "@/hooks/useDecks";
 import { createCategory } from "@/services/categoryService";
 import NewCategory from "@/components/features/NewCategory/NewCatModal";
-import { uploadFileAndCreateDeck } from "@/services/fileService";
+import {
+  uploadFileAndCreateDeck,
+  getFileById,
+  checkForDuplicateFile,
+} from "@/services/fileService";
 import { formatAndInsertFlashcardData } from "@/services/flashcardService";
 import "./newdeck.css";
 
@@ -31,7 +35,8 @@ const NewDeck = () => {
   const { categories, categoriesLoading, categoriesError, refreshCategories } =
     useCategories(user?.id);
 
-  const { modalOpen, closeModal } = useModal();
+  const { modalOpen, closeModal, file: selectedFile } = useModal();
+  const [file, setFile] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [currentFlashcard, setCurrentFlashcard] = useState(1);
   const [questionList, setQuestionList] = useState([]);
@@ -40,7 +45,6 @@ const NewDeck = () => {
   const [questionType, setQuestionType] = useState("");
   const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
   const maxPDFSize = 30 * 1024 * 1024; // 30 MB in bytes
-  const [file, setFile] = useState(null);
   const [deckName, setDeckName] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [uploading, setUploading] = useState(false);
@@ -48,6 +52,28 @@ const NewDeck = () => {
   const [llmResponse, setLlmResponse] = useState();
   const [errorp1, setError1] = useState(null);
   const [errorp2, setError2] = useState(null);
+
+  useEffect(() => {
+    const fetchFile = async () => {
+      console.log("Selected file:", selectedFile);
+      if (selectedFile) {
+        try {
+          const file = await getFileById(selectedFile.id);
+
+          if (file) {
+            console.log("File:", file);
+            setFile(file);
+          } else {
+            console.error("File not found.");
+          }
+        } catch (error) {
+          console.error("Error fetching file:", error);
+        }
+      }
+    };
+
+    fetchFile();
+  }, [selectedFile]);
 
   const handleDeckNameChange = (e) => setDeckName(e.target.value);
 
@@ -88,6 +114,7 @@ const NewDeck = () => {
 
   const handleFileChange = (event) => {
     const uploadedPDF = event.target.files[0];
+    console.log("Uploaded PDF:", uploadedPDF);
     if (uploadedPDF) {
       if (uploadedPDF.size <= maxPDFSize) {
         setFile(uploadedPDF);
@@ -149,6 +176,12 @@ const NewDeck = () => {
 
     if (!file) {
       setError1("Please upload a PDF file.");
+      return false;
+    }
+
+    // Check for duplicate file
+    if (checkForDuplicateFile(file, user.id)) {
+      setError1("File already exists. Please choose a different file.");
       return false;
     }
 
@@ -355,7 +388,7 @@ const NewDeck = () => {
 
   const pages = [
     <div className="page1-content" key="page1">
-      <div className="header">
+      <div className="deck-text-header">
         <h2>Generate Flashcards</h2>
         <p>
           This creates a deck of cards based on any material you upload here.
@@ -493,7 +526,7 @@ const NewDeck = () => {
       {errorp1 && <p className="error-message">{errorp1}</p>}
     </div>,
     <div className="page2-content" key="page2">
-      <div className="header">
+      <div className="deck-text-header">
         <h2>Review Flashcards</h2>
         <p>{noOfQuestions} Cards Generated</p>
       </div>
@@ -609,7 +642,7 @@ const NewDeck = () => {
                 <CloseIcon fontSize="large" />
               </IconButton>
             </div>
-            <div className="popup-content">{pages[currentPage]}</div>
+            <div className="deck-popup-content">{pages[currentPage]}</div>
           </Box>
         </Fade>
       </Modal>

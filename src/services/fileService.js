@@ -5,19 +5,29 @@ export const uploadFileAndCreateDeck = async (file, deckData) => {
   try {
     const userId = deckData.user_id;
 
-    // 1. Upload the file to Supabase Storage and create a file record
+    // 1. Check if the file already exists
+    const existingFile = await checkForDuplicateFile(file, userId);
+    if (existingFile) {
+      console.log("File already exists:", existingFile);
+      return {
+        message: "This file has already been uploaded.",
+        file: existingFile,
+      };
+    }
+
+    // 2. Upload the file to Supabase Storage and create a file record
     const fileRecord = await uploadFile(file, userId);
-    console.log(fileRecord)
+    console.log(fileRecord);
     const file_id = fileRecord[0].id;
 
     // Add the file_id to the deckData
     deckData.file_id = file_id;
 
-    // 2. Create a new deck with file_id as a foreign key
+    // 3. Create a new deck with file_id as a foreign key
     const deck = await createDeck(deckData);
 
     /* Removed this table for simplicty
-    // 3. Link the file to the deck in the deck_files table
+    // 4. Link the file to the deck in the deck_files table
     const { error: deckFileError } = await supabase
       .from("deck_files")
       .insert([{ deck_id: deck[0].id, file_id: fileRecord[0].id }]);
@@ -32,6 +42,22 @@ export const uploadFileAndCreateDeck = async (file, deckData) => {
     console.error("Error in uploadFileAndCreateDeck:", error);
     throw error;
   }
+};
+
+export const checkForDuplicateFile = async (file, userId) => {
+  const { data: existingFiles, error } = await supabase
+    .from("files")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("name", file.name)
+    .eq("size", file.size);
+
+  if (error) {
+    console.error("Error checking for duplicate file:", error);
+    return null;
+  }
+
+  return existingFiles; // Will be null if no duplicate is found
 };
 
 export const uploadFile = async (file, userId) => {
@@ -68,6 +94,24 @@ export const uploadFile = async (file, userId) => {
   }
 };
 
+export const getFilesByUser = async (userId) => {
+  const { data, error } = await supabase
+    .from("files")
+    .select("*, decks!decks_file_id_fkey(id)")
+    .eq("user_id", userId);
+
+  if (error) throw error;
+
+  const filesWithDeckCount = data.map((file) => ({
+    ...file,
+    deck_count: file.decks.length,
+  }));
+
+  console.log("Files for user:", filesWithDeckCount);
+
+  return filesWithDeckCount;
+};
+
 export const getFileByDeck = async (deckId) => {
   // Get the file_id from the deck
   const { data, error } = await supabase
@@ -91,13 +135,70 @@ export const getFileByDeck = async (deckId) => {
   if (fileError) throw fileError;
 
   return fileData;
-}
+};
+
+export const getFileById = async (fileId) => {
+  // Step 1: Get the file path from the files table
+  const { data: fileData, error } = await supabase
+    .from("files")
+    .select("*")
+    .eq("id", fileId)
+    .single();
+
+  if (error) throw error;
+
+  // Check if fileData is found
+  if (!fileData) {
+    throw new Error(`File with id ${fileId} not found.`);
+  }
+
+  // Step 2: Download the file from Supabase storage
+  const { data: fileBlob, error: downloadError } = await supabase.storage
+    .from("files")
+    .download(fileData.path);
+
+  if (downloadError) throw downloadError;
+
+  // Step 3: Create a File object
+  const file = new File([fileBlob], fileData.name, {
+    type: fileData.type || "application/pdf",
+    lastModified: new Date().getTime(),
+  });
+
+  return file;
+};
 
 export const deleteFile = async (fileId) => {
-  const { data, error } = await supabase
-    .from("files")
-    .delete()
-    .eq("id", fileId);
-  if (error) throw error;
-  return data;
+  try {
+    // Get the file path from the files table
+    const { data: fileData, error: fileError } = await supabase
+      .from("files")
+      .select("path")
+      .eq("id", fileId)
+      .single();
+
+    if (fileError) throw fileError;
+
+    const filePath = fileData.path;
+
+    // Delete the file from Supabase Storage
+    const { error: storageError } = await supabase.storage
+      .from("files")
+      .remove([filePath]);
+
+    if (storageError) throw storageError;
+
+    // Delete the file record from the files table
+    const { data, error } = await supabase
+      .from("files")
+      .delete()
+      .eq("id", fileId);
+
+    if (error) throw error;
+
+    return data;
+  } catch (error) {
+    console.error("Error in deleteFile:", error);
+    throw error;
+  }
 };

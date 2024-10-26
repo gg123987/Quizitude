@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
-import Alert from '@mui/material/Alert';
+import Alert from "@mui/material/Alert";
 import { useNavigate } from "react-router-dom";
-import useAuth from '@/hooks/useAuth';
+import useAuth from "@/hooks/useAuth";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -37,13 +37,20 @@ export default function Register() {
       setEmailError(false);
       setPasswordError(false);
 
-      if (!fNameRef.current?.value || !passwordRef.current?.value || !emailRef.current?.value) {
+      if (
+        !fNameRef.current?.value ||
+        !passwordRef.current?.value ||
+        !emailRef.current?.value
+      ) {
         setErrorMsg("Please fill in all fields");
         setLoading(false);
         return;
       }
 
-      if (!emailRef.current.value.includes("@") || !emailRef.current.value.includes(".")) {
+      if (
+        !emailRef.current.value.includes("@") ||
+        !emailRef.current.value.includes(".")
+      ) {
         setEmailError(true);
         setLoading(false);
         return;
@@ -57,18 +64,20 @@ export default function Register() {
 
       setErrorMsg("");
       setLoading(true);
-      
+
       const { data, error } = await register(
         emailRef.current.value,
         passwordRef.current.value,
-        fNameRef.current.value,
+        fNameRef.current.value
       );
-      
+
       console.log(data);
       console.log(error);
       if (error) {
         if (error.message === "User already registered") {
-          setErrorMsg("Email already exists. Please use a different email or login.");
+          setErrorMsg(
+            "Email already exists. Please use a different email or login."
+          );
         } else {
           setErrorMsg("Error in Creating Account");
         }
@@ -79,7 +88,7 @@ export default function Register() {
       setErrorMsg("Error in Creating Account");
     }
     setLoading(false);
-  };  
+  };
 
   const { signInWithGoogle } = useAuth();
 
@@ -142,10 +151,11 @@ export default function Register() {
               fontSize={"5rem"}
               fontFamily={"Inter"}
               marginTop="40px"
+              color="white"
               fontWeight={300}
               gutterBottom
             >
-              Study Smarter  <br />
+              Study Smarter <br />
               through AI-Generated Flashcards
             </Typography>
           </Box>
@@ -160,7 +170,7 @@ export default function Register() {
               padding: "20px 80px",
               width: "100%",
               maxWidth: "570px",
-              justifyContent: "center"
+              justifyContent: "center",
             }}
           >
             <img src={logoSmall} alt="logo" width="23px" height="23px" />
@@ -183,12 +193,9 @@ export default function Register() {
             >
               Start studying with flashcards today
             </Typography>
-            
-            <Button
-              onClick={handleGoogleSignIn}
-              fullWidth
-            >
-              <img src={GoogleSignup} alt="Google Signup"/>
+
+            <Button onClick={handleGoogleSignIn} fullWidth>
+              <img src={GoogleSignup} alt="Google Signup" />
             </Button>
 
             <Typography
@@ -205,7 +212,7 @@ export default function Register() {
               component="form"
               noValidate
               onSubmit={handleSubmit}
-              sx={{ mt: 1, textAlign: 'left' }}
+              sx={{ mt: 1, textAlign: "left" }}
             >
               {errorMsg && (
                 <Alert
@@ -216,7 +223,7 @@ export default function Register() {
                   {errorMsg}
                 </Alert>
               )}
-              <Typography 
+              <Typography
                 fontFamily="Inter"
                 fontWeight={400}
                 fontSize={"0.9em"}
@@ -237,7 +244,7 @@ export default function Register() {
                 inputRef={fNameRef}
                 disabled={loading}
               />
-              <Typography 
+              <Typography
                 fontFamily="Inter"
                 fontWeight={400}
                 fontSize={"0.9em"}
@@ -258,10 +265,12 @@ export default function Register() {
                 inputRef={emailRef}
                 error={emailError}
                 disabled={loading}
-                helperText={emailError ? "Please use a valid email address" : ""}
+                helperText={
+                  emailError ? "Please use a valid email address" : ""
+                }
                 sx={{ borderColor: emailError ? "red" : "" }}
               />
-              <Typography 
+              <Typography
                 fontFamily="Inter"
                 fontWeight={400}
                 fontSize={"0.9em"}
@@ -282,7 +291,9 @@ export default function Register() {
                 inputRef={passwordRef}
                 error={passwordError}
                 disabled={loading}
-                helperText={passwordError ? "Must be at least 8 characters" : ""}
+                helperText={
+                  passwordError ? "Must be at least 8 characters" : ""
+                }
                 sx={{ borderColor: passwordError ? "red" : "" }}
               />
               <Button
@@ -290,28 +301,47 @@ export default function Register() {
                 fullWidth
                 variant="contained"
                 disabled={loading}
-                sx={{ height: 50, mt: 5, mb: 2, backgroundColor: '#3538CD', color: '#FFFFFF', borderRadius: '10px'}}
+                sx={{
+                  height: 50,
+                  mt: 5,
+                  mb: 2,
+                  backgroundColor: "#3538CD",
+                  color: "#FFFFFF",
+                  borderRadius: "10px",
+                }}
               >
                 Get started
               </Button>
             </Box>
-              <Box sx={{ display: 'flex', alignSelf: 'center', marginTop: '20px', marginBottom: '4px' }}>
-                <Typography 
-                  fontFamily="Inter"
-                  fontWeight={400}
-                  fontSize={"0.9em"}
-                  textAlign="center"
-                >
-                  Already have an account?
-                </Typography>
-                <Link 
-                  href="/login" 
-                  variant="body2" 
-                  sx={{ fontWeight: 'bold', color: '#3538CD', textDecoration: 'none', marginLeft: '4px' }}
-                >
-                  Log in
-                </Link>
-              </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignSelf: "center",
+                marginTop: "20px",
+                marginBottom: "4px",
+              }}
+            >
+              <Typography
+                fontFamily="Inter"
+                fontWeight={400}
+                fontSize={"0.9em"}
+                textAlign="center"
+              >
+                Already have an account?
+              </Typography>
+              <Link
+                href="/login"
+                variant="body2"
+                sx={{
+                  fontWeight: "bold",
+                  color: "#3538CD",
+                  textDecoration: "none",
+                  marginLeft: "4px",
+                }}
+              >
+                Log in
+              </Link>
+            </Box>
           </Box>
         </Grid>
       </Grid>

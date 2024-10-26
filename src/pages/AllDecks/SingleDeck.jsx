@@ -30,7 +30,7 @@ import NewDeck from "@/components/features/NewDeck/NewDeckModal";
 import BasicTabs from "@/components/features/DisplayDecks/TabSelect";
 import ClearIcon from "@mui/icons-material/Clear";
 import FlashcardEditList from "@/components/features/Flashcard/FlashcardEditList";
-import DeckTable from "@/components/features/Scores/DeckTable";
+import SessionsTable from "@/components/features/Scores/SessionsTable";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { updateDeck, deleteDeck } from "@/services/deckService";
 import "./singledeck.css";
@@ -209,7 +209,7 @@ const DeckDetail = () => {
         label: "View Scores",
         content: (
           <div className="deck-table">
-            <DeckTable sessions={sortedSessions} />
+            <SessionsTable sessions={sortedSessions} />
           </div>
         ),
       },
