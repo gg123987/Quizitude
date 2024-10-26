@@ -49,12 +49,7 @@ export const getDeckById = async (deckId) => {
     .from("decks")
     .select(
       `
-      id,
-      name,
-      created_at,
-      updated_at,
-      is_favourite,
-      is_reviewed,
+      *,
       categories:categories!decks_category_id_fkey (
         id,
         name
@@ -82,13 +77,19 @@ export const getDeckById = async (deckId) => {
   return processedData;
 };
 
-export const updateDeck = async (deckId, deckData) => {
+export const updateDeck = async (deckId, deckData, userId) => {
+  console.log("Updating deck:", deckId);
+  console.log("New data:", deckData);
   const { data, error } = await supabase
     .from("decks")
-    .update(deckData)
-    .eq("id", deckId);
+    .update({ ...deckData })
+    .eq("user_id", userId)
+    .eq("id", deckId)
+    .select();
   if (error) throw error;
-  return data;
+
+  console.log("Deck updated:", data);
+  return { data, error };
 };
 
 export const deleteDeck = async (deckId) => {

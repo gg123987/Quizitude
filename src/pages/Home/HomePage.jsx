@@ -9,6 +9,7 @@ import FilteredCategories from "@/components/features/DisplayCategories/Filtered
 import useDecks from "@/hooks/useDecks";
 import useCategories from "@/hooks/useCategories";
 import useAuth from "@/hooks/useAuth";
+import useStreak from "@/hooks/useStreak";
 import { useMediaQuery } from "@mui/material";
 import flame from "@/assets/flame.png";
 import WeekIndicator from "@/components/features/Streaks/WeekIndicator";
@@ -17,14 +18,16 @@ import "./home.css"; // Add your CSS styles here
 
 const Home = () => {
   const { userId } = useOutletContext(); // Get user ID from context
+  const { user, userDetails } = useAuth();
   const { decks, loading: decksLoading, error } = useDecks(userId); // Assuming useDecks fetches both recent and pinned decks
   const {
     categories,
     loading: categoriesLoading,
     error: categoriesError,
   } = useCategories(userId);
-  const { user } = useAuth(); // Get user data from context
+
   const [loading, setLoading] = useState(true);
+  const streakCount = useStreak(userId);
 
   useEffect(() => {
     // If loading decks or categories, show loading spinner
@@ -89,16 +92,34 @@ const Home = () => {
     }
   };
 
+  const checkStudyToday = () => {
+    const today = new Date();
+    const lastSession = user.last_session ? new Date(user.last_session) : null;
+    if (lastSession) {
+      const lastSessionDate = new Date(
+        lastSession.getFullYear(),
+        lastSession.getMonth(),
+        lastSession.getDate()
+      );
+      const todayDate = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+      );
+      return lastSessionDate.getTime() === todayDate.getTime();
+    }
+    return false;
+  };
+
   const displayedPinnedDecks = pinnedDecks.slice(
     currentPinnedIndex * decksPerRow,
     (currentPinnedIndex + 1) * decksPerRow
   );
 
   const userFirstName =
-    user && user.user_metadata.name
-      ? user.user_metadata.name.split(" ")[0]
+    userDetails && userDetails.full_name
+      ? userDetails.full_name.split(" ")[0]
       : "User";
-  const streakCount = 40; // Change to actual streak count
 
   return (
     <div className="home">
@@ -119,7 +140,10 @@ const Home = () => {
           <div className="streak-sep" />
           <div className="streak-col right">
             <div className="streak-info">
-              <WeekIndicator streakCount={streakCount} />
+              <WeekIndicator
+                streakCount={streakCount}
+                studiedToday={checkStudyToday}
+              />
             </div>
           </div>
         </div>

@@ -272,7 +272,7 @@ const Decks = () => {
               justifyContent: "center",
             }}
           >
-            <h2>You have no flashcards yet</h2>
+            <h2>You have no decks yet</h2>
             <p>Upload your first PDF to get started. Click the button below</p>
             <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               <CustomButton onClick={handleOpenModal} icon={<AddIcon />}>

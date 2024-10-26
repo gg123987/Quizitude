@@ -8,13 +8,8 @@ import useCategory from "@/hooks/useCategory";
 
 // Static mapping for fixed segments
 const staticMappings = {
-  flashcards: "Flashcards",
   decks: "All Decks",
   categories: "Categories",
-  scores: "Scores",
-  settings: "Settings",
-  notifications: "Notifications",
-  // Add other static mappings as needed
 };
 
 export default function IconBreadcrumbs() {
@@ -53,7 +48,10 @@ export default function IconBreadcrumbs() {
   const formattedPathnames = pathnames.map((segment, index) => {
     if (index === 0) {
       // First segment, use static mapping
-      return staticMappings[segment] || segment;
+      return (
+        staticMappings[segment] ||
+        segment.charAt(0).toUpperCase() + segment.slice(1)
+      );
     } else if (index === 1) {
       // Second segment, use dynamic data based on type
       return getNameFromId(pathnames[0], segment);

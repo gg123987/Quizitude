@@ -60,6 +60,7 @@ function ResponsiveDrawer({ window, ...props }) {
       default:
         break;
     }
+    handleDrawerClose(); // Close the drawer when a menu option is clicked
   };
 
   useEffect(() => {
@@ -181,7 +182,7 @@ function ResponsiveDrawer({ window, ...props }) {
         <Box
           sx={{
             marginLeft: { sm: `${drawerWidth}px` },
-            marginTop: '64px',
+            marginTop: "64px",
             flexDirection: "row",
             flex: 1,
           }}

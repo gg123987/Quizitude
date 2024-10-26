@@ -12,34 +12,40 @@ import ShuffleIcon from "@mui/icons-material/Shuffle";
 import CompareIcon from "@mui/icons-material/Compare";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
+import useAuth from "@/hooks/useAuth";
+import { createSession } from "@/services/sessionService";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import confetti from "@/assets/confetti.svg";
 
 const StudyMode = () => {
+  const { user } = useAuth();
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentCardIndex, setCurrentCardIndex] = useState(0); // Index of the current flashcard
   const [flipped, setFlipped] = useState(false); // Boolean to track if the flashcard is flipped
   const [showSummary, setShowSummary] = useState(false);
   const [deckName, setDeckName] = useState("");
+  const [deckId, setDeckId] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const [correctCount, setCorrectCount] = useState(0);
+  const [incorrectCount, setIncorrectCount] = useState(0);
+  const [scorePercentage, setScorePercentage] = useState(0);
 
   useEffect(() => {
     // Get flashcards from location state
-    if (
-      location.state &&
-      location.state.flashcards &&
-      location.state.deckName
-    ) {
-      const flashcardsWithScore = location.state.flashcards.map((card) => ({
+    const { flashcards, deckName, deckId } = location.state || {};
+
+    if (flashcards && deckName && deckId) {
+      const flashcardsWithScore = flashcards.map((card) => ({
         ...card,
         score: undefined,
         answered: undefined,
       }));
       setCards(flashcardsWithScore);
-      setDeckName(location.state.deckName);
+      setDeckName(deckName);
+      setDeckId(deckId);
       setLoading(false);
     } else {
       // loading state
@@ -54,7 +60,7 @@ const StudyMode = () => {
     // Check if all cards have been answered
     const allAnswered = cards.every((card) => card.score !== undefined);
     if (allAnswered) {
-      setShowSummary(true);
+      logSession();
     }
   }, [cards]);
 
@@ -62,6 +68,37 @@ const StudyMode = () => {
     // Set flipped to false when the current card changes
     setFlipped(false);
   }, [currentCardIndex]);
+
+  const logSession = async () => {
+    // Log session into supabase using sessionService
+    console.log("All cards have been answered");
+
+    const correctCount = cards.filter(
+      (card) => card.score === "correct"
+    ).length;
+    const incorrectCount = cards.length - correctCount;
+    const scorePercentage = (correctCount / cards.length) * 100;
+
+    setCorrectCount(correctCount);
+    setIncorrectCount(incorrectCount);
+    setScorePercentage(scorePercentage);
+
+    const sessionData = {
+      deck_id: deckId,
+      deck_name: deckName,
+      date_reviewed: new Date().toISOString(),
+      correct: correctCount,
+      incorrect: incorrectCount,
+      score: scorePercentage,
+      user_id: user.id,
+    };
+
+    const result = await createSession(sessionData);
+    console.log("Session created:", result);
+
+    // Show the summary screen
+    setShowSummary(true);
+  };
 
   const handleShuffle = () => {
     const shuffledCards = [...cards];
@@ -216,12 +253,6 @@ const StudyMode = () => {
   };
 
   const renderSummary = () => {
-    const correctCount = cards.filter(
-      (card) => card.score === "correct"
-    ).length;
-    const incorrectCount = cards.length - correctCount;
-    const scorePercentage = (correctCount / cards.length) * 100;
-
     return (
       <div className="summary-container">
         <Box sx={{ mt: "100px", mb: "30px" }}>

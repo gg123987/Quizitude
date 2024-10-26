@@ -2,88 +2,13 @@ import React, { useState } from "react";
 import CustomButton from "@/components/common/CustomButton";
 import "./decktable.css";
 
-const DeckTable = () => {
-  const deckScores = [
-    {
-      deckName: "Deck 1",
-      dateReviewed: "2022-01-01",
-      timeReviewed: "10:00 AM",
-      knewCount: 10,
-      didntKnowCount: 2,
-      overallScore: 80,
-    },
-    {
-      deckName: "Deck 2",
-      dateReviewed: "2022-01-02",
-      timeReviewed: "11:00 AM",
-      knewCount: 8,
-      didntKnowCount: 4,
-      overallScore: 60,
-    },
-    {
-      deckName: "Deck 3",
-      dateReviewed: "2022-01-03",
-      timeReviewed: "12:00 PM",
-      knewCount: 12,
-      didntKnowCount: 1,
-      overallScore: 90,
-    },
-    {
-      deckName: "Deck 1",
-      dateReviewed: "2022-01-01",
-      timeReviewed: "10:00 AM",
-      knewCount: 10,
-      didntKnowCount: 2,
-      overallScore: 80,
-    },
-    {
-      deckName: "Deck 2",
-      dateReviewed: "2022-01-02",
-      timeReviewed: "11:00 AM",
-      knewCount: 8,
-      didntKnowCount: 4,
-      overallScore: 60,
-    },
-    {
-      deckName: "Deck 3",
-      dateReviewed: "2022-01-03",
-      timeReviewed: "12:00 PM",
-      knewCount: 12,
-      didntKnowCount: 1,
-      overallScore: 90,
-    },
-    {
-      deckName: "Deck 1",
-      dateReviewed: "2022-01-01",
-      timeReviewed: "10:00 AM",
-      knewCount: 10,
-      didntKnowCount: 2,
-      overallScore: 80,
-    },
-    {
-      deckName: "Deck 2",
-      dateReviewed: "2022-01-02",
-      timeReviewed: "11:00 AM",
-      knewCount: 8,
-      didntKnowCount: 4,
-      overallScore: 60,
-    },
-    {
-      deckName: "Deck 3",
-      dateReviewed: "2022-01-03",
-      timeReviewed: "12:00 PM",
-      knewCount: 12,
-      didntKnowCount: 1,
-      overallScore: 90,
-    },
-  ];
-
+const DeckTable = ({ sessions }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const rowsPerPage = 7;
 
-  const totalPages = Math.ceil(deckScores.length / rowsPerPage);
+  const totalPages = Math.ceil(sessions.length / rowsPerPage);
 
-  const currentData = deckScores.slice(
+  const currentData = sessions.slice(
     currentPage * rowsPerPage,
     (currentPage + 1) * rowsPerPage
   );
@@ -97,6 +22,27 @@ const DeckTable = () => {
   const handlePrev = () => {
     if (currentPage > 0) {
       setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+
+    if (diffInMinutes < 1) {
+      return `${diffInSeconds} secs ago`;
+    } else if (diffInMinutes < 60) {
+      return `${diffInMinutes} mins ago`;
+    } else {
+      const options = { hour: "2-digit", minute: "2-digit" };
+      return date.toLocaleTimeString(undefined, options);
     }
   };
 
@@ -120,53 +66,55 @@ const DeckTable = () => {
                 key={index}
                 className={index % 2 === 0 ? "even-row" : "odd-row"}
               >
-                <td>{score.deckName}</td>
-                <td>{score.dateReviewed}</td>
-                <td>{score.timeReviewed}</td>
-                <td>{score.knewCount}</td>
-                <td>{score.didntKnowCount}</td>
-                <td>{score.overallScore}</td>
+                <td>{score.deck_name}</td>
+                <td>{formatDate(score.date_reviewed)}</td>
+                <td>{formatTime(score.date_reviewed)}</td>
+                <td>{score.correct}</td>
+                <td>{score.incorrect}</td>
+                <td>{score.score}%</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <div className="table-spacer"></div>
-      <div className="pagination-controls">
-        <CustomButton
-          className="nav-button"
-          onClick={handlePrev}
-          disabled={currentPage === 0}
-          style={{
-            color: "#344054",
-            backgroundColor: "#FFFFFF",
-            width: "100px",
-            borderColor: "",
-            border: "1px solid #D0D5DD",
-            margin: 0,
-          }}
-        >
-          Previous
-        </CustomButton>
-        <span className="pagination-text">
-          Page {currentPage + 1} of {totalPages}
-        </span>
-        <CustomButton
-          className="nav-button"
-          onClick={handleNext}
-          disabled={currentPage === totalPages - 1}
-          style={{
-            color: "#344054",
-            backgroundColor: "#FFFFFF",
-            width: "100px",
-            borderColor: "",
-            border: "1px solid #D0D5DD",
-            margin: 0,
-          }}
-        >
-          Next
-        </CustomButton>
-      </div>
+      {totalPages > 1 && (
+        <div className="pagination-controls">
+          <CustomButton
+            className="nav-button"
+            onClick={handlePrev}
+            disabled={currentPage === 0}
+            style={{
+              color: "#344054",
+              backgroundColor: "#FFFFFF",
+              width: "100px",
+              borderColor: "",
+              border: "1px solid #D0D5DD",
+              margin: 0,
+            }}
+          >
+            Previous
+          </CustomButton>
+          <span className="pagination-text">
+            Page {currentPage + 1} of {totalPages}
+          </span>
+          <CustomButton
+            className="nav-button"
+            onClick={handleNext}
+            disabled={currentPage === totalPages - 1}
+            style={{
+              color: "#344054",
+              backgroundColor: "#FFFFFF",
+              width: "100px",
+              borderColor: "",
+              border: "1px solid #D0D5DD",
+              margin: 0,
+            }}
+          >
+            Next
+          </CustomButton>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import "./WeekIndicator.css"; // Import CSS styles
 
-const WeekIndicator = ({ streakCount }) => {
+const WeekIndicator = ({ streakCount, studiedToday }) => {
   // Get the current date and the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
   const currentDate = new Date();
   // For testing: currentDate.setDate(currentDate.getDate() + 3);
@@ -16,9 +16,12 @@ const WeekIndicator = ({ streakCount }) => {
     return date.getDate(); // Get the day of the month
   });
 
+  // Determine the starting index for the streak
+  const startIndex = studiedToday ? currentDay : currentDay - 1;
+
   // Get the indices of the streak days
-  const streakIndices = Array.from({ length: currentDay }, (_, i) => {
-    const index = currentDay - 1 - i; // Calculate the index in reverse order
+  const streakIndices = Array.from({ length: startIndex + 1 }, (_, i) => {
+    const index = startIndex - i; // Calculate the index in reverse order
     if (streakCount > 0) {
       streakCount--; // Decrease streakCount
       return index; // Return the index if streakCount allows
