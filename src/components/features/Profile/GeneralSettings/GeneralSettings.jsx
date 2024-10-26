@@ -23,10 +23,6 @@ const GeneralSettings = ({
     setShowProVersion(true); // Set state to show ProVersion
   };
 
-  if (showProVersion) {
-    return <ProVersion setShowProVersion={setShowProVersion} />; // Return ProVersion component if showProVersion is true
-  }
-
   const [showDeletePopup, setShowDeletePopup] = useState(false); // For popup visibility state
   const { passwordReset } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -223,6 +219,9 @@ const GeneralSettings = ({
           </div>
         </div>
       )}
+
+      {/* Pro Version Popup */}
+      {showProVersion && <ProVersion setShowProVersion={setShowProVersion} />}
     </div>
   );
 };
@@ -236,7 +235,7 @@ GeneralSettings.propTypes = {
   }).isRequired,
   setEmail: PropTypes.func.isRequired,
   setFullName: PropTypes.func.isRequired,
-  avatar_url: PropTypes.string.isRequired,
+  avatar_url: PropTypes.string,
   setAvatarUrl: PropTypes.func.isRequired,
   updateProfile: PropTypes.func.isRequired,
   isGoogleUser: PropTypes.bool.isRequired,
