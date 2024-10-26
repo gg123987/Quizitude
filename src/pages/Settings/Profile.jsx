@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react'
 import useAuth from '@/hooks/useAuth'
 import { supabase } from '@/utils/supabase'
-import Avatar from '@/components/features/Profile/Avatar'
+import Avatar from '@/components/features/Profile/Avatar/Avatar'
 import PropTypes from 'prop-types';
+import './profile.css'
+import SettingsNavbar from '@/components/features/Profile/SettingsNavbar/SettingsNavbar'
+import GeneralSettings from '@/components/features/Profile/GeneralSettings/GeneralSettings';
+import Streak from '@/components/features/Profile/Streak/Streak';
+import ViewScoreHistory from '@/components/features/Profile/ViewScoreHistory/ViewScoreHistory';
 
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true)
@@ -10,6 +15,7 @@ export default function Account({ session }) {
   const [email, setEmail] = useState(null)
   const [avatar_url, setAvatarUrl] = useState(null)
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('Streak');
 
   useEffect(() => {
     let ignore = false
@@ -68,39 +74,44 @@ export default function Account({ session }) {
   }
 
   return (
-    <form onSubmit={updateProfile} className="form-widget">
-        <Avatar
-        url={avatar_url}
-        size={150}
-        onUpload={(event, url) => {
-            updateProfile(event, url)
-        }}
-        />
+    <div className="profile-container">
       <div>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          value={user.email || ''}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <form onSubmit={updateProfile} className="form-widget">
+          <Avatar
+            url={avatar_url}
+            size={150}
+            onUpload={(filePath) => {
+              setAvatarUrl(filePath); // Set the avatar URL when upload is complete
+            }}
+          />
+          <div className="form-fields">
+            <div className='form-field'>
+              <strong><p id="full_name">{user.user_metadata.full_name || ''}</p></strong>
+            </div>
+            <div className='form-field'>
+              <p id="email">{user.email || ''}</p>
+            </div>
+          </div>
+          <div className='upload-button-container'>
+            <button className="button block primary" type="submit" disabled={loading}>
+              {loading ? 'Loading ...' : 'Edit Profile'}
+            </button>
+          </div>
+        </form>
+        <SettingsNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
-      <div>
-        <label htmlFor="full_name">Full Name</label>
-        <input
-          id="full_name"
-          type="text"
-          required
-          value={user.user_metadata.full_name || ''}
-          onChange={(e) => setFullName(e.target.value)}
-        />
-      </div>
-      <div>
-        <button className="button block primary" type="submit" disabled={loading}>
-          {loading ? 'Loading ...' : 'Update'}
-        </button>
-      </div>
-    </form>
+      {activeTab === 'General Settings' && 
+      <GeneralSettings 
+        user={{ email, user_metadata: { full_name } }} 
+        setEmail={setEmail} 
+        setFullName={setFullName} 
+        avatar_url={avatar_url}
+        setAvatarUrl={setAvatarUrl}
+      />
+      }
+      {activeTab === 'Streak' && <Streak />}
+      {activeTab === 'View Score History' && <ViewScoreHistory />}
+    </div>
   )
 }
 
