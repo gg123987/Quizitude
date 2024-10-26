@@ -18,8 +18,6 @@ export default function Account({ session }) {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("Streak");
 
-  console.log("Active tab:", activeTab);
-
   useEffect(() => {
     let ignore = false;
     async function getProfile() {

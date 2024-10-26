@@ -1,0 +1,87 @@
+.pro-version-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f9f9f9;
+    padding: 20px;
+  }
+  
+  .pro-version-content {
+    position: relative;
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 70%; /* Make the content area wider */
+    max-width: 900px; /* Limit maximum width */
+  }
+  
+  .close-button {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    color: #333;
+  }
+  
+  .pro-version-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .pro-version-subtitle {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 30px;
+  }
+  
+  .pro-version-plans {
+    display: flex;
+    justify-content: space-evenly;
+  }
+  
+  .plan {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 10px;
+    width: 180px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .plan h2 {
+    font-size: 28px;
+    margin-bottom: 5px;
+  }
+  
+  .plan p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 20px;
+  }
+  
+  .popular-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #e6e8ff;
+    color: #4e56ff;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+  }
+  
+  .monthly-plan {
+    margin-right: 20px;
+  }
+  
