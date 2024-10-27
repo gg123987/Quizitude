@@ -8,7 +8,7 @@ const useStreak = (userId) => {
     // Function to check streak upon login or activity
     const updateStreak = async () => {
       try {
-        const data = await checkUserStreak(userId); // Call Supabase function/API
+        const data = await checkUserStreak(userId);
         setStreakData(data);
         console.log("Streak updated:", data);
       } catch (error) {
