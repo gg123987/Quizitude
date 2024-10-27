@@ -11,10 +11,22 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import "./newcat.css";
 
+/**
+ * NewCategory component renders a modal for adding a new category.
+ *
+ * @param {Object} props - Component props
+ * @param {boolean} props.open - Determines if the modal is open
+ * @param {function} props.onClose - Function to call when the modal is closed
+ * @param {function} props.onSave - Function to call when saving the new category
+ */
 const NewCategory = ({ open, onClose, onSave }) => {
   const [categoryName, setCategoryName] = useState("");
-  const [error, setError] = useState(""); // State to manage error messages
+  const [error, setError] = useState("");
 
+  /**
+   * Handles the save action for the new category.
+   * Validates the category name and calls the onSave function.
+   */
   const handleSave = async () => {
     if (categoryName.trim()) {
       try {

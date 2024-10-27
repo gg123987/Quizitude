@@ -30,6 +30,70 @@ import {
 import { formatAndInsertFlashcardData } from "@/services/flashcardService";
 import "./newdeck.css";
 
+/**
+ * NewDeck component allows users to create a new deck of flashcards by uploading a PDF file,
+ * specifying the number of questions, question type, and category. It also provides functionality
+ * to review and edit the generated flashcards before saving them.
+ *
+ * @component
+ * @example
+ * return (
+ *   <NewDeck />
+ * )
+ *
+ * @returns {JSX.Element} The rendered NewDeck component.
+ *
+ * @description
+ * This component handles the following functionalities:
+ * - Fetching and displaying categories.
+ * - Handling file uploads and drag-and-drop functionality for PDF files.
+ * - Validating user inputs such as deck name, number of questions, question type, and category.
+ * - Generating flashcards using an LLM (Language Learning Model) based on the uploaded PDF.
+ * - Allowing users to review and edit the generated flashcards.
+ * - Saving the deck and flashcards to the server.
+ *
+ * @state {Object} user - The authenticated user object.
+ * @state {Array} categories - List of available categories.
+ * @state {boolean} categoriesLoading - Loading state for categories.
+ * @state {Object} categoriesError - Error state for categories.
+ * @state {boolean} modalOpen - State to control the visibility of the modal.
+ * @state {Object} selectedFile - The selected PDF file.
+ * @state {Object} file - The uploaded PDF file.
+ * @state {number} currentPage - The current page of the modal (0 for generation, 1 for review).
+ * @state {number} currentFlashcard - The index of the current flashcard being reviewed.
+ * @state {Array} questionList - List of generated questions.
+ * @state {Object} currentQuestion - The current question being reviewed.
+ * @state {string} noOfQuestions - The number of questions to generate.
+ * @state {string} questionType - The type of questions to generate (multiple-choice or short-answer).
+ * @state {boolean} newCategoryModalOpen - State to control the visibility of the new category modal.
+ * @state {string} deckName - The name of the deck.
+ * @state {string} categoryId - The selected category ID.
+ * @state {boolean} uploading - State to indicate if the file is being uploaded.
+ * @state {Object} llmResponse - The response from the LLM.
+ * @state {string} errorp1 - Error message for the first page.
+ * @state {string} errorp2 - Error message for the second page.
+ *
+ * @function handleDeckNameChange - Updates the deck name state.
+ * @function handleNoOfQuestionsChange - Updates the number of questions state.
+ * @function resetComponent - Resets the component state to initial values.
+ * @function handleClose - Closes the modal and resets the component state.
+ * @function handleQuestionTypeChange - Updates the question type state.
+ * @function handleCategoryChange - Updates the category state or opens the new category modal.
+ * @function handleFileChange - Handles file selection and validation.
+ * @function handleDelete - Deletes the selected file.
+ * @function handleDrop - Handles file drop and validation.
+ * @function p1Validations - Validates the inputs on the first page.
+ * @function CheckDeckName - Checks if the deck name already exists.
+ * @function handleUpload - Uploads the file and creates the deck and flashcards.
+ * @function handleGenerateFlashcards - Generates flashcards using the LLM.
+ * @function updateCurrentQuestionForward - Updates the current question and moves to the next one.
+ * @function updateCurrentQuestionBackward - Updates the current question and moves to the previous one.
+ * @function handleNextFlashcard - Moves to the next flashcard.
+ * @function handlePreviousFlashcard - Moves to the previous flashcard.
+ * @function handleAddNewCategory - Opens the new category modal.
+ * @function handleSaveNewCategory - Saves the new category and refreshes the categories list.
+ * @function formatFlashcardData - Formats the flashcard data for review.
+ */
 const NewDeck = () => {
   const { user } = useAuth();
   const { categories, categoriesLoading, categoriesError, refreshCategories } =
@@ -153,7 +217,7 @@ const NewDeck = () => {
     }
   };
 
-  const p1Validations = () => {
+  const p1Validations = async () => {
     if (!deckName) {
       setError1("Please enter a deck name.");
       return false;
@@ -169,18 +233,16 @@ const NewDeck = () => {
       return false;
     }
 
-    if (!categoryId) {
-      setError1("Please select a category.");
-      return false;
-    }
-
     if (!file) {
       setError1("Please upload a PDF file.");
       return false;
     }
 
     // Check for duplicate file
-    if (checkForDuplicateFile(file, user.id)) {
+    const isDuplicate = await checkForDuplicateFile(file, user.id);
+    console.log("Duplicate file:", isDuplicate);
+
+    if (isDuplicate) {
       setError1("File already exists. Please choose a different file.");
       return false;
     }

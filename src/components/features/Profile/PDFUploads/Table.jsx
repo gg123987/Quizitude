@@ -18,6 +18,14 @@ import Button from "@mui/material/Button";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import InsertDriveFileOutlinedIcon from "@mui/icons-material/InsertDriveFileOutlined";
 
+/**
+ * headCells array defines the columns for the table.
+ * Each object in the array represents a column with the following properties:
+ * - id: The unique identifier for the column.
+ * - numeric: Boolean value to determine if the column is numeric.
+ * - disablePadding: Boolean value to determine if padding should be disabled.
+ * - label: The column header text.
+ */
 const headCells = [
   { id: "name", numeric: false, disablePadding: true, label: "File name" },
   { id: "size", numeric: true, disablePadding: false, label: "File size" },
@@ -31,14 +39,26 @@ const headCells = [
   { id: "genDel", numeric: true, disablePadding: false, label: "" },
 ];
 
+/**
+ * EnhancedTableHead component renders the header of a table with a selectable checkbox.
+ *
+ * @component
+ * @param {Object} props - The properties object.
+ * @param {number} props.numSelected - The number of selected rows.
+ * @param {function} props.onSelectAllClick - The function to call when the select all checkbox is clicked.
+ * @param {number} props.rowCount - The total number of rows in the table.
+ *
+ * @returns {JSX.Element} The rendered table head component.
+ *
+ */
 const EnhancedTableHead = ({ numSelected, onSelectAllClick, rowCount }) => (
   <TableHead>
     <TableRow>
       <TableCell padding="checkbox">
         <Checkbox
           color="primary"
-          indeterminate={numSelected > 0 && numSelected < rowCount}
-          checked={rowCount > 0 && numSelected === rowCount}
+          indeterminate={numSelected > 0 && numSelected < rowCount} // Indeterminate state when some but not all rows are selected
+          checked={rowCount > 0 && numSelected === rowCount} // Checked state when all rows are selected
           onChange={onSelectAllClick}
           inputProps={{ "aria-label": "select all desserts" }}
         />
@@ -56,6 +76,8 @@ const EnhancedTableHead = ({ numSelected, onSelectAllClick, rowCount }) => (
   </TableHead>
 );
 
+// EnhancedTableToolbar component renders a toolbar with action buttons for the table.
+// It displays the number of selected rows and provides a delete button when rows are selected.
 const EnhancedTableToolbar = ({ numSelected }) => (
   <Toolbar>
     <Typography variant="h6" id="tableTitle" component="div">
@@ -71,6 +93,26 @@ const EnhancedTableToolbar = ({ numSelected }) => (
   </Toolbar>
 );
 
+/**
+ * EnhancedTable component renders a table with selectable rows, pagination, and action buttons.
+ *
+ * @component
+ * @param {Object[]} data - Array of data objects to be displayed in the table.
+ * @param {Function} onDelete - Callback function to handle the deletion of a row.
+ * @param {Function} onGenerate - Callback function to handle the generation action for a row.
+ *
+ * @example
+ * const data = [
+ *   { id: 1, name: 'File1', size: 2048, deck_count: 3, uploaded_at: '2023-01-01T00:00:00Z' },
+ *   { id: 2, name: 'File2', size: 1024, deck_count: 5, uploaded_at: '2023-02-01T00:00:00Z' }
+ * ];
+ * const handleDelete = (id) => { console.log(`Delete row with id ${id}`); };
+ * const handleGenerate = (row) => { console.log(`Generate action for row`, row); };
+ *
+ * <EnhancedTable data={data} onDelete={handleDelete} onGenerate={handleGenerate} />
+ *
+ * @returns {JSX.Element} The rendered EnhancedTable component.
+ */
 const EnhancedTable = ({ data, onDelete, onGenerate }) => {
   const [selected, setSelected] = React.useState([]);
   const rowsPerPage = 6;
@@ -85,6 +127,20 @@ const EnhancedTable = ({ data, onDelete, onGenerate }) => {
     setSelected([]);
   };
 
+  /**
+   * Handles the click event for selecting or deselecting an item.
+   *
+   * @param {Object} event - The click event object.
+   * @param {string|number} id - The unique identifier of the item to be selected or deselected.
+   *
+   * This function updates the `selected` state by either adding or removing the given `id`.
+   * - If the `id` is not in the `selected` array, it adds the `id`.
+   * - If the `id` is the first element in the `selected` array, it removes the first element.
+   * - If the `id` is the last element in the `selected` array, it removes the last element.
+   * - If the `id` is in the middle of the `selected` array, it removes that specific element.
+   *
+   * @returns {void}
+   */
   const handleClick = (event, id) => {
     const selectedIndex = selected.indexOf(id);
     let newSelected = [];

@@ -3,6 +3,23 @@ import "./proVersion.css";
 import Button from "@mui/material/Button";
 import CheckoutForm from "../Checkout/CheckoutForm";
 
+/**
+ * ProVersion Component
+ *
+ * This component renders the Pro Version upgrade interface. It allows users to
+ * upgrade to a Pro Version by selecting either a monthly or annual plan. Upon
+ * clicking the "Upgrade Now" button, the checkout form is displayed.
+ *
+ * @component
+ * @param {Object} props - Component props
+ * @param {Function} props.setShowProVersion - Function to toggle the visibility of the Pro Version component
+ *
+ * @example
+ * // Usage example:
+ * <ProVersion setShowProVersion={setShowProVersion} />
+ *
+ * @returns {JSX.Element} The Pro Version component
+ */
 const ProVersion = ({ setShowProVersion }) => {
   const [showCheckoutForm, setShowCheckoutForm] = useState(false);
 

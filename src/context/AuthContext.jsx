@@ -30,6 +30,9 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    /**
+     * Fetches the current user and their details from Supabase.
+     */
     const getUser = async () => {
       try {
         const { data } = await supabase.auth.getUser();
@@ -58,6 +61,9 @@ const AuthProvider = ({ children }) => {
       }
     };
 
+    /**
+     * Retrieves session data from local storage and sets the authentication state.
+     */
     const getSessionData = async () => {
       try {
         const token = localStorage.getItem("rememberMeToken");
@@ -77,6 +83,9 @@ const AuthProvider = ({ children }) => {
     getSessionData();
     getUser();
 
+    /**
+     * Sets up an authentication state change listener.
+     */
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === "SIGNED_IN") {
@@ -101,6 +110,7 @@ const AuthProvider = ({ children }) => {
       }
     );
 
+    // Cleanup the listener on component unmount
     return () => {
       authListener.subscription?.unsubscribe();
     };

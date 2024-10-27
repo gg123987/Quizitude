@@ -47,6 +47,31 @@ const defaultSort = [
 
 import PropTypes from "prop-types";
 
+/**
+ * SelectSort Component
+ *
+ * This component renders a dropdown select input for sorting options.
+ *
+ * @component
+ * @param {Object} props - The properties object.
+ * @param {Array} props.sortOptions - An array of sorting options. Each option should be an object with `value` and `label` properties.
+ * @param {function} props.onSortChange - Callback function to handle the change event when a sorting option is selected.
+ * @param {string} [props.width="19ch"] - The width of the select input.
+ *
+ * @example
+ * const sortOptions = [
+ *   { value: 'name', label: 'Name' },
+ *   { value: 'date', label: 'Date' },
+ * ];
+ *
+ * function handleSortChange(value) {
+ *   console.log('Selected sort option:', value);
+ * }
+ *
+ * <SelectSort sortOptions={sortOptions} onSortChange={handleSortChange} />
+ *
+ * @returns {JSX.Element} The rendered SelectSort component.
+ */
 export default function SelectSort({
   sortOptions = defaultSort,
   onSortChange,

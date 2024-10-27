@@ -16,18 +16,21 @@ import WeekIndicator from "@/components/features/Streaks/WeekIndicator";
 import CircularProgress from "@mui/material/CircularProgress";
 import "./home.css"; // Add your CSS styles here
 
+/**
+ * Home component - Main page for displaying user-specific content such as recent decks, pinned decks, and categories.
+ */
 const Home = () => {
   const { userId } = useOutletContext(); // Get user ID from context
   const { user, userDetails } = useAuth();
-  const { decks, loading: decksLoading, error } = useDecks(userId); // Assuming useDecks fetches both recent and pinned decks
+  const { decks, loading: decksLoading, error } = useDecks(userId); // Fetch decks
   const {
     categories,
     loading: categoriesLoading,
     error: categoriesError,
-  } = useCategories(userId);
+  } = useCategories(userId); // Fetch categories
 
-  const [loading, setLoading] = useState(true);
-  const streakCount = useStreak(userId);
+  const [loading, setLoading] = useState(true); // State to manage loading spinner
+  const streakCount = useStreak(userId); // Fetch user's streak count
 
   useEffect(() => {
     // If loading decks or categories, show loading spinner
@@ -38,13 +41,15 @@ const Home = () => {
     }
   }, [decksLoading, categoriesLoading]);
 
-  const [currentRecentIndex, setCurrentRecentIndex] = useState(0);
-  const [currentPinnedIndex, setCurrentPinnedIndex] = useState(0);
+  const [currentRecentIndex, setCurrentRecentIndex] = useState(0); // State for recent decks pagination
+  const [currentPinnedIndex, setCurrentPinnedIndex] = useState(0); // State for pinned decks pagination
 
+  // Media queries to determine screen size
   const isLargeScreen = useMediaQuery("(min-width: 1630px)");
   const isMediumScreen = useMediaQuery("(min-width: 1247px)");
   const isSmallScreen = useMediaQuery("(min-width: 450px)");
 
+  // Determine number of decks per row based on screen size
   const decksPerRow = isLargeScreen
     ? 4
     : isMediumScreen
@@ -53,6 +58,7 @@ const Home = () => {
     ? 2
     : 1;
 
+  // Determine number of categories per row based on screen size
   const categoriesPerRow = isLargeScreen
     ? 4
     : isMediumScreen
@@ -61,10 +67,10 @@ const Home = () => {
     ? 2
     : 1;
 
-  const rowsToShow = 3;
-  const categoriesLimit = categoriesPerRow * rowsToShow;
+  const rowsToShow = 3; // Number of rows to show for categories
+  const categoriesLimit = categoriesPerRow * rowsToShow; // Limit for categories to display
 
-  // Filter and sort decks
+  // Filter and sort recent decks
   const recentDecks = React.useMemo(() => {
     return decks
       .filter((deck) => !deck.is_pinned) // Only recent decks that are not pinned
@@ -72,14 +78,17 @@ const Home = () => {
       .slice(0, decksPerRow); // Take only the most recent decks based on decksPerRow
   }, [decks]);
 
+  // Limit the displayed categories
   const displayedCategories = React.useMemo(() => {
     return categories.slice(0, categoriesLimit);
   }, [categories]);
 
+  // Filter pinned decks
   const pinnedDecks = React.useMemo(() => {
     return decks.filter((deck) => deck.is_pinned); // Only pinned decks
   }, [decks]);
 
+  // Handle pagination for pinned decks
   const handleNextPinned = () => {
     if (currentPinnedIndex < Math.ceil(pinnedDecks.length / decksPerRow) - 1) {
       setCurrentPinnedIndex(currentPinnedIndex + 1);
@@ -92,6 +101,7 @@ const Home = () => {
     }
   };
 
+  // Check if the user has studied today
   const checkStudyToday = () => {
     const today = new Date();
     const lastSession = userDetails.last_session
@@ -113,6 +123,7 @@ const Home = () => {
     return false;
   };
 
+  // Get the displayed pinned decks based on pagination
   const displayedPinnedDecks = pinnedDecks.slice(
     currentPinnedIndex * decksPerRow,
     (currentPinnedIndex + 1) * decksPerRow

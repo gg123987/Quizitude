@@ -5,11 +5,20 @@ import flame from "@/assets/flame.png";
 import MonthIndicator from "@/components/features/Streaks/MonthIndicator";
 import "./streak.css";
 
+/**
+ * Streak component displays the user's current streak of study days.
+ * It shows the number of consecutive days the user has studied and
+ * provides a visual indicator for the current month.
+ */
 const Streak = () => {
   const { userId } = useOutletContext();
   const { userDetails } = useAuth();
   const streakCount = useStreak(userId);
 
+  /**
+   * Checks if the user has studied today.
+   * @returns {boolean} True if the user has studied today, otherwise false.
+   */
   const checkStudyToday = () => {
     const today = new Date();
     const lastSession = userDetails.last_session

@@ -53,6 +53,32 @@ const CustomTextField = styled(TextField)(() => ({
   },
 }));
 
+/**
+ * DeckDetail page displays the details of a specific deck, including its flashcards and sessions.
+ * It allows users to search, sort, rename, and delete the deck, as well as navigate to study mode.
+ *
+ * @component
+ * @example
+ * return (
+ *   <DeckDetail />
+ * )
+ *
+ * @description
+ * This page fetches and displays the details of a deck based on the deck ID from the URL parameters.
+ * It provides functionalities to:
+ * - View and search flashcards within the deck.
+ * - Sort and view sessions related to the deck.
+ * - Rename and delete the deck.
+ * - Navigate to the study mode with the filtered flashcards.
+ *
+ * @requires useParams - To get the deck ID from the URL.
+ * @requires useDeck - Custom hook to fetch deck details.
+ * @requires useDeckSessions - Custom hook to fetch deck sessions.
+ * @requires useFlashcards - Custom hook to fetch flashcards.
+ * @requires useModal - Custom hook to handle modal operations.
+ * @requires useNavigate - To navigate between routes.
+ *
+ */
 const DeckDetail = () => {
   const { id } = useParams();
   const { deck, loading, error, refreshDeck } = useDeck(id);
@@ -102,11 +128,13 @@ const DeckDetail = () => {
     openModal(<NewDeck />);
   };
 
+  // Handle search input change
   const handleChange = (event) => {
     setShowClearIcon(event.target.value === "" ? "none" : "flex");
     setSearchQuery(event.target.value);
   };
 
+  // navigate to study mode with filtered flashcards
   const handleStudyCard = () => {
     console.log("Study Card");
     navigate("/study", {

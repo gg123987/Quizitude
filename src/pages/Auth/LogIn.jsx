@@ -21,6 +21,31 @@ import { supabase } from "@/utils/supabase";
 
 const defaultTheme = createTheme();
 
+/**
+ * SignInSide component renders the login page with options to sign in using email/password or Google.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered component.
+ *
+ * @example
+ * return (
+ *   <SignInSide />
+ * )
+ *
+ * @remarks
+ * - This component uses Material-UI for styling and layout.
+ * - It includes form validation and error handling for email and password fields.
+ * - It supports "Remember Me" functionality by storing the session token in localStorage.
+ * - It provides a link to reset the password and to sign up for a new account.
+ *
+ * @async
+ * @function handleSubmit
+ * @description Handles the form submission for email/password login.
+ * @param {Event} e - The form submission event.
+ *
+ * @function handleGoogleSignIn
+ * @description Handles the Google sign-in button click.
+ */
 export default function SignInSide() {
   const [rememberMe, setRememberMe] = useState(false);
   const emailRef = useRef(null);
@@ -51,6 +76,7 @@ export default function SignInSide() {
       console.log("Login data:", user, session, error);
 
       if (error) {
+        // If the error is due to invalid login credentials, check if the email exists
         if (error.message === "Invalid login credentials") {
           const { data: users } = await supabase
             .from("users")
@@ -60,6 +86,7 @@ export default function SignInSide() {
 
           const count = users ? 1 : 0;
 
+          // If the email exists, show password error, otherwise show email error
           if (count > 0) {
             setEmailError(false);
             setPasswordError(true);

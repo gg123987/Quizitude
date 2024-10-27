@@ -9,6 +9,7 @@ import EditIcon from "@/assets/edit-icon";
 import DoneIcon from "@mui/icons-material/Done";
 import { deleteFlashcard, updateFlashcard } from "@/services/flashcardService";
 
+// Custom styled TextField component with specific styles for focus and hover states
 const CssTextField = styled(TextField)({
   "& label.Mui-focused": {
     color: "green",
@@ -29,6 +30,15 @@ const CssTextField = styled(TextField)({
   },
 });
 
+/**
+ * FlashcardEdit component allows editing and deleting of a flashcard.
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.flashcard - Flashcard data
+ * @param {string} props.flashcard.question - Flashcard question
+ * @param {string} props.flashcard.answer - Flashcard answer
+ * @param {Function} props.onChange - Callback function to trigger when flashcard data changes
+ */
 const FlashcardEdit = ({ flashcard, onChange }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedQuestion, setEditedQuestion] = useState(flashcard.question);
@@ -43,6 +53,7 @@ const FlashcardEdit = ({ flashcard, onChange }) => {
     setIsEditing(true);
   };
 
+  // Save edited flashcard data
   const handleSave = async () => {
     const flashcardData = {
       question: editedQuestion,

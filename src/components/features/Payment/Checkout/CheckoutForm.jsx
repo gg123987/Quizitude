@@ -1,68 +1,79 @@
-import React, { useState } from 'react';
-import './checkoutForm.css';
-import { TextField, Button, Grid } from '@mui/material';
+import React, { useState } from "react";
+import "./checkoutForm.css";
+import { TextField, Button, Grid } from "@mui/material";
 
+/**
+ * CheckoutForm component handles the rendering and validation of a payment form.
+ * @param {Object} props - Component props.
+ * @param {Function} props.setShowCheckoutForm - Function to toggle the visibility of the checkout form.
+ */
 const CheckoutForm = ({ setShowCheckoutForm }) => {
-  const [cardNumber, setCardNumber] = useState('');
-  const [nameOnCard, setNameOnCard] = useState('');
-  const [expirationDate, setExpirationDate] = useState('');
-  const [cvv, setCvv] = useState('');
+  const [cardNumber, setCardNumber] = useState("");
+  const [nameOnCard, setNameOnCard] = useState("");
+  const [expirationDate, setExpirationDate] = useState("");
+  const [cvv, setCvv] = useState("");
   const [errors, setErrors] = useState({});
 
-  // Get current month and year
+  /**
+   * Get the current month and year.
+   * @returns {Object} - An object containing the current month and year.
+   */
   const getCurrentMonthYear = () => {
     const now = new Date();
-    const currentMonth = now.getMonth() + 1; 
-    const currentYear = now.getFullYear() % 100; 
+    const currentMonth = now.getMonth() + 1; // Months are zero-indexed
+    const currentYear = now.getFullYear() % 100; // Get last two digits of the year
     return { currentMonth, currentYear };
   };
 
-  // Validate form fields
+  /**
+   * Validate form fields and return any errors.
+   * @returns {Object} - An object containing validation errors.
+   */
   const validateFields = () => {
     const newErrors = {};
 
     // Checking card length
     if (!cardNumber || cardNumber.length !== 16) {
-      newErrors.cardNumber = 'Card number must be 16 digits long';
+      newErrors.cardNumber = "Card number must be 16 digits long";
     }
 
     // Checking name isn't empty
     if (!nameOnCard) {
-      newErrors.nameOnCard = 'Name on card is required';
+      newErrors.nameOnCard = "Name on card is required";
     }
 
     // Expiration date MM/YY format
     const { currentMonth, currentYear } = getCurrentMonthYear();
     if (!expirationDate || expirationDate.length !== 5) {
-      newErrors.expirationDate = 'Expiration date must be in MM/YY format';
+      newErrors.expirationDate = "Expiration date must be in MM/YY format";
     } else {
-      const [expMonth, expYear] = expirationDate.split('/').map(Number);
+      const [expMonth, expYear] = expirationDate.split("/").map(Number);
 
       // Check if expiration date is valid and in the future
       if (
-        expYear < currentYear || 
+        expYear < currentYear ||
         (expYear === currentYear && expMonth < currentMonth)
       ) {
-        newErrors.expirationDate = 'Expiration date must be in the future';
+        newErrors.expirationDate = "Expiration date must be in the future";
       }
     }
 
     // Validate that CVV is 3 digits
     if (!cvv || cvv.length !== 3) {
-      newErrors.cvv = 'CVV must be 3 digits long';
+      newErrors.cvv = "CVV must be 3 digits long";
     }
     return newErrors;
   };
 
   const handleExpirationDateChange = (e) => {
-    let value = e.target.value.replace(/\D/g, ''); // Remove any non-digit characters
+    let value = e.target.value.replace(/\D/g, ""); // Remove any non-digit characters
     if (value.length > 4) {
       value = value.slice(0, 4); // Limit input to 4 digits (MMYY)
     }
     if (value.length >= 3) {
-      value = value.slice(0, 2) + '/' + value.slice(2); // Add '/' after MM
+      value = value.slice(0, 2) + "/" + value.slice(2); // Add '/' after MM
     }
-    setExpirationDate(value); 
+    setExpirationDate(value);
   };
 
   const handleSubmit = (e) => {
@@ -73,14 +84,19 @@ const CheckoutForm = ({ setShowCheckoutForm }) => {
       setErrors(validationErrors);
     } else {
       setErrors({});
-      console.log('Form submitted successfully');
+      console.log("Form submitted successfully");
     }
   };
 
   return (
     <div className="checkout-container">
       <div className="checkout-content">
-        <div className="close-button" onClick={() => setShowCheckoutForm(false)}>X</div>
+        <div
+          className="close-button"
+          onClick={() => setShowCheckoutForm(false)}
+        >
+          X
+        </div>
         <h1 className="checkout-title">Checkout</h1>
         <form onSubmit={handleSubmit}>
           <Grid container spacing={2}>
@@ -90,7 +106,9 @@ const CheckoutForm = ({ setShowCheckoutForm }) => {
                 label="Card Number"
                 variant="outlined"
                 value={cardNumber}
-                onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, ''))} // Only allow digits
+                onChange={(e) =>
+                  setCardNumber(e.target.value.replace(/\D/g, ""))
+                } // Only allow digits
                 error={!!errors.cardNumber}
                 helperText={errors.cardNumber}
               />
@@ -123,15 +141,15 @@ const CheckoutForm = ({ setShowCheckoutForm }) => {
                 label="CVV"
                 variant="outlined"
                 value={cvv}
-                onChange={(e) => setCvv(e.target.value.replace(/\D/g, ''))} // Only allow numbers
+                onChange={(e) => setCvv(e.target.value.replace(/\D/g, ""))} // Only allow numbers
                 error={!!errors.cvv}
                 helperText={errors.cvv}
               />
             </Grid>
             <Grid item xs={12}>
-              <Button 
-                fullWidth 
-                variant="contained" 
+              <Button
+                fullWidth
+                variant="contained"
                 sx={{ backgroundColor: "#3538cd" }}
                 type="submit"
               >

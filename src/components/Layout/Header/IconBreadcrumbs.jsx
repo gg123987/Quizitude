@@ -12,6 +12,19 @@ const staticMappings = {
   categories: "Categories",
 };
 
+/**
+ * IconBreadcrumbs component renders a breadcrumb navigation based on the current URL path.
+ * It dynamically fetches and displays names for decks and categories.
+ *
+ * @returns {JSX.Element|null} The rendered breadcrumb navigation or null if no pathnames are present.
+ *
+ * @description
+ * This component uses the `useLocation` hook to get the current pathname and splits it into segments.
+ * It fetches deck and category details based on the type of the first segment in the pathname.
+ * If the data is loading, it displays a loading message. Once loaded, it maps the pathnames to display names
+ * and renders them as breadcrumb links.
+ *
+ */
 export default function IconBreadcrumbs() {
   const location = useLocation();
 

@@ -26,6 +26,12 @@ export const updateUser = async (userId, userUpdates) => {
   return data;
 };
 
+/**
+ * Updates a user's streak based on their last session date.
+ * @param {string} userId - The ID of the user to update.
+ * @param {Date} current_date - The current date.
+ * @throws Will throw an error if the user's streak cannot be updated.
+ */
 export const updateUserStreak = async (userId, current_date) => {
   const { data: user, error } = await supabase
     .from("users")
@@ -37,11 +43,6 @@ export const updateUserStreak = async (userId, current_date) => {
   const last_session = user.last_session ? new Date(user.last_session) : null;
   const streak = user.current_streak || 0;
   const longest_streak = user.longest_streak || 0;
-
-  console.log("Current date:", current_date);
-  console.log("Last session:", last_session);
-  console.log("Current streak:", streak);
-  console.log("Longest streak:", longest_streak);
 
   let new_streak = streak;
 
@@ -86,6 +87,12 @@ export const updateUserStreak = async (userId, current_date) => {
   await updateUser(userId, userUpdates);
 };
 
+/**
+ * Checks and resets a user's streak if they missed a day.
+ * @param {string} userId - The ID of the user to check.
+ * @returns {number} The current streak.
+ * @throws Will throw an error if the user's streak cannot be checked.
+ */
 export const checkUserStreak = async (userId) => {
   const { data: user, error } = await supabase
     .from("users")
@@ -98,10 +105,6 @@ export const checkUserStreak = async (userId) => {
   let streak = user.current_streak || 0;
   const longest_streak = user.longest_streak || 0;
   const current_date = new Date();
-
-  console.log("Last session:", last_session);
-  console.log("Current streak:", streak);
-  console.log("Longest streak:", longest_streak);
 
   if (last_session) {
     // Normalize both dates to the start of the day (removing time differences)

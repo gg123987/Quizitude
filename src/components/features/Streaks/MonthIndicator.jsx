@@ -2,13 +2,24 @@ import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import "./MonthIndicator.css"; // Import CSS styles
+import "./MonthIndicator.css";
 
+/**
+ * MonthIndicator component displays a calendar month view with streak indicators.
+ * @param {Object} props - Component props.
+ * @param {number} props.streakCount - Number of consecutive days the user has studied.
+ * @param {boolean} props.studiedToday - Indicates if the user has studied today.
+ */
 const MonthIndicator = ({ streakCount, studiedToday }) => {
   // State to manage the displayed month and year
   const [currentDate, setCurrentDate] = useState(new Date());
   const today = new Date();
 
+  /**
+   * Generates an array representing the days of the current month.
+   * Pads the start and end of the array to align days correctly in a calendar view.
+   * @returns {Array} Array of days in the current month, with null values for padding.
+   */
   const getMonthDays = () => {
     const startOfMonth = new Date(
       currentDate.getFullYear(),
@@ -56,11 +67,15 @@ const MonthIndicator = ({ streakCount, studiedToday }) => {
   const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
   const monthDays = getMonthDays();
 
-  // Calculate streak indices based on the current streak count and today’s date
+  /**
+   * Calculates the indices of the days in the current month that are part of the streak.
+   * @returns {Array} Array of indices representing streak days in the current month.
+   */
   const calculateStreakIndices = () => {
     const streakIndices = [];
     const startDate = new Date(today);
 
+    // If the user hasn't studied today, set the start date to yesterday to avoid counting today in the streak
     if (!studiedToday) {
       startDate.setDate(today.getDate() - 1);
     }
@@ -89,7 +104,9 @@ const MonthIndicator = ({ streakCount, studiedToday }) => {
   };
 
   const streakIndices = calculateStreakIndices();
-  const firstStreakIndex = streakIndices[streakIndices.length - 1];
+
+  // Get the first and last streak indices to determine the start and end of the streak for styling
+  const firstStreakIndex = streakIndices[streakIndices.length - 1]; // Reverse the streakIndices array
   const lastStreakIndex = streakIndices[0];
 
   return (

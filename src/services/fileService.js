@@ -1,6 +1,12 @@
 import { supabase } from "@/utils/supabase";
 import { createDeck } from "./deckService";
 
+/**
+ * Uploads a file and creates a deck associated with that file.
+ * @param {File} file - The file to be uploaded.
+ * @param {Object} deckData - The data for the deck to be created.
+ * @returns {Object} - The created deck and file information.
+ */
 export const uploadFileAndCreateDeck = async (file, deckData) => {
   try {
     const userId = deckData.user_id;
@@ -26,7 +32,7 @@ export const uploadFileAndCreateDeck = async (file, deckData) => {
     // 3. Create a new deck with file_id as a foreign key
     const deck = await createDeck(deckData);
 
-    /* Removed this table for simplicty
+    /* Removed this table for simplicity
     // 4. Link the file to the deck in the deck_files table
     const { error: deckFileError } = await supabase
       .from("deck_files")
@@ -44,6 +50,12 @@ export const uploadFileAndCreateDeck = async (file, deckData) => {
   }
 };
 
+/**
+ * Checks if a file with the same name and size already exists for a user.
+ * @param {File} file - The file to check for duplicates.
+ * @param {string} userId - The ID of the user.
+ * @returns {Object|null} - The existing file if found, otherwise null.
+ */
 export const checkForDuplicateFile = async (file, userId) => {
   const { data: existingFiles, error } = await supabase
     .from("files")
@@ -60,6 +72,12 @@ export const checkForDuplicateFile = async (file, userId) => {
   return existingFiles; // Will be null if no duplicate is found
 };
 
+/**
+ * Uploads a file to Supabase Storage and creates a record in the files table.
+ * @param {File} file - The file to be uploaded.
+ * @param {string} userId - The ID of the user.
+ * @returns {Object} - The created file record.
+ */
 export const uploadFile = async (file, userId) => {
   try {
     // 1. Create a user-specific folder path
@@ -94,6 +112,11 @@ export const uploadFile = async (file, userId) => {
   }
 };
 
+/**
+ * Retrieves all files uploaded by a specific user.
+ * @param {string} userId - The ID of the user.
+ * @returns {Array} - The list of files with deck count.
+ */
 export const getFilesByUser = async (userId) => {
   const { data, error } = await supabase
     .from("files")
@@ -112,6 +135,11 @@ export const getFilesByUser = async (userId) => {
   return filesWithDeckCount;
 };
 
+/**
+ * Retrieves the file associated with a specific deck.
+ * @param {string} deckId - The ID of the deck.
+ * @returns {Object} - The file information.
+ */
 export const getFileByDeck = async (deckId) => {
   // Get the file_id from the deck
   const { data, error } = await supabase
@@ -137,6 +165,11 @@ export const getFileByDeck = async (deckId) => {
   return fileData;
 };
 
+/**
+ * Retrieves a file by its ID.
+ * @param {string} fileId - The ID of the file.
+ * @returns {File} - The file object.
+ */
 export const getFileById = async (fileId) => {
   // Step 1: Get the file path from the files table
   const { data: fileData, error } = await supabase
@@ -168,6 +201,11 @@ export const getFileById = async (fileId) => {
   return file;
 };
 
+/**
+ * Deletes a file by its ID.
+ * @param {string} fileId - The ID of the file to be deleted.
+ * @returns {Object} - The deleted file record.
+ */
 export const deleteFile = async (fileId) => {
   try {
     // Get the file path from the files table

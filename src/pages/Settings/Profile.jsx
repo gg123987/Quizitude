@@ -12,6 +12,55 @@ import ViewScoreHistory from "@/components/features/Profile/ViewScoreHistory/Vie
 import PDFUploads from "@/components/features/Profile/PDFUploads/PDFUpload";
 import useFetchUser from "@/hooks/useFetchUser";
 
+/**
+ * Account component for managing user profile settings.
+ *
+ * @component
+ * @param {Object} props - Component props.
+ * @param {Object} props.session - The current user session.
+ *
+ * @returns {JSX.Element} The rendered Account component.
+ *
+ * @example
+ * <Account session={session} />
+ *
+ * @description
+ * This component fetches and displays the user's profile information, including full name, email, and avatar URL.
+ * It allows the user to update their profile information and avatar. The component also includes navigation tabs
+ * for different settings sections such as "General Settings", "Streak", "View Score History", and "PDF Uploads".
+ *
+ * @param {Object} session - The current user session.
+ *
+ * @property {boolean} loading - Indicates if the profile data is being loaded.
+ * @property {string|null} full_name - The user's full name.
+ * @property {string|null} email - The user's email address.
+ * @property {string|null} avatar_url - The URL of the user's avatar.
+ * @property {Object} user - The authenticated user object from useAuth.
+ * @property {string} activeTab - The currently active settings tab.
+ * @property {string} userID - The ID of the authenticated user.
+ * @property {Object} userData - The fetched user data.
+ * @property {boolean} userLoading - Indicates if the user data is being loaded.
+ * @property {Object|null} userError - Error object if there was an error fetching user data.
+ * @property {string} tempFullName - Temporary state for the user's full name during editing.
+ * @property {string} tempEmail - Temporary state for the user's email during editing.
+ * @property {boolean} isGoogleUser - Indicates if the user signed in with Google.
+ *
+ * @method
+ * @name getProfile
+ * @description Fetches the user's profile data and updates the state.
+ *
+ * @method
+ * @name updateProfile
+ * @description Updates the user's profile information in the authentication and database.
+ * @param {Event} event - The form submission event.
+ *
+ * @method
+ * @name updateAvatarUrl
+ * @description Updates the user's avatar URL in the database.
+ * @param {Event} event - The form submission event.
+ * @param {string} avatarUrl - The new avatar URL.
+ */
+
 export default function Account({ session }) {
   const [loading, setLoading] = useState(true);
   const [full_name, setFullName] = useState(null);
@@ -37,6 +86,7 @@ export default function Account({ session }) {
       console.log("userData in here", userData);
       console.log("user from useAuth", user);
 
+      // Check if the user is loaded and the user data is fetched
       if (!ignore && !userLoading && userData) {
         if (full_name !== userData.full_name) {
           setFullName(userData.full_name);

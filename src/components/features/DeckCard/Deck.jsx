@@ -4,16 +4,36 @@ import CustomButton from "@/components/common/CustomButton";
 import { useNavigate } from "react-router-dom";
 import "./deck.css";
 
+/**
+ * Deck component represents a single deck card with its category, name, and flashcards count.
+ * It provides navigation to the deck details and category decks.
+ *
+ * @param {Object} props - The component props.
+ * @param {Object} props.deck - The deck object.
+ * @param {number} props.deck.id - The unique identifier of the deck.
+ * @param {Object} props.deck.categories - The category object of the deck.
+ * @param {number} props.deck.categories.id - The unique identifier of the category.
+ * @param {string} props.deck.categories.name - The name of the category.
+ * @param {string} props.deck.name - The name of the deck.
+ * @param {number} props.deck.flashcards_count - The number of flashcards in the deck.
+ */
 const Deck = ({ deck }) => {
   const { categories, name, flashcards_count } = deck;
   const categoryName = categories.name;
   const categoryId = categories.id;
   const navigate = useNavigate();
 
+  /**
+   * Handles the click event on the deck card to navigate to the deck details page.
+   */
   const handleClickDeck = () => {
     navigate(`/decks/${deck.id}`);
   };
 
+  /**
+   * Handles the click event on the category button to navigate to the decks filtered by category.
+   * @param {Event} e - The click event.
+   */
   const handleClickCategory = (e) => {
     e.stopPropagation();
 

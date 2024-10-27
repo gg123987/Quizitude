@@ -2,13 +2,19 @@ import React, { useState } from "react";
 import CustomButton from "@/components/common/CustomButton";
 import "./sessionstable.css";
 
+/**
+ * SessionsTable component displays a paginated table of session scores.
+ *
+ * @param {Array} sessions - Array of session objects containing score details.
+ */
 const SessionsTable = ({ sessions }) => {
   const [currentPage, setCurrentPage] = useState(0);
-  const rowsPerPage = 7;
-  console.log(sessions);
+  const rowsPerPage = 7; // Set based on screen size
 
+  // Calculate the total number of pages needed for the sessions
   const totalPages = Math.ceil(sessions.length / rowsPerPage);
 
+  // Get the data for the current page
   const currentData = sessions.slice(
     currentPage * rowsPerPage,
     (currentPage + 1) * rowsPerPage
@@ -26,16 +32,26 @@ const SessionsTable = ({ sessions }) => {
     }
   };
 
+  /**
+   * Format the date string to a more readable format.
+   */
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  /**
+   * Format the time string to show how long ago the session was reviewed.
+   */
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
     const diffInMinutes = Math.floor(diffInSeconds / 60);
+
+    // Return the time in seconds if less than a minute
+    // Return the time in minutes if less than an hour
+    // Otherwise, return the time in HH:MM format
 
     if (diffInMinutes < 1) {
       return `${diffInSeconds} secs ago`;

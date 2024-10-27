@@ -8,6 +8,19 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import "./generalSettings.css";
 
+/**
+ * GeneralSettings component allows users to update their profile information,
+ * upgrade their account, reset their password, and delete their account.
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.user - User object containing user details
+ * @param {Function} props.setEmail - Function to set the user's email
+ * @param {Function} props.setFullName - Function to set the user's full name
+ * @param {string} props.avatar_url - URL of the user's avatar
+ * @param {Function} props.setAvatarUrl - Function to set the user's avatar URL
+ * @param {Function} props.updateProfile - Function to update the user's profile
+ * @param {boolean} props.isGoogleUser - Flag indicating if the user is a Google user
+ */
 const GeneralSettings = ({
   user,
   setEmail,
@@ -49,6 +62,9 @@ const GeneralSettings = ({
     }
   };
 
+  /**
+   * Deletes the user's account from the database.
+   */
   const handleDeleteAccount = async () => {
     console.log("Deleting account...");
     try {
@@ -59,7 +75,7 @@ const GeneralSettings = ({
 
       console.log("Account successfully deleted:", response);
       alert("Account successfully deleted");
-      //redirect the user to the login page
+      // Redirect the user to the login page
       window.location.href = "/login";
     } catch (error) {
       console.error("Error deleting account:", error.message);
@@ -70,6 +86,7 @@ const GeneralSettings = ({
   return (
     <div className="settings-page">
       <div className="settings-container">
+        {/* Upgrade Account Section */}
         <div className="section">
           <h6 className="left-aligned">Upgrade your Account</h6>
           <div className="box">
@@ -93,6 +110,7 @@ const GeneralSettings = ({
           </div>
         </div>
 
+        {/* Profile Section */}
         <div className="section">
           <h6 className="left-aligned">Profile</h6>
           <p className="left-aligned">
@@ -144,6 +162,7 @@ const GeneralSettings = ({
           </Button>
         </div>
 
+        {/* Profile Photo Section */}
         <div className="section">
           <h6 className="left-aligned">Profile Photo</h6>
           <p className="left-aligned">Update your profile photo</p>
@@ -156,6 +175,7 @@ const GeneralSettings = ({
             }}
           />
         </div>
+
         {/* Password Reset Section */}
         {!isGoogleUser && (
           <div className="section">

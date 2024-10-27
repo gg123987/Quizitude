@@ -19,24 +19,34 @@ import GoogleSignup from "@/assets/Google Signup.svg";
 const defaultTheme = createTheme();
 
 export default function Register() {
+  // Refs for form fields
   const fNameRef = useRef(null);
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
+
+  // State variables for error messages and loading state
   const [errorMsg, setErrorMsg] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { register } = useAuth();
 
+  // Navigation hook
+  const navigate = useNavigate();
+
+  // Custom hook for authentication
+  const { register, signInWithGoogle } = useAuth();
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Reset error messages and loading state
       setErrorMsg("");
       setLoading(true);
       setEmailError(false);
       setPasswordError(false);
 
+      // Validate form fields
       if (
         !fNameRef.current?.value ||
         !passwordRef.current?.value ||
@@ -62,17 +72,14 @@ export default function Register() {
         return;
       }
 
-      setErrorMsg("");
-      setLoading(true);
-
+      // Attempt to register the user
       const { data, error } = await register(
         emailRef.current.value,
         passwordRef.current.value,
         fNameRef.current.value
       );
 
-      console.log(data);
-      console.log(error);
+      // Handle registration response
       if (error) {
         if (error.message === "User already registered") {
           setErrorMsg(
@@ -90,8 +97,7 @@ export default function Register() {
     setLoading(false);
   };
 
-  const { signInWithGoogle } = useAuth();
-
+  // Handle Google Sign-In
   const handleGoogleSignIn = () => {
     signInWithGoogle();
   };

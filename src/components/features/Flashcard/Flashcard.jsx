@@ -6,6 +6,23 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { Typography } from "@mui/material";
 import "./flashcard.css";
 
+/**
+ * Flashcard component to display a flashcard with question and answer.
+ * The card can be flipped to show the answer and has different modes for studying and default.
+ *
+ * @param {Object} props - The properties object.
+ * @param {Object} props.flashcard - The flashcard data.
+ * @param {string} props.flashcard.question - The question text.
+ * @param {string} props.flashcard.answer - The answer text.
+ * @param {Array} [props.flashcard.options] - The options for the flashcard (optional).
+ * @param {string} [props.flashcard.score] - The score of the flashcard, can be "correct" or "incorrect" (optional).
+ * @param {number} [props.flashcard.answered] - The answered status of the flashcard (optional).
+ * @param {string} [props.mode="default"] - The mode of the flashcard, can be "default" or "studying".
+ * @param {boolean} [props.isCurrentCard=false] - Indicates if the flashcard is the current card.
+ * @param {string} [props.width="650px"] - The width of the flashcard.
+ * @param {string} [props.height="300px"] - The height of the flashcard.
+ * @param {boolean} [props.flipped=false] - Indicates if the flashcard is flipped.
+ */
 const Flashcard = ({
   flashcard,
   mode = "default",
@@ -16,12 +33,16 @@ const Flashcard = ({
 }) => {
   const [flip, setFlip] = useState(false);
 
+  // Sync the internal flip state with the flipped prop when it changes.
   useEffect(() => {
     if (flipped !== flip) {
       setFlip(flipped);
     }
   }, [flipped]);
 
+  /**
+   * Handles the click event to flip the flashcard.
+   */
   const handleClick = () => {
     if (
       status === "default" &&
@@ -33,12 +54,15 @@ const Flashcard = ({
     }
   };
 
+  // Determine the status of the flashcard based on the mode and other properties.
   const status =
     mode === "studying"
       ? flashcard.score !== undefined || isCurrentCard
         ? "review"
         : "hidden"
       : mode;
+
+  // Determine the outline color of the flashcard based on the mode and score.
   const outline =
     mode !== "studying"
       ? "white"
@@ -49,6 +73,8 @@ const Flashcard = ({
       : flashcard.score === "correct"
       ? "blue"
       : "red";
+
+  // Determine the fill color of the flashcard based on the mode and score.
   const fill =
     mode !== "studying"
       ? "white"

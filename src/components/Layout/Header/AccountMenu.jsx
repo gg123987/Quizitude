@@ -10,20 +10,48 @@ import useAuth from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import QuizIcon from "@mui/icons-material/Quiz";
 
+/**
+ * AccountMenu component renders a user account menu with options to navigate to profile, study, and logout.
+ *
+ * @component
+ *
+ * @example
+ * return (
+ *   <AccountMenu />
+ * )
+ *
+ * @returns {React.Fragment} A fragment containing the account menu.
+ *
+ * @description
+ * This component uses Material-UI components such as Tooltip, Avatar, Menu, MenuItem, Divider, and ListItemIcon.
+ * It provides navigation options for the user to access their profile, study page, and logout functionality.
+ *
+ * @function
+ * @name AccountMenu
+ *
+ * @hook
+ * @name useAuth
+ * @description Custom hook to get authentication state and sign out function.
+ *
+ * @hook
+ * @name useNavigate
+ * @description Hook from react-router-dom to navigate programmatically.
+ *
+ * @state {HTMLElement|null} anchorEl - The current anchor element for the menu.
+ * @state {boolean} open - Boolean indicating if the menu is open.
+ */
 export default function AccountMenu() {
   const { auth, signOut } = useAuth();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const open = Boolean(anchorEl);
+  const open = Boolean(anchorEl); // Boolean to check if anchorEl is not null
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleStudy = () => {
-    navigate("/study");
   };
 
   const handlProfile = () => {

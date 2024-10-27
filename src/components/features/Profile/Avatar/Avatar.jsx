@@ -3,6 +3,28 @@ import PropTypes from "prop-types";
 import { supabase } from "@/utils/supabase";
 import "./avatar.css";
 
+/**
+ * Avatar component for displaying and uploading user avatars.
+ *
+ * @component
+ * @param {Object} props - Component properties.
+ * @param {string} props.userId - The ID of the user.
+ * @param {string} props.url - The URL of the current avatar image.
+ * @param {number|string} props.size - The size of the avatar image.
+ * @param {function} props.onUpload - Callback function to handle avatar upload.
+ *
+ * @example
+ * <Avatar userId="123" url="https://example.com/avatar.jpg" size={100} onUpload={handleUpload} />
+ *
+ * @returns {JSX.Element} The Avatar component.
+ *
+ * @description
+ * This component displays a user's avatar and allows the user to upload a new avatar image.
+ * It handles image downloading from a storage service and manages loading and uploading states.
+ *
+ * @function
+ * @name Avatar
+ */
 export default function Avatar({ userId, url, size, onUpload }) {
   const [avatarUrl, setAvatarUrl] = useState(url);
   const [uploading, setUploading] = useState(false);
