@@ -218,7 +218,13 @@ const NewDeck = () => {
   };
 
   const p1Validations = async () => {
+    console.log("Validating page 1 inputs");
+
+    setError1(null);
+
+    console.log("Deck name:", deckName);
     if (!deckName) {
+      console.log("Deck name is empty");
       setError1("Please enter a deck name.");
       return false;
     }
@@ -311,7 +317,9 @@ const NewDeck = () => {
 
   const handleGenerateFlashcards = async () => {
     try {
-      if (p1Validations()) {
+      const isValid = await p1Validations();
+
+      if (isValid) {
         setError1(null);
         setUploading(true);
 
