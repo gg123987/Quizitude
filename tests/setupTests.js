@@ -1,5 +1,6 @@
 // tests/setupTests.js
 import { expect, vi } from "vitest";
+import "@testing-library/jest-dom";
 
 // Mock Supabase client
 beforeAll(() => {
@@ -71,5 +72,10 @@ beforeAll(() => {
 
   vi.mock("@/services/categoryService", () => ({
     createCategory: vi.fn(),
+  }));
+
+  vi.mock("@/services/flashcardService", () => ({
+    deleteFlashcard: vi.fn().mockResolvedValue({}),
+    updateFlashcard: vi.fn().mockResolvedValue({}),
   }));
 });

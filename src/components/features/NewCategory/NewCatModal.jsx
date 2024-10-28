@@ -57,7 +57,11 @@ const NewCategory = ({ open, onClose, onSave }) => {
     >
       <Box className="cat-popup">
         <div className="close">
-          <IconButton className="close-button" onClick={onClose}>
+          <IconButton
+            className="close-button"
+            onClick={onClose}
+            aria-label="Close"
+          >
             <CloseIcon fontSize="large" />
           </IconButton>
         </div>

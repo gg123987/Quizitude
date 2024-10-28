@@ -222,9 +222,7 @@ const NewDeck = () => {
 
     setError1(null);
 
-    console.log("Deck name:", deckName);
     if (!deckName) {
-      console.log("Deck name is empty");
       setError1("Please enter a deck name.");
       return false;
     }

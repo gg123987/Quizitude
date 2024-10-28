@@ -78,6 +78,8 @@ const FlashcardEdit = ({ flashcard, onChange }) => {
                 fullWidth
                 multiline
                 rows={6}
+                aria-label="question"
+                data-testid="question-input"
               />
             ) : (
               <div className="box-text">{flashcard.question}</div>
@@ -95,6 +97,8 @@ const FlashcardEdit = ({ flashcard, onChange }) => {
                 fullWidth
                 multiline
                 rows={6}
+                aria-label="answer"
+                data-testid="answer-input"
               />
             ) : (
               <div className="box-text">{flashcard.answer}</div>
@@ -103,15 +107,15 @@ const FlashcardEdit = ({ flashcard, onChange }) => {
         </div>
       </div>
       <div className="delete-edit-icons">
-        <IconButton onClick={handleDelete}>
+        <IconButton onClick={handleDelete} aria-label="delete flashcard">
           <TrashIcon />
         </IconButton>
         {isEditing ? (
-          <IconButton onClick={handleSave}>
+          <IconButton onClick={handleSave} aria-label="save flashcard">
             <DoneIcon />
           </IconButton>
         ) : (
-          <IconButton onClick={handleEdit}>
+          <IconButton onClick={handleEdit} aria-label="edit flashcard">
             <EditIcon />
           </IconButton>
         )}

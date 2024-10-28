@@ -89,6 +89,7 @@ const Flashcard = ({
       className={`card ${flip ? "flip" : ""}`}
       onClick={handleClick}
       style={{ width, height, borderColor: outline, backgroundColor: fill }}
+      data-testid="flashcard"
     >
       <div className="badge">
         {flashcard.score === "correct" && (
@@ -99,18 +100,20 @@ const Flashcard = ({
         )}
       </div>
       <div className="front">
-        <Typography
-          className="flashcard-question"
-          variant="body1"
-          style={{ whiteSpace: "pre-wrap" }}
-        >
-          {status !== "hidden" && flashcard.question}
+        <div>
+          <Typography
+            className="flashcard-question"
+            variant="body1"
+            style={{ whiteSpace: "pre-wrap" }}
+          >
+            {status !== "hidden" ? flashcard.question : null}
+          </Typography>
           {status === "hidden" && (
             <div className="flashcard-placeholder">
-              <QuestionMarkIcon color="action" />
+              <QuestionMarkIcon color="action" data-testid="placeholder-icon" />
             </div>
           )}
-        </Typography>
+        </div>
       </div>
       {flip && mode === "default" && (
         <div className="back">

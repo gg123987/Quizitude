@@ -229,7 +229,7 @@ const Category = ({ category, onRefreshCategories }) => {
               Cancel
             </Button>
             <Button onClick={handleRenameSubmit} color="primary">
-              Rename
+              Save
             </Button>
           </DialogActions>
         </Dialog>
