@@ -33,8 +33,6 @@ describe("FlashcardEdit Component", () => {
     // Click the Edit button
     fireEvent.click(screen.getByRole("button", { name: /edit flashcard/i }));
 
-    console.log(screen.debug());
-
     // Update the question by selecting the textarea directly
     const questionInput = screen.getByTestId("question-input");
     const answerInput = screen.getByTestId("answer-input");

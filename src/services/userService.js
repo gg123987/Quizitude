@@ -26,6 +26,19 @@ export const updateUser = async (userId, userUpdates) => {
   return data;
 };
 
+export const deleteUser = async (userId) => {
+  console.log("Deleting account...");
+  try {
+    const response = await supabase.from("users").delete().eq("id", userId);
+
+    console.log("Account successfully deleted:", response);
+    return response;
+  } catch (error) {
+    console.error("Error deleting account:", error.message);
+    alert("Failed to delete the account");
+  }
+};
+
 /**
  * Updates a user's streak based on their last session date.
  * @param {string} userId - The ID of the user to update.

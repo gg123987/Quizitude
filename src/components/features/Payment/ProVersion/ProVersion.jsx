@@ -57,6 +57,7 @@ const ProVersion = ({ setShowProVersion }) => {
                 sx={{ backgroundColor: "#3538cd" }}
                 fullWidth
                 onClick={handleUpgradeClick}
+                data-testid="month-upgrade-now"
               >
                 Upgrade Now
               </Button>
@@ -70,6 +71,7 @@ const ProVersion = ({ setShowProVersion }) => {
                 sx={{ backgroundColor: "#3538cd" }}
                 fullWidth
                 onClick={handleUpgradeClick}
+                data-testid="ann-upgrade-now"
               >
                 Upgrade Now
               </Button>

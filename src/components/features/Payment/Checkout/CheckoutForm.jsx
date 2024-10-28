@@ -94,6 +94,7 @@ const CheckoutForm = ({ setShowCheckoutForm }) => {
         <div
           className="close-button"
           onClick={() => setShowCheckoutForm(false)}
+          data-testid="close-button"
         >
           X
         </div>

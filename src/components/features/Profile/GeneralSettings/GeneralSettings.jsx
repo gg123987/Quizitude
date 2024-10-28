@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import useAuth from "@/hooks/useAuth";
 import PropTypes from "prop-types";
-import Avatar from "@/components/features/Profile/Avatar/Avatar"; // Ensure this path is correct
-import { supabase } from "@/utils/supabase";
+import Avatar from "@/components/features/Profile/Avatar/Avatar";
 import ProVersion from "@/components/features/Payment/ProVersion/ProVersion";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
+import { deleteUser } from "@/services/userService";
 import "./generalSettings.css";
 
 /**
@@ -68,12 +68,7 @@ const GeneralSettings = ({
   const handleDeleteAccount = async () => {
     console.log("Deleting account...");
     try {
-      const response = await supabase
-        .from("users")
-        .delete()
-        .eq("id", user.userID);
-
-      console.log("Account successfully deleted:", response);
+      await deleteUser(user.userID);
       alert("Account successfully deleted");
       // Redirect the user to the login page
       window.location.href = "/login";
@@ -99,6 +94,7 @@ const GeneralSettings = ({
             <div className="upgrade-button">
               <Button
                 variant="contained"
+                data-testid="upgrade-button"
                 sx={{
                   backgroundColor: "#3538cd",
                 }}
@@ -126,6 +122,7 @@ const GeneralSettings = ({
             fullWidth
             required
             sx={{ marginBottom: "1rem" }}
+            inputProps={{ "data-testid": "email-input" }}
           />
           <TextField
             id="full-name"
@@ -137,9 +134,11 @@ const GeneralSettings = ({
             fullWidth
             required
             sx={{ marginBottom: "1rem" }}
+            inputProps={{ "data-testid": "full-name-input" }}
           />
           <Button
             variant="contained"
+            data-testid="cancel-button"
             sx={{
               backgroundColor: "#ffffff",
               color: "black",
@@ -153,6 +152,7 @@ const GeneralSettings = ({
           </Button>
           <Button
             variant="contained"
+            data-testid="save-button"
             onClick={handleSaveChanges}
             sx={{
               backgroundColor: "#3538cd",
@@ -186,6 +186,7 @@ const GeneralSettings = ({
             </p>
             <Button
               variant="contained"
+              data-testid="reset-password-button"
               onClick={resetPassword}
               sx={{
                 backgroundColor: "#3538cd",
@@ -203,6 +204,7 @@ const GeneralSettings = ({
             <p className="text">You will lose access to all your information</p>
             <Button
               variant="contained"
+              data-testid="delete-account-button"
               onClick={() => setShowDeletePopup(true)}
               sx={{
                 backgroundColor: "#b32318",

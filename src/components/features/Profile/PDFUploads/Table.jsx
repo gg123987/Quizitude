@@ -60,7 +60,7 @@ const EnhancedTableHead = ({ numSelected, onSelectAllClick, rowCount }) => (
           indeterminate={numSelected > 0 && numSelected < rowCount} // Indeterminate state when some but not all rows are selected
           checked={rowCount > 0 && numSelected === rowCount} // Checked state when all rows are selected
           onChange={onSelectAllClick}
-          inputProps={{ "aria-label": "select all desserts" }}
+          inputProps={{ "aria-label": "select all files" }}
         />
       </TableCell>
       {headCells.map((headCell) => (
@@ -122,6 +122,7 @@ const EnhancedTable = ({ data, onDelete, onGenerate }) => {
     if (event.target.checked) {
       const newSelected = data.map((n) => n.id);
       setSelected(newSelected);
+      console.log(newSelected);
       return;
     }
     setSelected([]);
@@ -195,6 +196,7 @@ const EnhancedTable = ({ data, onDelete, onGenerate }) => {
                       color="primary"
                       onClick={(event) => handleClick(event, row.id)}
                       checked={isItemSelected}
+                      data-testid={`checkbox-${row.id}`}
                     />
                   </TableCell>
 
@@ -231,6 +233,7 @@ const EnhancedTable = ({ data, onDelete, onGenerate }) => {
                         textTransform: "none",
                         color: "#606060",
                       }}
+                      data-testid={`delete-button-${row.id}`}
                       variant="text"
                       onClick={() => onDelete(row.id)}
                     >

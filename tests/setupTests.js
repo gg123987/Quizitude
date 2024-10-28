@@ -22,6 +22,15 @@ beforeAll(() => {
           }),
           insert: vi.fn().mockResolvedValue({ data: [{ id: 1 }], error: null }),
         })),
+        storage: {
+          from: vi.fn().mockReturnThis(), // Support chaining
+          download: vi
+            .fn()
+            .mockResolvedValue({ data: new Blob(), error: null }), // Mock download
+          upload: vi
+            .fn()
+            .mockResolvedValue({ data: { path: "test-path" }, error: null }), // Mock upload
+        },
       })),
     };
   });
@@ -59,6 +68,10 @@ beforeAll(() => {
   }));
 
   vi.mock("@/hooks/useModal", () => ({
+    default: vi.fn(),
+  }));
+
+  vi.mock("@/hooks/useAvatar", () => ({
     default: vi.fn(),
   }));
 

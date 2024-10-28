@@ -57,6 +57,7 @@ const WeekIndicator = ({ streakCount, studiedToday }) => {
             } ${index === firstStreakIndex ? "streak-start" : ""} ${
               index === lastStreakIndex ? "streak-end" : ""
             }`}
+            data-testid={`day-${index}`}
           >
             {number}
             {index === currentDay && <div className="dot-indicator"></div>}
