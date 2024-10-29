@@ -6,6 +6,7 @@ import { useOutletContext } from "react-router-dom";
 import EnhancedTable from "./Table.jsx";
 import { deleteFile } from "@/services/fileService.js";
 import useFiles from "@/hooks/useFiles.js";
+import CircularProgress from "@mui/material/CircularProgress";
 
 /**
  * PDFUploads component handles the display and management of PDF files for a user.
@@ -95,7 +96,7 @@ const PDFUploads = () => {
 
   return (
     <div className="table-container">
-      {loading && <p>Loading...</p>}
+      {loading && <CircularProgress color="inherit" />}
       {error && <p>Error: {error.message}</p>}
       {!loading && !error && (
         <EnhancedTable

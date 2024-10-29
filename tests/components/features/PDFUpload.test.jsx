@@ -47,7 +47,7 @@ describe("PDFUploads Component", () => {
   test("renders PDFUploads component", () => {
     render(<PDFUploads />);
 
-    expect(screen.queryByText("Loading...")).not.toBeInTheDocument(); // Loading should not be shown
+    expect(screen.queryByRole("progressbar")).toBeNull();
     expect(screen.getByText("Document 1.pdf")).toBeInTheDocument(); // Check if files are rendered
     expect(screen.getByText("Document 2.pdf")).toBeInTheDocument();
   });
@@ -79,6 +79,6 @@ describe("PDFUploads Component", () => {
 
     render(<PDFUploads />);
 
-    expect(screen.getByText("Loading...")).toBeInTheDocument(); // Check if the loading message is displayed
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
   });
 });

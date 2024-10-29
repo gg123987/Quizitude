@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import useAvatar from "@/hooks/useAvatar";
+import { CircularProgress } from "@mui/material";
 import "./avatar.css";
 
 /**
@@ -64,7 +65,7 @@ export default function Avatar({ userId, url, size, onUpload }) {
             alignItems: "center",
           }}
         >
-          <span>Loading...</span>
+          <CircularProgress size={size / 2} color="inherit" />
         </div>
       ) : avatarUrl ? (
         <img

@@ -41,7 +41,7 @@ describe("Avatar Component", () => {
     render(
       <Avatar userId={userId} url={url} size={size} onUpload={onUploadMock} />
     );
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
   });
 
   test("displays avatar image when url is provided", () => {

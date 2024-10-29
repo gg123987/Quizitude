@@ -7,9 +7,6 @@ import { useSessions } from "@/hooks/useSessions";
 
 // Mock the hooks and components
 vi.mock("@/hooks/useSessions");
-vi.mock("@/components/common/CircularProgressSpinner", () => ({
-  default: () => <div>Loading...</div>,
-}));
 vi.mock("@/components/features/Scores/SessionsTable", () => ({
   default: ({ sessions }) => (
     <div data-testid="sessions-table">
