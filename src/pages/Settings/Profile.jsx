@@ -178,7 +178,6 @@ export default function Account({ session }) {
                 updateAvatarUrl(new Event("submit"), filePath);
               }}
             />
-
             <div className="form-fields">
               <div className="form-field">
                 <p id="full_name">{full_name || ""}</p>

@@ -201,6 +201,7 @@ const Categories = () => {
               ),
               endAdornment: (
                 <InputAdornment
+                  data-testid="clear-search"
                   position="end"
                   style={{ display: showClearIcon }}
                   onClick={() => setSearchQuery("")}

@@ -48,7 +48,7 @@ const Streak = () => {
             <div className="streak-graphic">
               <img src={flame} alt="Streak" />
               <div className="streak-count-group">
-                <h4 className="streak-count" data-testId="streak-count">
+                <h4 className="streak-count" data-testid="streak-count">
                   {streakCount}
                 </h4>
                 <h2 className="streak-day">Day Streak</h2>

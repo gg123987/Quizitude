@@ -276,8 +276,12 @@ const DeckDetail = () => {
               {""}
             </CustomButton>
             <Menu anchorEl={anchorEl} open={menuOpen} onClose={handleMenuClose}>
-              <MenuItem onClick={handleRenameDeck}>Rename</MenuItem>
-              <MenuItem onClick={handleDeleteDeck}>Delete</MenuItem>
+              <MenuItem data-testid="rename-menu" onClick={handleRenameDeck}>
+                Rename
+              </MenuItem>
+              <MenuItem data-testid="delete-menu" onClick={handleDeleteDeck}>
+                Delete
+              </MenuItem>
             </Menu>
           </div>
         </div>
@@ -398,8 +402,12 @@ const DeckDetail = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleRenameDialogClose}>Cancel</Button>
-          <Button onClick={handleRenameSubmit}>Rename</Button>
+          <Button data-testid="cancel-button" onClick={handleRenameDialogClose}>
+            Cancel
+          </Button>
+          <Button data-testid="rename-button" onClick={handleRenameSubmit}>
+            Rename
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -414,7 +422,11 @@ const DeckDetail = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteDialogClose}>Cancel</Button>
-          <Button onClick={handleDeleteSubmit} color="error">
+          <Button
+            data-testid="delete-button"
+            onClick={handleDeleteSubmit}
+            color="error"
+          >
             Delete
           </Button>
         </DialogActions>

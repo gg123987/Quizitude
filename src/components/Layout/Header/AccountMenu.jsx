@@ -68,7 +68,9 @@ export default function AccountMenu() {
     <React.Fragment>
       <Tooltip title="Account settings">
         <div onClick={handleClick} style={{ cursor: "pointer" }}>
-          <Avatar sx={{ width: 32, height: 32 }}>M</Avatar>
+          <Avatar data-testid="account-avatar" sx={{ width: 32, height: 32 }}>
+            M
+          </Avatar>
         </div>
       </Tooltip>
       <Menu
@@ -102,12 +104,12 @@ export default function AccountMenu() {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem onClick={handlProfile}>
+        <MenuItem onClick={handlProfile} data-testid="profile-option">
           <Avatar /> Profile
         </MenuItem>
         <Divider />
         {auth && (
-          <MenuItem onClick={handleLogout}>
+          <MenuItem onClick={handleLogout} data-testid="logout-option">
             <ListItemIcon>
               <Logout fontSize="small" />
             </ListItemIcon>

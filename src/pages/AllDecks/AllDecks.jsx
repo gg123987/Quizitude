@@ -89,8 +89,8 @@ const Decks = () => {
     if (searchQuery.trim() === "") {
       return decks;
     }
-    return decks.filter((deck) =>
-      deck.name.toLowerCase().includes(searchQuery.toLowerCase())
+    return decks?.filter((deck) =>
+      deck?.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [decks, searchQuery, categoryId]);
 
