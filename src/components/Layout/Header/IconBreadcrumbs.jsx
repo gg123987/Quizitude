@@ -8,15 +8,23 @@ import useCategory from "@/hooks/useCategory";
 
 // Static mapping for fixed segments
 const staticMappings = {
-  flashcards: "Flashcards",
   decks: "All Decks",
   categories: "Categories",
-  scores: "Scores",
-  settings: "Settings",
-  notifications: "Notifications",
-  // Add other static mappings as needed
 };
 
+/**
+ * IconBreadcrumbs component renders a breadcrumb navigation based on the current URL path.
+ * It dynamically fetches and displays names for decks and categories.
+ *
+ * @returns {JSX.Element|null} The rendered breadcrumb navigation or null if no pathnames are present.
+ *
+ * @description
+ * This component uses the `useLocation` hook to get the current pathname and splits it into segments.
+ * It fetches deck and category details based on the type of the first segment in the pathname.
+ * If the data is loading, it displays a loading message. Once loaded, it maps the pathnames to display names
+ * and renders them as breadcrumb links.
+ *
+ */
 export default function IconBreadcrumbs() {
   const location = useLocation();
 
@@ -53,7 +61,10 @@ export default function IconBreadcrumbs() {
   const formattedPathnames = pathnames.map((segment, index) => {
     if (index === 0) {
       // First segment, use static mapping
-      return staticMappings[segment] || segment;
+      return (
+        staticMappings[segment] ||
+        segment.charAt(0).toUpperCase() + segment.slice(1)
+      );
     } else if (index === 1) {
       // Second segment, use dynamic data based on type
       return getNameFromId(pathnames[0], segment);

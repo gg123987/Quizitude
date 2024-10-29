@@ -1,5 +1,11 @@
 import { supabase } from "@/utils/supabase";
 
+/**
+ * Creates a new category in the database.
+ * @param {Object} categoryData - The data for the new category.
+ * @returns {Object} The created category data.
+ * @throws Will throw an error if the category creation fails.
+ */
 export const createCategory = async (categoryData) => {
   const { data, error } = await supabase
     .from("categories")
@@ -10,6 +16,12 @@ export const createCategory = async (categoryData) => {
   return data;
 };
 
+/**
+ * Fetches all categories for a specific user, including the count of decks in each category.
+ * Also includes an "Uncategorised" category for decks without a category.
+ * @param {string} userId - The ID of the user.
+ * @returns {Array} An array of categories with deck counts.
+ */
 export const getCategoriesByUser = async (userId) => {
   const { data, error } = await supabase
     .from("categories")
@@ -66,6 +78,12 @@ export const getCategoriesByUser = async (userId) => {
   return processedData;
 };
 
+/**
+ * Fetches a category by its ID.
+ * @param {string} categoryId - The ID of the category.
+ * @returns {Object} The category data.
+ * @throws Will throw an error if the category fetch fails.
+ */
 export const getCategoryById = async (categoryId) => {
   const { data, error } = await supabase
     .from("categories")
@@ -76,6 +94,14 @@ export const getCategoryById = async (categoryId) => {
   return data;
 };
 
+/**
+ * Updates a category with new data.
+ * @param {string} categoryId - The ID of the category to update.
+ * @param {Object} categoryData - The new data for the category.
+ * @param {string} userId - The ID of the user.
+ * @returns {Object} The updated category data.
+ * @throws Will throw an error if the category update fails.
+ */
 export const updateCategory = async (categoryId, categoryData, userId) => {
   console.log("Updating category:", categoryId);
   console.log("New data:", categoryData);
@@ -91,6 +117,13 @@ export const updateCategory = async (categoryId, categoryData, userId) => {
   return { data, error };
 };
 
+/**
+ * Deletes a category and updates associated decks to be uncategorized.
+ * @param {string} categoryId - The ID of the category to delete.
+ * @param {string} userId - The ID of the user.
+ * @returns {Object} An object containing any error that occurred.
+ * @throws Will throw an error if the category deletion or deck update fails.
+ */
 export const deleteCategory = async (categoryId, userId) => {
   // Update decks with this category id to be "uncategorised"
   const { error: updateError } = await supabase

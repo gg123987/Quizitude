@@ -70,6 +70,7 @@
 }
 
 .all-decks-data h2 {
+  text-align: center;
   font-family: 'Inter';
   font-weight: 600;
   font-size: 20px;
@@ -77,6 +78,7 @@
 }
 
 .all-decks-data p {
+  text-align: center;
   width: 25%;
   font-family: 'Inter';
   font-weight: 400;

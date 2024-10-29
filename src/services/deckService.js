@@ -1,5 +1,11 @@
 import { supabase } from "@/utils/supabase";
 
+/**
+ * Creates a new deck in the database.
+ * @param {Object} deckData - The data of the deck to be created.
+ * @returns {Object} The created deck data.
+ * @throws Will throw an error if the deck creation fails.
+ */
 export const createDeck = async (deckData) => {
   const { data, error } = await supabase
     .from("decks")
@@ -11,6 +17,11 @@ export const createDeck = async (deckData) => {
   return data;
 };
 
+/**
+ * Fetches all decks for a specific user.
+ * @param {string} userId - The ID of the user.
+ * @returns {Array} An array of decks with their categories and flashcards count.
+ */
 export const getDecksByUser = async (userId) => {
   const { data, error } = await supabase
     .from("decks")
@@ -34,7 +45,7 @@ export const getDecksByUser = async (userId) => {
     return [];
   }
 
-  // Process the data to include the flashcards count
+  // Process the data to include the flashcards count and the deck category
   const processedData = data.map((deck) => ({
     ...deck,
     categories: deck.categories || { id: 0, name: "Uncategorised" },
@@ -44,17 +55,17 @@ export const getDecksByUser = async (userId) => {
   return processedData;
 };
 
+/**
+ * Fetches a specific deck by its ID.
+ * @param {string} deckId - The ID of the deck.
+ * @returns {Object|null} The deck data with its categories and flashcards count, or null if not found.
+ */
 export const getDeckById = async (deckId) => {
   const { data, error } = await supabase
     .from("decks")
     .select(
       `
-      id,
-      name,
-      created_at,
-      updated_at,
-      is_favourite,
-      is_reviewed,
+      *,
       categories:categories!decks_category_id_fkey (
         id,
         name
@@ -72,7 +83,7 @@ export const getDeckById = async (deckId) => {
     return null;
   }
 
-  // Process the data to include the flashcards count
+  // Process the data to include the flashcards count and the deck category
   const processedData = {
     ...data,
     categories: data.categories || { id: 0, name: "Uncategorised" },
@@ -82,15 +93,35 @@ export const getDeckById = async (deckId) => {
   return processedData;
 };
 
-export const updateDeck = async (deckId, deckData) => {
+/**
+ * Updates a specific deck by its ID.
+ * @param {string} deckId - The ID of the deck to be updated.
+ * @param {Object} deckData - The new data for the deck.
+ * @param {string} userId - The ID of the user who owns the deck.
+ * @returns {Object} The updated deck data.
+ * @throws Will throw an error if the deck update fails.
+ */
+export const updateDeck = async (deckId, deckData, userId) => {
+  console.log("Updating deck:", deckId);
+  console.log("New data:", deckData);
   const { data, error } = await supabase
     .from("decks")
-    .update(deckData)
-    .eq("id", deckId);
+    .update({ ...deckData })
+    .eq("user_id", userId)
+    .eq("id", deckId)
+    .select();
   if (error) throw error;
-  return data;
+
+  console.log("Deck updated:", data);
+  return { data, error };
 };
 
+/**
+ * Deletes a specific deck by its ID.
+ * @param {string} deckId - The ID of the deck to be deleted.
+ * @returns {Object} The data of the deleted deck.
+ * @throws Will throw an error if the deck deletion fails.
+ */
 export const deleteDeck = async (deckId) => {
   const { data, error } = await supabase
     .from("decks")

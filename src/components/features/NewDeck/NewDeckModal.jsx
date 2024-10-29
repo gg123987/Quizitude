@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Modal, Box } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
@@ -10,7 +10,8 @@ import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
+import CircularProgressSpinner from "@/components/common/CircularProgressSpinner";
+import CircularProgress from "@mui/material/CircularProgress";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import fetchLLMResponse from "@/api/LLM";
@@ -22,16 +23,44 @@ import useCategories from "@/hooks/useCategories";
 import useDecks from "@/hooks/useDecks";
 import { createCategory } from "@/services/categoryService";
 import NewCategory from "@/components/features/NewCategory/NewCatModal";
-import { uploadFileAndCreateDeck } from "@/services/fileService";
+import {
+  uploadFileAndCreateDeck,
+  getFileById,
+  checkForDuplicateFile,
+} from "@/services/fileService";
 import { formatAndInsertFlashcardData } from "@/services/flashcardService";
 import "./newdeck.css";
 
+/**
+ * NewDeck component allows users to create a new deck of flashcards by uploading a PDF file,
+ * specifying the number of questions, question type, and category. It also provides functionality
+ * to review and edit the generated flashcards before saving them.
+ *
+ * @component
+ * @example
+ * return (
+ *   <NewDeck />
+ * )
+ *
+ * @returns {JSX.Element} The rendered NewDeck component.
+ *
+ * @description
+ * This component handles the following functionalities:
+ * - Fetching and displaying categories.
+ * - Handling file uploads and drag-and-drop functionality for PDF files.
+ * - Validating user inputs such as deck name, number of questions, question type, and category.
+ * - Generating flashcards using an LLM (Language Learning Model) based on the uploaded PDF.
+ * - Allowing users to review and edit the generated flashcards.
+ * - Saving the deck and flashcards to the server.
+ *
+ */
 const NewDeck = () => {
   const { user } = useAuth();
   const { categories, categoriesLoading, categoriesError, refreshCategories } =
     useCategories(user?.id);
 
-  const { modalOpen, closeModal } = useModal();
+  const { modalOpen, closeModal, file: selectedFile } = useModal();
+  const [file, setFile] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [currentFlashcard, setCurrentFlashcard] = useState(1);
   const [questionList, setQuestionList] = useState([]);
@@ -40,14 +69,36 @@ const NewDeck = () => {
   const [questionType, setQuestionType] = useState("");
   const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
   const maxPDFSize = 30 * 1024 * 1024; // 30 MB in bytes
-  const [file, setFile] = useState(null);
   const [deckName, setDeckName] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   //create a variable to store the response from the LLM
   const [llmResponse, setLlmResponse] = useState();
   const [errorp1, setError1] = useState(null);
   const [errorp2, setError2] = useState(null);
+
+  useEffect(() => {
+    const fetchFile = async () => {
+      console.log("Selected file:", selectedFile);
+      if (selectedFile) {
+        try {
+          const file = await getFileById(selectedFile.id);
+
+          if (file) {
+            console.log("File:", file);
+            setFile(file);
+          } else {
+            console.error("File not found.");
+          }
+        } catch (error) {
+          console.error("Error fetching file:", error);
+        }
+      }
+    };
+
+    fetchFile();
+  }, [selectedFile]);
 
   const handleDeckNameChange = (e) => setDeckName(e.target.value);
 
@@ -86,8 +137,10 @@ const NewDeck = () => {
     }
   };
 
+  // Handle file input changes
   const handleFileChange = (event) => {
     const uploadedPDF = event.target.files[0];
+    console.log("Uploaded PDF:", uploadedPDF);
     if (uploadedPDF) {
       if (uploadedPDF.size <= maxPDFSize) {
         setFile(uploadedPDF);
@@ -98,11 +151,13 @@ const NewDeck = () => {
     }
   };
 
+  // Handle file deletion
   const handleDelete = (event) => {
     event.stopPropagation();
     setFile(null);
   };
 
+  // Handle file drop event
   const handleDrop = (event) => {
     event.preventDefault();
     const droppedFiles = event.dataTransfer.files;
@@ -126,7 +181,12 @@ const NewDeck = () => {
     }
   };
 
-  const p1Validations = () => {
+  // Validate inputs on page 1
+  const p1Validations = async () => {
+    console.log("Validating page 1 inputs");
+
+    setError1(null);
+
     if (!deckName) {
       setError1("Please enter a deck name.");
       return false;
@@ -142,13 +202,17 @@ const NewDeck = () => {
       return false;
     }
 
-    if (!categoryId) {
-      setError1("Please select a category.");
+    if (!file) {
+      setError1("Please upload a PDF file.");
       return false;
     }
 
-    if (!file) {
-      setError1("Please upload a PDF file.");
+    // Check for duplicate file
+    const isDuplicate = await checkForDuplicateFile(file, user.id);
+    console.log("Duplicate file:", isDuplicate);
+
+    if (isDuplicate && isDuplicate.length > 0) {
+      setError1("File already exists. Please choose a different file.");
       return false;
     }
 
@@ -163,16 +227,16 @@ const NewDeck = () => {
     return true;
   };
 
-  //function to get all the decks of the user
+  // Get all the decks of the user
   const { decks } = useDecks(user?.id);
 
+  // Check if the deck name already exists
   const CheckDeckName = (deckName) => {
-    //check if the deck name exists in the decks
     const deckExists = decks.some((deck) => deck.name === deckName);
-
     return deckExists;
   };
 
+  // Handle file upload and deck creation
   const handleUpload = async () => {
     try {
       setUploading(true);
@@ -216,33 +280,54 @@ const NewDeck = () => {
 
   const handleGenerateFlashcards = async () => {
     try {
-      if (p1Validations()) {
-        setError1(null);
-        setUploading(true);
+      const isValid = await p1Validations();
 
-        let response = await fetchLLMResponse(
+      if (isValid) {
+        setError1(null);
+        setUploading(true); // Start uploading
+        setUploadProgress(0); // Reset progress to 0
+
+        // Simulate progress increment while awaiting the API response
+        const progressInterval = setInterval(() => {
+          setUploadProgress((prev) => {
+            console.log("Progress:", prev);
+            if (prev < 90) {
+              return Math.min(prev + 10, 100); // Increment progress
+            }
+            return prev; // Prevent going over 100
+          });
+        }, 250); // Update progress every 200ms
+
+        // Make the API call
+        const response = await fetchLLMResponse(
           noOfQuestions,
           file,
           questionType
         );
+        clearInterval(progressInterval); // Stop the progress simulation
+        console.log("upload progress", uploadProgress);
 
-        //create a copy of the response to avoid modifying the original response
+        // Format the response
         let thisResponse = JSON.parse(JSON.stringify(response));
         thisResponse = formatFlashcardData(thisResponse);
 
+        // Update state with the received response
         setQuestionList(thisResponse);
         setCurrentQuestion(thisResponse[0]);
-
-        setUploading(false);
+        setLlmResponse(response);
         setError1(null);
         setError2(null);
-        setCurrentPage(1);
-
-        setLlmResponse(response);
       }
     } catch (error) {
-      console.error("Error during upload:", error);
-      setUploading(false);
+      console.error("Error during generation:", error);
+      setError1("Error generating flashcards. Please try again.");
+    } finally {
+      setUploadProgress(100);
+      // Short delay to show the progress bar at 100%
+      setTimeout(() => {
+        setUploading(false); // Stop uploading
+        setCurrentPage(1); // Move to the next page
+      }, 500);
     }
   };
 
@@ -257,7 +342,6 @@ const NewDeck = () => {
 
     // Update the currentQuestion state with the updated values
     setCurrentQuestion({ question: updatedQuestion, answer: updatedAnswer });
-    //console.log(currentQuestion.question);
 
     // Update questionsList with the amended question
     const updatedQuestionList = [...questionList];
@@ -265,8 +349,7 @@ const NewDeck = () => {
     setQuestionList(updatedQuestionList);
 
     // Move to the next question
-    //(using -1 + 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
-    setCurrentQuestion(questionList[currentFlashcard - 1 + 1]);
+    setCurrentQuestion(questionList[currentFlashcard]);
   };
 
   const updateCurrentQuestionBackward = () => {
@@ -287,8 +370,7 @@ const NewDeck = () => {
     setQuestionList(updatedQuestionList);
 
     // Move to the previous question
-    //(using -1 - 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
-    setCurrentQuestion(questionList[currentFlashcard - 1 - 1]);
+    setCurrentQuestion(questionList[currentFlashcard - 2]);
   };
 
   const handleNextFlashcard = () => {
@@ -302,7 +384,6 @@ const NewDeck = () => {
     if (currentFlashcard > 1) {
       setCurrentFlashcard(currentFlashcard - 1);
       updateCurrentQuestionBackward();
-      //console.log(document.getElementById('reviewTextFieldQuestion').value);
     }
   };
 
@@ -322,11 +403,10 @@ const NewDeck = () => {
     setCategoryId(category[0].id);
   };
 
-  //function to modify the flashcard data to be displayed in the review flashcards page
-  //this function takes in the response for the LLM and formats the Multiple Choice questions options
+  // Format flashcard data for review
   const formatFlashcardData = (response) => {
     let thisResponse = response;
-    //check if the response is for multiple choice questions by checking if it contains the "choices" key
+    // Check if the response is for multiple choice questions
     if (response[0].choices) {
       // Modify each question in the response array
       thisResponse.forEach((question) => {
@@ -353,9 +433,10 @@ const NewDeck = () => {
     return thisResponse;
   };
 
+  // Pages for the modal
   const pages = [
     <div className="page1-content" key="page1">
-      <div className="header">
+      <div className="deck-text-header">
         <h2>Generate Flashcards</h2>
         <p>
           This creates a deck of cards based on any material you upload here.
@@ -487,13 +568,13 @@ const NewDeck = () => {
           disabled={uploading}
         >
           {!uploading && "Generate Flashcards"}
-          {uploading && <CircularWithValueLabel interval={400} />}
+          {uploading && <CircularProgressSpinner value={uploadProgress} />}
         </Button>
       </div>
       {errorp1 && <p className="error-message">{errorp1}</p>}
     </div>,
     <div className="page2-content" key="page2">
-      <div className="header">
+      <div className="deck-text-header">
         <h2>Review Flashcards</h2>
         <p>{noOfQuestions} Cards Generated</p>
       </div>
@@ -557,7 +638,7 @@ const NewDeck = () => {
         </div>
       </div>
       {errorp2 && <p className="error-message">{errorp2}</p>}
-      {uploading && <CircularWithValueLabel />}
+      {uploading && <CircularProgress color="inherit" />}
       <Button
         id="saveButton"
         style={{
@@ -609,7 +690,7 @@ const NewDeck = () => {
                 <CloseIcon fontSize="large" />
               </IconButton>
             </div>
-            <div className="popup-content">{pages[currentPage]}</div>
+            <div className="deck-popup-content">{pages[currentPage]}</div>
           </Box>
         </Fade>
       </Modal>

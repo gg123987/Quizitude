@@ -1,11 +1,9 @@
 export const TABLES = {
   DECKS: "decks",
   CATEGORIES: "categories",
-  DECK_CATEGORY: "deck_category",
+  USERS: "users",
   FILES: "files",
-  DECK_FILES: "deck_files",
   FLASHCARDS: "flashcards",
-  OPTIONS: "options",
 };
 
 export const API = {

@@ -1,32 +1,41 @@
 import React from "react";
-import "./WeekIndicator.css"; // Import CSS styles
+import "./WeekIndicator.css";
 
-const WeekIndicator = ({ streakCount }) => {
+/**
+ * WeekIndicator component displays the days of the week and highlights the streak of study days.
+ *
+ * @param {number} streakCount - The number of consecutive days the user has studied.
+ * @param {boolean} studiedToday - Indicates whether the user has studied today.
+ */
+const WeekIndicator = ({ streakCount, studiedToday }) => {
   // Get the current date and the day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
   const currentDate = new Date();
-  // For testing: currentDate.setDate(currentDate.getDate() + 3);
-  const currentDay = currentDate.getDay(); // Day of the week (0-6)
+  const currentDay = currentDate.getDay();
 
   // Create an array representing the days of the week and their respective numbers
   const daysOfWeek = ["S", "M", "T", "W", "T", "F", "S"];
   const dayNumbers = Array.from({ length: 7 }, (_, i) => {
-    // Calculate the date for each day in the week
     const date = new Date(currentDate);
     date.setDate(date.getDate() - currentDay + i); // Adjust date to the correct day of the week
     return date.getDate(); // Get the day of the month
   });
 
-  // Get the indices of the streak days
-  const streakIndices = Array.from({ length: currentDay }, (_, i) => {
-    const index = currentDay - 1 - i; // Calculate the index in reverse order
+  // Determine the starting index for the streak
+  // If the user studied today, the streak starts from the current day
+  const startIndex = studiedToday ? currentDay : currentDay - 1;
+
+  // Get the indices of the streak days in reverse order
+  // If the streakCount is greater than 0, the streak is displayed
+  const streakIndices = Array.from({ length: startIndex + 1 }, (_, i) => {
+    const index = startIndex - i;
     if (streakCount > 0) {
-      streakCount--; // Decrease streakCount
-      return index; // Return the index if streakCount allows
+      streakCount--;
+      return index;
     }
     return undefined; // If streakCount is exhausted, return undefined
   }).filter((index) => index !== undefined);
 
-  // Determine the first and last indices in the streak
+  // Determine the first and last indices in the streak for styling
   const firstStreakIndex = streakIndices[streakIndices.length - 1];
   const lastStreakIndex = streakIndices[0];
 
@@ -48,6 +57,7 @@ const WeekIndicator = ({ streakCount }) => {
             } ${index === firstStreakIndex ? "streak-start" : ""} ${
               index === lastStreakIndex ? "streak-end" : ""
             }`}
+            data-testid={`day-${index}`}
           >
             {number}
             {index === currentDay && <div className="dot-indicator"></div>}

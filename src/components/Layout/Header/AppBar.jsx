@@ -15,11 +15,33 @@ import NewDeckModal from "@/components/features/NewDeck/NewDeckModal";
 import useModal from "@/hooks/useModal";
 import "./appbar.css";
 
+/**
+ * CustomAppBar component renders a responsive AppBar with a drawer toggle button,
+ * breadcrumbs, and a set of action icons including a button to open a modal.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {function} props.handleDrawerToggle - Function to handle the drawer toggle action.
+ * @param {number} props.drawerWidth - The width of the drawer.
+ *
+ * @returns {JSX.Element} The rendered CustomAppBar component.
+ *
+ * @example
+ * <CustomAppBar handleDrawerToggle={handleDrawerToggle} drawerWidth={240} />
+ *
+ * @description
+ * The CustomAppBar component adjusts its layout based on the screen width.
+ * It displays a "New Deck" button which changes its text based on the screen width.
+ * The AppBar contains a drawer toggle button, breadcrumbs, and icons for settings, notifications, and account menu.
+ * It also includes a modal for creating a new deck.
+ *
+ */
 const CustomAppBar = ({ handleDrawerToggle, drawerWidth }) => {
   const { width } = useWindowDimensions();
   const [buttonText, setButtonText] = useState("New Deck");
   const { modalOpen, openModal, closeModal } = useModal();
 
+  // Update button text based on screen width
   useEffect(() => {
     if (width < 1000) {
       setButtonText("");

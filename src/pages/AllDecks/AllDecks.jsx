@@ -7,19 +7,20 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import useDecks from "@/hooks/useDecks";
-import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
+import CircularProgress from "@mui/material/CircularProgress";
 import SelectSort from "@/components/common/SelectSort";
 import CustomButton from "@/components/common/CustomButton";
 import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
 import useModal from "@/hooks/useModal";
 import NewDeck from "@/components/features/NewDeck/NewDeckModal";
-import BasicTabs from "@/components/features/DisplayDecks/TabSelect";
+import BasicTabs from "@/components/common/TabSelect";
 import ClearIcon from "@mui/icons-material/Clear";
 import FilteredDecks from "@/components/features/DisplayDecks/FilteredDecks";
 import { useMediaQuery } from "@mui/material";
 import "./alldecks.css";
 
+// Custom styled TextField component
 const CustomTextField = styled(TextField)(() => ({
   width: "280px",
   backgroundColor: "white",
@@ -39,6 +40,11 @@ const CustomTextField = styled(TextField)(() => ({
   },
 }));
 
+/**
+ * Decks Page
+ * This component displays a list of decks with various functionalities such as search, filter, sort, and pagination.
+ * It also allows users to create a new deck.
+ */
 const Decks = () => {
   const { userId } = useOutletContext();
   const location = useLocation();
@@ -48,22 +54,26 @@ const Decks = () => {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [showClearIcon, setShowClearIcon] = useState("none");
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortOption, setSortOption] = useState("Recently Created"); // Default sort option
+  const [sortOption, setSortOption] = useState("Recently Created");
 
+  // Media queries for responsive design
   const isLargeScreen = useMediaQuery("(min-width: 1630px)");
   const isMediumScreen = useMediaQuery("(min-width: 1247px)");
   const isSmallScreen = useMediaQuery("(min-width: 450px)");
 
+  // Get query parameters from URL
   const query = new URLSearchParams(location.search);
   const categoryId = query.get("categoryId");
   const categoryName = query.get("categoryName");
 
+  // Filter decks based on category if passed in URL
   const decks = categoryId
     ? allDecks.filter(
         (deck) => deck.category_id == (categoryId == 0 ? null : categoryId)
       )
     : allDecks;
 
+  // Determine number of columns based on screen size
   const columns = isLargeScreen
     ? 4
     : isMediumScreen
@@ -74,12 +84,13 @@ const Decks = () => {
   const rows = 3; // Fixed number of rows per page
   const decksPerPage = rows * columns;
 
+  // Filter decks based on search query
   const filteredDecks = React.useMemo(() => {
     if (searchQuery.trim() === "") {
       return decks;
     }
-    return decks.filter((deck) =>
-      deck.name.toLowerCase().includes(searchQuery.toLowerCase())
+    return decks?.filter((deck) =>
+      deck?.name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [decks, searchQuery, categoryId]);
 
@@ -88,15 +99,18 @@ const Decks = () => {
     setCurrentPage(1); // Reset to first page when changing tabs
   }, []);
 
+  // Open modal to create a new deck
   const handleOpenModal = () => {
     openModal(<NewDeck />);
   };
 
+  // Handle search input change
   const handleChange = (event) => {
     setShowClearIcon(event.target.value === "" ? "none" : "flex");
     setSearchQuery(event.target.value);
   };
 
+  // Update clear icon visibility based on search query
   React.useEffect(() => {
     setShowClearIcon(searchQuery === "" ? "none" : "flex");
   }, [searchQuery]);
@@ -105,6 +119,7 @@ const Decks = () => {
     setSortOption(option);
   };
 
+  // Filter and sort decks based on selected tab and sort option
   const filteredAndSortedDecks = React.useMemo(() => {
     let sortedDecks = [];
     switch (value) {
@@ -146,8 +161,8 @@ const Decks = () => {
     return sortedDecks;
   }, [filteredDecks, value, sortOption]);
 
-  const totalDecks = filteredAndSortedDecks.length;
-  const totalPages = Math.ceil(totalDecks / decksPerPage);
+  const totalDecks = filteredAndSortedDecks.length; // Total number of decks after filtering and sorting
+  const totalPages = Math.ceil(totalDecks / decksPerPage); // Total number of pages based on decks per page
 
   // Slice decks for current page
   const currentDecks = React.useMemo(() => {
@@ -168,6 +183,7 @@ const Decks = () => {
     }
   };
 
+  // Data for tabs
   const tabsData = React.useMemo(
     () => [
       {
@@ -257,7 +273,7 @@ const Decks = () => {
       </div>
 
       <div className="all-decks-data">
-        {loading && <CircularWithValueLabel />}
+        {loading && <CircularProgress color="inherit" />}
         {error && <p className="error-message">{error.message}</p>}
         {!loading && !error && decks.length === 0 && (
           <Box
@@ -268,9 +284,11 @@ const Decks = () => {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              height: "100%",
+              justifyContent: "center",
             }}
           >
-            <h2>You have no flashcards yet</h2>
+            <h2>You have no decks yet</h2>
             <p>Upload your first PDF to get started. Click the button below</p>
             <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               <CustomButton onClick={handleOpenModal} icon={<AddIcon />}>

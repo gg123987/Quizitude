@@ -1,0 +1,76 @@
+.month-indicator {
+  width: 80%;
+  max-width: 650px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 30px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+}
+
+.header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.days,
+.numbers {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.day {
+  text-align: center;
+  width: 14.28%; /* 7 days of the week */
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #101828;
+  margin-bottom: 15px;
+}
+
+.number {
+  text-align: center;
+  width: 14.28%; /* 7 days of the week */
+  position: relative;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #101828;
+  padding: 5px;
+  margin: 3px 0;
+}
+
+/* Highlight today */
+.number.today {
+  background-color: rgba(224, 234, 255, 1);
+  padding: 5px;
+  color: rgba(53, 56, 205, 1);
+  border-radius: 5px;
+}
+
+.dot-indicator {
+  width: 5px;
+  height: 5px;
+  background-color: rgba(53, 56, 205, 1);
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -8px;
+}

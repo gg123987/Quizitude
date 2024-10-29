@@ -19,6 +19,15 @@ import { updateCategory, deleteCategory } from "@/services/categoryService";
 import React, { useState } from "react";
 import "./category.css";
 
+/**
+ * Category component represents a single category card with options to rename or delete the category.
+ * @param {Object} props - Component props.
+ * @param {Object} props.category - Category data.
+ * @param {number} props.category.id - Category ID.
+ * @param {string} props.category.name - Category name.
+ * @param {number} props.category.decks_count - Number of decks in the category.
+ * @param {Function} props.onRefreshCategories - Callback to refresh the categories list.
+ */
 const Category = ({ category, onRefreshCategories }) => {
   const { name, decks_count } = category;
   const navigate = useNavigate();
@@ -41,16 +50,25 @@ const Category = ({ category, onRefreshCategories }) => {
     setAnchorEl(null);
   };
 
+  /**
+   * Opens the rename dialog.
+   */
   const handleRenameCategory = () => {
     setRenameDialogOpen(true);
     handleMenuClose();
   };
 
+  /**
+   * Opens the delete confirmation dialog.
+   */
   const handleDeleteCategory = () => {
     setDeleteDialogOpen(true);
     handleMenuClose();
   };
 
+  /**
+   * Navigates to the decks page for the selected category.
+   */
   const handleClickCategory = () => {
     const params = new URLSearchParams();
     params.append("categoryId", category.id);
@@ -67,6 +85,9 @@ const Category = ({ category, onRefreshCategories }) => {
     setDeleteDialogOpen(false);
   };
 
+  /**
+   * Submits the new category name to the server.
+   */
   const handleRenameSubmit = async () => {
     const { data, error } = await updateCategory(
       category.id,
@@ -85,6 +106,9 @@ const Category = ({ category, onRefreshCategories }) => {
     }
   };
 
+  /**
+   * Submits the delete request to the server.
+   */
   const handleDeleteSubmit = async () => {
     console.log("Deleting category...");
     const { error } = await deleteCategory(category.id, category.user_id);
@@ -205,7 +229,7 @@ const Category = ({ category, onRefreshCategories }) => {
               Cancel
             </Button>
             <Button onClick={handleRenameSubmit} color="primary">
-              Rename
+              Save
             </Button>
           </DialogActions>
         </Dialog>

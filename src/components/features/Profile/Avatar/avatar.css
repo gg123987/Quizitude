@@ -1,0 +1,45 @@
+.avatar-container {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .avatar-container .avatar {
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .avatar-container .avatar img {
+    display: block;
+  }
+  
+  .avatar-container .avatar.no-image {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    position: relative;
+  }
+  
+  .avatar-container .upload-text {
+    color: #888;
+    font-size: 14px;
+  }
+  
+  .avatar-container .avatar-delete-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: red;
+    cursor: pointer;
+    visibility: hidden;
+  }
+  
+  .avatar-container:hover .avatar-delete-button {
+    visibility: visible;
+  }
+  

@@ -12,34 +12,119 @@ import ShuffleIcon from "@mui/icons-material/Shuffle";
 import CompareIcon from "@mui/icons-material/Compare";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
+import useAuth from "@/hooks/useAuth";
+import { createSession } from "@/services/sessionService";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import confetti from "@/assets/confetti.svg";
 
+/**
+ * StudyMode page handles the study session for flashcards.
+ * It manages the state of flashcards, user responses, and session logging.
+ *
+ * @description
+ * This page fetches flashcards from the location state and initializes the study session.
+ * It provides functionalities to shuffle cards, handle user responses, reveal answers, and log the session.
+ * The component also displays a summary screen after all cards have been reviewed.
+ *
+ * @function
+ * @name StudyMode
+ *
+ * @property {Object} user - The authenticated user object from useAuth.
+ * @property {Array} cards - The array of flashcards to be reviewed.
+ * @property {boolean} loading - The loading state for fetching flashcards.
+ * @property {number} currentCardIndex - The index of the current flashcard being reviewed.
+ * @property {boolean} flipped - Boolean to track if the flashcard is flipped.
+ * @property {boolean} showSummary - Boolean to track if the summary screen should be displayed.
+ * @property {string} deckName - The name of the flashcard deck.
+ * @property {string} deckId - The ID of the flashcard deck.
+ * @property {number} correctCount - The count of correctly answered flashcards.
+ * @property {number} incorrectCount - The count of incorrectly answered flashcards.
+ * @property {number} scorePercentage - The percentage score of the review session.
+ *
+ * @method
+ * @name logSession
+ * @description Logs the study session data to the backend.
+ *
+ * @method
+ * @name handleShuffle
+ * @description Shuffles the order of the flashcards.
+ *
+ * @method
+ * @name handleResponse
+ * @description Handles the user's response to a flashcard.
+ *
+ * @method
+ * @name handleReveal
+ * @description Toggles the flipped state of the current flashcard.
+ *
+ * @method
+ * @name handleKnow
+ * @description Marks the current flashcard as known.
+ *
+ * @method
+ * @name handleDontKnow
+ * @description Marks the current flashcard as not known.
+ *
+ * @method
+ * @name handleReviewAgain
+ * @description Resets the study session for another review.
+ *
+ * @method
+ * @name handleFinishLesson
+ * @description Finishes the lesson and navigates back to the previous page.
+ *
+ * @method
+ * @name handleclose
+ * @description Closes the study session and navigates back to the previous page.
+ *
+ * @method
+ * @name AutoNextCard
+ * @description Automatically moves to the next flashcard after a delay.
+ *
+ * @method
+ * @name goToNextCard
+ * @description Moves to the next flashcard.
+ *
+ * @method
+ * @name goToPreviousCard
+ * @description Moves to the previous flashcard.
+ *
+ * @method
+ * @name renderSummary
+ * @description Renders the summary screen after all flashcards have been reviewed.
+ */
+
 const StudyMode = () => {
+  const { user } = useAuth();
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentCardIndex, setCurrentCardIndex] = useState(0); // Index of the current flashcard
   const [flipped, setFlipped] = useState(false); // Boolean to track if the flashcard is flipped
   const [showSummary, setShowSummary] = useState(false);
   const [deckName, setDeckName] = useState("");
+  const [deckId, setDeckId] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
+  const [correctCount, setCorrectCount] = useState(0);
+  const [incorrectCount, setIncorrectCount] = useState(0);
+  const [scorePercentage, setScorePercentage] = useState(0);
 
   useEffect(() => {
     // Get flashcards from location state
-    if (
-      location.state &&
-      location.state.flashcards &&
-      location.state.deckName
-    ) {
-      const flashcardsWithScore = location.state.flashcards.map((card) => ({
+    const { flashcards, deckName, deckId } = location.state || {};
+
+    // If flashcards are available, set the state
+    // Add in score and answered properties to each card
+    if (flashcards && deckName && deckId) {
+      const flashcardsWithScore = flashcards.map((card) => ({
         ...card,
         score: undefined,
         answered: undefined,
       }));
       setCards(flashcardsWithScore);
-      setDeckName(location.state.deckName);
+      setDeckName(deckName);
+      setDeckId(deckId);
       setLoading(false);
     } else {
       // loading state
@@ -47,6 +132,7 @@ const StudyMode = () => {
     }
   }, [location.state]);
 
+  // Log the session when all cards have been answered
   useEffect(() => {
     if (loading) {
       return;
@@ -54,7 +140,7 @@ const StudyMode = () => {
     // Check if all cards have been answered
     const allAnswered = cards.every((card) => card.score !== undefined);
     if (allAnswered) {
-      setShowSummary(true);
+      logSession();
     }
   }, [cards]);
 
@@ -62,6 +148,37 @@ const StudyMode = () => {
     // Set flipped to false when the current card changes
     setFlipped(false);
   }, [currentCardIndex]);
+
+  const logSession = async () => {
+    // Log session into supabase using sessionService
+    console.log("All cards have been answered");
+
+    const correctCount = cards.filter(
+      (card) => card.score === "correct"
+    ).length;
+    const incorrectCount = cards.length - correctCount;
+    const scorePercentage = (correctCount / cards.length) * 100;
+
+    setCorrectCount(correctCount);
+    setIncorrectCount(incorrectCount);
+    setScorePercentage(scorePercentage);
+
+    const sessionData = {
+      deck_id: deckId,
+      deck_name: deckName,
+      date_reviewed: new Date().toISOString(),
+      correct: correctCount,
+      incorrect: incorrectCount,
+      score: scorePercentage,
+      user_id: user.id,
+    };
+
+    const result = await createSession(sessionData);
+    console.log("Session created:", result);
+
+    // Show the summary screen
+    setShowSummary(true);
+  };
 
   const handleShuffle = () => {
     const shuffledCards = [...cards];
@@ -216,12 +333,6 @@ const StudyMode = () => {
   };
 
   const renderSummary = () => {
-    const correctCount = cards.filter(
-      (card) => card.score === "correct"
-    ).length;
-    const incorrectCount = cards.length - correctCount;
-    const scorePercentage = (correctCount / cards.length) * 100;
-
     return (
       <div className="summary-container">
         <Box sx={{ mt: "100px", mb: "30px" }}>

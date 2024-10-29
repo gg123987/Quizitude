@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import useCategories from "@/hooks/useCategories";
-import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
+import CircularProgress from "@mui/material/CircularProgress";
 import SelectSort from "@/components/common/SelectSort";
 import CustomButton from "@/components/common/CustomButton";
 import AddIcon from "@mui/icons-material/Add";
@@ -19,6 +19,7 @@ import { useMediaQuery } from "@mui/material";
 import useModal from "@/hooks/useModal";
 import "./categories.css";
 
+// Custom styled TextField component
 const CustomTextField = styled(TextField)(() => ({
   width: "280px",
   backgroundColor: "white",
@@ -39,7 +40,9 @@ const CustomTextField = styled(TextField)(() => ({
 }));
 
 const Categories = () => {
+  // Get userId from the outlet context
   const { userId } = useOutletContext();
+  // Fetch categories and related states
   const { categories, loading, error, refreshCategories } =
     useCategories(userId);
   const { openModal } = useModal();
@@ -50,10 +53,12 @@ const Categories = () => {
   const [sortOption, setSortOption] = useState("Recently Created"); // Default sort option
   const [newCategoryModalOpen, setNewCategoryModalOpen] = useState(false);
 
+  // Media queries for responsive design
   const isLargeScreen = useMediaQuery("(min-width: 1630px)");
   const isMediumScreen = useMediaQuery("(min-width: 1247px)");
   const isSmallScreen = useMediaQuery("(min-width: 450px)");
 
+  // Determine the number of columns based on screen size
   const columns = isLargeScreen
     ? 4
     : isMediumScreen
@@ -64,10 +69,12 @@ const Categories = () => {
   const rows = 6; // Fixed number of rows per page
   const categoriesPerPage = rows * columns;
 
+  // Refresh categories
   const handleRefreshCategories = async () => {
     await refreshCategories(); // Fetch categories again
   };
 
+  // Filter categories based on search query
   const filteredCategories = React.useMemo(() => {
     if (searchQuery.trim() === "") {
       return categories;
@@ -77,23 +84,28 @@ const Categories = () => {
     );
   }, [categories, searchQuery]);
 
+  // Open new category modal
   const handleOpenModal = () => {
     setNewCategoryModalOpen(true);
   };
 
+  // Handle search input change
   const handleChange = (event) => {
     setShowClearIcon(event.target.value === "" ? "none" : "flex");
     setSearchQuery(event.target.value);
   };
 
+  // Update clear icon visibility based on search query
   React.useEffect(() => {
     setShowClearIcon(searchQuery === "" ? "none" : "flex");
   }, [searchQuery]);
 
+  // Handle sort option change
   const handleSortChange = (option) => {
     setSortOption(option);
   };
 
+  // Sort and filter categories
   const filteredAndSortedCategories = React.useMemo(() => {
     let sortedCategories = [...filteredCategories];
 
@@ -134,18 +146,21 @@ const Categories = () => {
     return filteredAndSortedCategories.slice(start, end);
   }, [filteredAndSortedCategories, currentPage, categoriesPerPage]);
 
+  // Handle pagination next page
   const handleNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
     }
   };
 
+  // Handle pagination previous page
   const handlePreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
   };
 
+  // Save new category
   const handleSaveNewCategory = async (categoryName) => {
     const newCategory = { name: categoryName, user_id: userId };
     const category = await createCategory(newCategory);
@@ -186,6 +201,7 @@ const Categories = () => {
               ),
               endAdornment: (
                 <InputAdornment
+                  data-testid="clear-search"
                   position="end"
                   style={{ display: showClearIcon }}
                   onClick={() => setSearchQuery("")}
@@ -214,40 +230,54 @@ const Categories = () => {
         </div>
 
         <div className="col-right">
-          <CustomButton
-            onClick={handleOpenModal}
-            icon={<AddIcon />}
-            style={{
-              color: "#3538CD",
-              backgroundColor: "transparent",
-              width: "150px",
-              border: "1.4px solid #3538CD",
-            }}
-          >
-            {"New Category"}
-          </CustomButton>
+          {categories.length > 0 && (
+            <CustomButton
+              onClick={handleOpenModal}
+              icon={<AddIcon />}
+              style={{
+                color: "#3538CD",
+                backgroundColor: "transparent",
+                width: "150px",
+                border: "1.4px solid #3538CD",
+              }}
+            >
+              {"New Category"}
+            </CustomButton>
+          )}
           <SelectSort onSortChange={handleSortChange} />
         </div>
       </div>
 
       <div className="all-categories-data">
-        {loading && <CircularWithValueLabel />}
+        {loading && <CircularProgress color="inherit" />}
         {error && <p className="error-message">{error.message}</p>}
         {!loading && !error && categories.length === 0 && (
           <Box
             sx={{
-              textAlign: "center",
               padding: "20px",
               flex: 1,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              height: "100%",
+              justifyContent: "center",
             }}
           >
-            <h2>You have no flashcards yet</h2>
-            <p>Upload your first PDF to get started. Click the button below</p>
+            <h2>You have no categories yet</h2>
+            <p style={{ textAlign: "center" }}>
+              Create your first category by clicking the button below
+            </p>
             <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <CustomButton onClick={handleOpenModal} icon={<AddIcon />}>
+              <CustomButton
+                onClick={handleOpenModal}
+                icon={<AddIcon />}
+                style={{
+                  color: "#3538CD",
+                  backgroundColor: "transparent",
+                  width: "150px",
+                  border: "1.4px solid #3538CD",
+                }}
+              >
                 {"New Category"}
               </CustomButton>
             </Box>

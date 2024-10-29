@@ -1,5 +1,6 @@
 // tests/setupTests.js
 import { expect, vi } from "vitest";
+import "@testing-library/jest-dom";
 
 // Mock Supabase client
 beforeAll(() => {
@@ -21,6 +22,15 @@ beforeAll(() => {
           }),
           insert: vi.fn().mockResolvedValue({ data: [{ id: 1 }], error: null }),
         })),
+        storage: {
+          from: vi.fn().mockReturnThis(), // Support chaining
+          download: vi
+            .fn()
+            .mockResolvedValue({ data: new Blob(), error: null }), // Mock download
+          upload: vi
+            .fn()
+            .mockResolvedValue({ data: { path: "test-path" }, error: null }), // Mock upload
+        },
       })),
     };
   });
@@ -61,6 +71,10 @@ beforeAll(() => {
     default: vi.fn(),
   }));
 
+  vi.mock("@/hooks/useAvatar", () => ({
+    default: vi.fn(),
+  }));
+
   vi.mock("@/services/fileService", () => ({
     uploadFileAndCreateDeck: vi.fn(),
   }));
@@ -71,5 +85,10 @@ beforeAll(() => {
 
   vi.mock("@/services/categoryService", () => ({
     createCategory: vi.fn(),
+  }));
+
+  vi.mock("@/services/flashcardService", () => ({
+    deleteFlashcard: vi.fn().mockResolvedValue({}),
+    updateFlashcard: vi.fn().mockResolvedValue({}),
   }));
 });

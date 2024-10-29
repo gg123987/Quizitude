@@ -1,17 +1,25 @@
 import Groq from "groq-sdk";
 import pdfToText from "react-pdftotext";
 
+/**
+ * FetchLLMResponse - Fetches responses from a Language Learning Model (LLM) based on the provided PDF and question type.
+ *
+ * @param {number} noOfQuestions - Number of questions to generate.
+ * @param {File} pdf - PDF file from which text is extracted.
+ * @param {string} typeOfQuestion - Type of questions to generate ("multiple-choice" or "short-answer").
+ * @returns {Promise<Array>} - Returns a promise that resolves to an array of questions and answers.
+ */
 export default async function FetchLLMResponse(
   noOfQuestions,
   pdf,
   typeOfQuestion
 ) {
+  // Extract text from the provided PDF
   const text = await getPdfText(pdf);
 
   //const groq = new Groq({ apiKey: "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" ,dangerouslyAllowBrowser: true});
-  //const groq = new Groq({ apiKey: "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" ,dangerouslyAllowBrowser: true});
 
-  //This code is to control the message that is sent to the LLM model based on the type of question
+  // Define the message structure based on the type of question
   let messages;
   if (typeOfQuestion === "multiple-choice") {
     messages = [
@@ -32,12 +40,12 @@ export default async function FetchLLMResponse(
       },
       {
         role: "user",
-        content: `Given the provided data, generate ${noOfQuestions} short-answer questions with answers. . Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`,
+        content: `Given the provided data, generate ${noOfQuestions} short-answer questions with answers. Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`,
       },
     ];
   }
 
-  // THIS USES THE OPENROUTER API`
+  // Use the OpenRouter API to fetch the response from the LLM model
   try {
     const response = await fetch(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -60,6 +68,7 @@ export default async function FetchLLMResponse(
     const data = await response.json();
 
     //console.log(data.choices[0].message.content);
+    // Parse the response content
     let thisResponse = JSON.parse(data.choices[0].message.content);
 
     // if (typeOfQuestion === "multiple-choice"){
@@ -84,14 +93,13 @@ export default async function FetchLLMResponse(
     //   });
     // }
 
-    //console.log(thisResponse);
     return thisResponse; // Return the content from the response
   } catch (error) {
-    console.error("Error fetching data1:", error);
+    console.error("Error fetching data:", error);
     alert(
       "Error: Issue with the AI model. Please attempt to regenerate the flashcards"
     );
-    throw Error("Error fetching data2:", error);
+    throw Error("Error fetching data:", error);
   }
 
   /*
@@ -140,8 +148,12 @@ export default async function FetchLLMResponse(
   */
 }
 
-//export default fetchLLMResponse;
-
+/**
+ * getPdfText - Extracts text from a given PDF file.
+ *
+ * @param {File} pdf - PDF file from which text is to be extracted.
+ * @returns {Promise<string>} - Returns a promise that resolves to the extracted text.
+ */
 async function getPdfText(pdf) {
   try {
     const pdfjsLib = await import("pdfjs-dist/build/pdf.mjs");

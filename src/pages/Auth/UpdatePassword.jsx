@@ -1,14 +1,18 @@
 import { useRef, useState } from "react";
-import useAuth from '@/hooks/useAuth';
+import useAuth from "@/hooks/useAuth";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Link from "@mui/material/Link";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * UpdatePassword component allows users to update their password.
+ * It includes form validation and error handling.
+ */
 export default function UpdatePassword() {
   const { updatePassword } = useAuth();
   const passwordRef = useRef(null);
@@ -22,6 +26,7 @@ export default function UpdatePassword() {
     e.preventDefault();
     setLoading(true);
 
+    // Validate form fields
     if (!passwordRef.current?.value || !confirmPasswordRef.current?.value) {
       setErrorMsg("Please complete all fields");
       setLoading(false);
@@ -42,15 +47,18 @@ export default function UpdatePassword() {
       setErrorMsg("");
       const { error } = await updatePassword(passwordRef.current.value);
       if (!error) {
-        navigate("/");
+        navigate("/"); // Navigate to the home page on successful password update
       }
     } catch (error) {
       setErrorMsg("Error in Updating Password. Please try again");
     }
-    
+
     setLoading(false);
   };
 
+  /**
+   * Handles changes in the password input field to reset the password error state.
+   */
   const handlePasswordChange = () => {
     if (passwordError) {
       setPasswordError(false);
@@ -94,9 +102,7 @@ export default function UpdatePassword() {
           {errorMsg}
         </Alert>
       )}
-      <Box
-        sx={{ maxWidth: "18%" }}
-      >
+      <Box sx={{ maxWidth: "18%" }}>
         <form onSubmit={handleSubmit}>
           <Typography
             fontFamily="Inter"
@@ -122,9 +128,9 @@ export default function UpdatePassword() {
             onChange={handlePasswordChange}
             sx={{
               borderColor: passwordError ? "red" : "",
-              '& .MuiInputBase-input': {
-                height: '10px',
-              }
+              "& .MuiInputBase-input": {
+                height: "10px",
+              },
             }}
           />
           <Typography
@@ -147,9 +153,9 @@ export default function UpdatePassword() {
             autoComplete=""
             inputRef={confirmPasswordRef}
             sx={{
-              '& .MuiInputBase-input': {
-                height: '10px',
-              }
+              "& .MuiInputBase-input": {
+                height: "10px",
+              },
             }}
           />
           <Button
@@ -157,19 +163,42 @@ export default function UpdatePassword() {
             fullWidth
             variant="contained"
             disabled={loading}
-            sx={{ mt: 3, mb: 2, backgroundColor: '#3538CD', color: '#FFFFFF', borderRadius: '8px', height: '40px' }}
+            sx={{
+              mt: 3,
+              mb: 2,
+              backgroundColor: "#3538CD",
+              color: "#FFFFFF",
+              borderRadius: "8px",
+              height: "40px",
+            }}
           >
             Reset password
           </Button>
         </form>
       </Box>
-      <Box sx={{ display: 'flex', alignSelf: 'center', marginTop: '20px', marginBottom: '4px' }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignSelf: "center",
+          marginTop: "20px",
+          marginBottom: "4px",
+        }}
+      >
         <Link
           href="/login"
           variant="body2"
-          sx={{ fontFamily: "Inter", fontWeight: '600', color: "#475467", fontSize: "0.9em", textDecoration: 'none', display: 'inline-block' }}
+          sx={{
+            fontFamily: "Inter",
+            fontWeight: "600",
+            color: "#475467",
+            fontSize: "0.9em",
+            textDecoration: "none",
+            display: "inline-block",
+          }}
         >
-          <ArrowBackIcon sx={{ fontSize: 'medium', color: "#475467", marginRight: "5px" }} />
+          <ArrowBackIcon
+            sx={{ fontSize: "medium", color: "#475467", marginRight: "5px" }}
+          />
           Back to log in
         </Link>
       </Box>

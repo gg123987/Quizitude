@@ -16,6 +16,14 @@ import useWindowDimensions from "@/hooks/useWindowDimensions";
 import useModal from "@/hooks/useModal";
 import "./drawer.css";
 
+/**
+ * ResponsiveDrawer component provides a responsive sidebar drawer that adapts to different screen sizes.
+ * It includes navigation buttons to different sections of the application.
+ *
+ * @param {Object} props - The component props.
+ * @param {function} props.window - Function to get the window object.
+ * @param {React.ReactNode} props.children - The children components to be rendered inside the main content area.
+ */
 function ResponsiveDrawer({ window, ...props }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -26,6 +34,7 @@ function ResponsiveDrawer({ window, ...props }) {
   const { width } = useWindowDimensions();
   const { modalOpen } = useModal();
 
+  // Get the container to render the drawer
   const container =
     window !== undefined ? () => window().document.body : undefined;
 
@@ -38,6 +47,8 @@ function ResponsiveDrawer({ window, ...props }) {
     setIsClosing(false);
   };
 
+  // Toggle the drawer open and close states
+  // Prevent toggling the drawer when it is closing
   const handleDrawerToggle = () => {
     if (!isClosing) {
       setMobileOpen(!mobileOpen);
@@ -60,6 +71,7 @@ function ResponsiveDrawer({ window, ...props }) {
       default:
         break;
     }
+    handleDrawerClose(); // Close the drawer when a menu option is clicked
   };
 
   useEffect(() => {
@@ -73,6 +85,7 @@ function ResponsiveDrawer({ window, ...props }) {
     }
   }, [width, modalOpen]);
 
+  // Drawer content including logo and navigation buttons
   const drawer = (
     <div className="sideBar">
       <Box sx={{ display: "flex", padding: "30px 20px" }}>
@@ -126,8 +139,10 @@ function ResponsiveDrawer({ window, ...props }) {
   return (
     <Box sx={{ display: "flex", height: "100vh" }}>
       <CssBaseline />
+      {/* Render the drawer only if the modal is not open */}
       {!modalOpen && (
         <>
+          {/* Temporary drawer for mobile view */}
           <Drawer
             container={container}
             variant="temporary"
@@ -147,6 +162,7 @@ function ResponsiveDrawer({ window, ...props }) {
           >
             {drawer}
           </Drawer>
+          {/* Permanent drawer for desktop view */}
           <Drawer
             variant="permanent"
             sx={{
@@ -164,6 +180,7 @@ function ResponsiveDrawer({ window, ...props }) {
           </Drawer>
         </>
       )}
+      {/* Main content area */}
       <Box
         sx={{
           display: "flex",
@@ -173,15 +190,17 @@ function ResponsiveDrawer({ window, ...props }) {
         }}
       >
         <Box sx={{ display: "flex", flexDirection: "row" }}>
+          {/* Custom AppBar component for the header */}
           <CustomAppBar
             handleDrawerToggle={handleDrawerToggle}
             drawerWidth={drawerWidth}
           />
         </Box>
+        {/* Render children components (pages) */}
         <Box
           sx={{
             marginLeft: { sm: `${drawerWidth}px` },
-            marginTop: '64px',
+            marginTop: "64px",
             flexDirection: "row",
             flex: 1,
           }}

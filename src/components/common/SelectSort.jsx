@@ -26,7 +26,7 @@ const CssTextField = styled(TextField)({
   },
 });
 
-const sortOptions = [
+const defaultSort = [
   {
     value: "Recently Created",
     label: "Recently Created",
@@ -47,10 +47,42 @@ const sortOptions = [
 
 import PropTypes from "prop-types";
 
-export default function SelectSort({ onSortChange }) {
-SelectSort.propTypes = {
-  onSortChange: PropTypes.func.isRequired,
-};
+/**
+ * SelectSort Component
+ *
+ * This component renders a dropdown select input for sorting options.
+ *
+ * @component
+ * @param {Object} props - The properties object.
+ * @param {Array} props.sortOptions - An array of sorting options. Each option should be an object with `value` and `label` properties.
+ * @param {function} props.onSortChange - Callback function to handle the change event when a sorting option is selected.
+ * @param {string} [props.width="19ch"] - The width of the select input.
+ *
+ * @example
+ * const sortOptions = [
+ *   { value: 'name', label: 'Name' },
+ *   { value: 'date', label: 'Date' },
+ * ];
+ *
+ * function handleSortChange(value) {
+ *   console.log('Selected sort option:', value);
+ * }
+ *
+ * <SelectSort sortOptions={sortOptions} onSortChange={handleSortChange} />
+ *
+ * @returns {JSX.Element} The rendered SelectSort component.
+ */
+export default function SelectSort({
+  sortOptions = defaultSort,
+  onSortChange,
+  width = "19ch",
+}) {
+  SelectSort.propTypes = {
+    sortOptions: PropTypes.array,
+    onSortChange: PropTypes.func.isRequired,
+    width: PropTypes.string,
+  };
+
   const handleChange = (event) => {
     onSortChange(event.target.value);
   };
@@ -59,7 +91,7 @@ SelectSort.propTypes = {
     <Box
       component="form"
       sx={{
-        "& .MuiTextField-root": { m: 1, width: "19ch" },
+        "& .MuiTextField-root": { m: 1, width: width },
       }}
       noValidate
       autoComplete="off"
@@ -69,7 +101,7 @@ SelectSort.propTypes = {
           id="outlined-select-sort"
           select
           label=""
-          defaultValue="Recently Created"
+          defaultValue={sortOptions[0].value}
           size="small"
           variant="outlined"
           SelectProps={{

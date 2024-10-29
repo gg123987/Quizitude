@@ -10,6 +10,25 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { supabase } from "@/utils/supabase";
 import mailsent from "@/assets/MailSent.svg";
 
+/**
+ * PasswordReset component handles the password reset process.
+ *
+ * @description
+ * This component renders a form for users to request a password reset link.
+ * It verifies the email address with the database and sends a reset link if the email exists.
+ * If the reset link is successfully sent, it displays a confirmation message and allows the user to resend the link.
+ *
+ * @function handleSubmit
+ * @description Handles the form submission for requesting a password reset link.
+ * @param {Event} e - The form submission event.
+ * @returns {Promise<void>}
+ *
+ * @function handleResubmit
+ * @description Handles the form submission for resending the password reset link.
+ * @param {Event} e - The form submission event.
+ * @returns {Promise<void>}
+ *
+ */
 export default function PasswordReset() {
   const { passwordReset } = useAuth();
   const emailRef = useRef(null);
@@ -33,6 +52,8 @@ export default function PasswordReset() {
 
       const count = users ? 1 : 0;
 
+      // Check if the email exists in the database
+      // If the email does not exist, display an error message
       if (count > 0) {
         setEmailError(false);
       } else {
@@ -58,7 +79,7 @@ export default function PasswordReset() {
     e.preventDefault();
     try {
       setLoading(true);
-  
+
       const { error: reError } = await passwordReset(emailInput);
       if (!reError) {
         setEmailInput(emailInput);
@@ -70,8 +91,9 @@ export default function PasswordReset() {
       console.error(e);
     }
     setLoading(false);
-  };  
+  };
 
+  // Display the confirmation message if the reset link is sent
   if (confirmation) {
     return (
       <Box

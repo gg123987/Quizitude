@@ -6,7 +6,7 @@ import {
   passwordReset,
   updatePassword,
   signInWithGoogle,
-  register
+  register,
 } from "@/services/authService";
 import { supabase } from "@/utils/supabase";
 
@@ -14,6 +14,7 @@ import { supabase } from "@/utils/supabase";
 export const AuthContext = createContext({
   auth: false,
   user: null,
+  userDetails: null,
   login: () => {},
   signOut: () => {},
   passwordReset: () => {},
@@ -25,24 +26,47 @@ export const AuthContext = createContext({
 const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(false);
   const [user, setUser] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    /**
+     * Fetches the current user and their details from Supabase.
+     */
     const getUser = async () => {
       try {
         const { data } = await supabase.auth.getUser();
         const { user: currentUser } = data;
-        setUser(currentUser ?? null);
+
+        if (currentUser) {
+          setUser(currentUser);
+
+          // Fetch additional data from the `users` table based on the user's ID
+          const { data: userProfile, error } = await supabase
+            .from("users")
+            .select("*")
+            .eq("id", currentUser.id)
+            .single();
+          if (error) throw error;
+
+          setUserDetails(userProfile);
+        } else {
+          setUser(null);
+          setUserDetails(null);
+        }
       } catch (error) {
-        console.error('Error getting user:', error.message);
+        console.error("Error getting user or user details:", error.message);
       } finally {
         setLoading(false);
       }
     };
 
+    /**
+     * Retrieves session data from local storage and sets the authentication state.
+     */
     const getSessionData = async () => {
       try {
-        const token = localStorage.getItem('rememberMeToken');
+        const token = localStorage.getItem("rememberMeToken");
         if (token) {
           const { data: sessionData, error } = await supabase.auth.getSession();
           if (error) throw error;
@@ -52,23 +76,41 @@ const AuthProvider = ({ children }) => {
           }
         }
       } catch (error) {
-        console.error('Error getting session data:', error.message);
+        console.error("Error getting session data:", error.message);
       }
     };
 
     getSessionData();
     getUser();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN") {
-        setAuth(true);
-        setUser(session.user);
-      } else if (event === "SIGNED_OUT") {
-        setAuth(false);
-        setUser(null);
-      }
-    });
+    /**
+     * Sets up an authentication state change listener.
+     */
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === "SIGNED_IN") {
+          setAuth(true);
+          setUser(session.user);
 
+          // Fetch additional user data after signing in
+          supabase
+            .from("users")
+            .select("*")
+            .eq("id", session.user.id)
+            .single()
+            .then(({ data, error }) => {
+              if (error)
+                console.error("Error fetching user details:", error.message);
+              setUserDetails(data);
+            });
+        } else if (event === "SIGNED_OUT") {
+          setAuth(false);
+          setUser(null);
+        }
+      }
+    );
+
+    // Cleanup the listener on component unmount
     return () => {
       authListener.subscription?.unsubscribe();
     };
@@ -79,6 +121,7 @@ const AuthProvider = ({ children }) => {
       value={{
         auth,
         user,
+        userDetails,
         login,
         signOut,
         passwordReset,
