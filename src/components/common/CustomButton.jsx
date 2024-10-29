@@ -35,6 +35,7 @@ const CustomButton = ({ children, icon, fontSize = "0.9rem", ...props }) => {
         display: "flex", // Ensure flexbox behavior
         alignItems: "center", // Align content vertically
         justifyContent: "center", // Center content horizontally
+        fontSize,
         ...props.style, // Allow additional custom styles
       }}
     >

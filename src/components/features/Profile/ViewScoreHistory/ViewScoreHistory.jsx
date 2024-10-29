@@ -1,7 +1,7 @@
 import { useOutletContext } from "react-router-dom";
 import React, { useState } from "react";
 import SelectSort from "@/components/common/SelectSort";
-import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useSessions } from "@/hooks/useSessions";
 import SessionsTable from "@/components/features/Scores/SessionsTable";
 import "./viewScoreHistory.css";
@@ -43,7 +43,7 @@ import "./viewScoreHistory.css";
  * @param {Array} sortOptions - Array of sorting options.
  * @param {string} width - Width of the select component.
  *
- * @component CircularWithValueLabel
+ * @component CircularProgress
  * @description A loading indicator component.
  *
  * @component SessionsTable
@@ -92,7 +92,7 @@ const ScoreHistory = () => {
       </div>
 
       <div className="sessions-content">
-        {loading && <CircularWithValueLabel />}
+        {loading && <CircularProgress color="inherit" />}
         {error && <p className="error-message">{error.message}</p>}
         <div className="sessions-table">
           <SessionsTable sessions={sortedSessions} />

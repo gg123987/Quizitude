@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import useCategories from "@/hooks/useCategories";
-import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
+import CircularProgress from "@mui/material/CircularProgress";
 import SelectSort from "@/components/common/SelectSort";
 import CustomButton from "@/components/common/CustomButton";
 import AddIcon from "@mui/icons-material/Add";
@@ -248,7 +248,7 @@ const Categories = () => {
       </div>
 
       <div className="all-categories-data">
-        {loading && <CircularWithValueLabel />}
+        {loading && <CircularProgress color="inherit" />}
         {error && <p className="error-message">{error.message}</p>}
         {!loading && !error && categories.length === 0 && (
           <Box

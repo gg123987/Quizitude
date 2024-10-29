@@ -24,6 +24,10 @@ const AuthRoute = () => {
   const location = useLocation();
   const userId = user?.id;
 
+  console.log("auth", auth);
+  console.log("location", location);
+  console.log("user", user);
+
   // Check if the current path is a login or register page
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/register";

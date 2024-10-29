@@ -10,7 +10,8 @@ import FormControl from "@mui/material/FormControl";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
+import CircularProgressSpinner from "@/components/common/CircularProgressSpinner";
+import CircularProgress from "@mui/material/CircularProgress";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import fetchLLMResponse from "@/api/LLM";
@@ -52,47 +53,6 @@ import "./newdeck.css";
  * - Allowing users to review and edit the generated flashcards.
  * - Saving the deck and flashcards to the server.
  *
- * @state {Object} user - The authenticated user object.
- * @state {Array} categories - List of available categories.
- * @state {boolean} categoriesLoading - Loading state for categories.
- * @state {Object} categoriesError - Error state for categories.
- * @state {boolean} modalOpen - State to control the visibility of the modal.
- * @state {Object} selectedFile - The selected PDF file.
- * @state {Object} file - The uploaded PDF file.
- * @state {number} currentPage - The current page of the modal (0 for generation, 1 for review).
- * @state {number} currentFlashcard - The index of the current flashcard being reviewed.
- * @state {Array} questionList - List of generated questions.
- * @state {Object} currentQuestion - The current question being reviewed.
- * @state {string} noOfQuestions - The number of questions to generate.
- * @state {string} questionType - The type of questions to generate (multiple-choice or short-answer).
- * @state {boolean} newCategoryModalOpen - State to control the visibility of the new category modal.
- * @state {string} deckName - The name of the deck.
- * @state {string} categoryId - The selected category ID.
- * @state {boolean} uploading - State to indicate if the file is being uploaded.
- * @state {Object} llmResponse - The response from the LLM.
- * @state {string} errorp1 - Error message for the first page.
- * @state {string} errorp2 - Error message for the second page.
- *
- * @function handleDeckNameChange - Updates the deck name state.
- * @function handleNoOfQuestionsChange - Updates the number of questions state.
- * @function resetComponent - Resets the component state to initial values.
- * @function handleClose - Closes the modal and resets the component state.
- * @function handleQuestionTypeChange - Updates the question type state.
- * @function handleCategoryChange - Updates the category state or opens the new category modal.
- * @function handleFileChange - Handles file selection and validation.
- * @function handleDelete - Deletes the selected file.
- * @function handleDrop - Handles file drop and validation.
- * @function p1Validations - Validates the inputs on the first page.
- * @function CheckDeckName - Checks if the deck name already exists.
- * @function handleUpload - Uploads the file and creates the deck and flashcards.
- * @function handleGenerateFlashcards - Generates flashcards using the LLM.
- * @function updateCurrentQuestionForward - Updates the current question and moves to the next one.
- * @function updateCurrentQuestionBackward - Updates the current question and moves to the previous one.
- * @function handleNextFlashcard - Moves to the next flashcard.
- * @function handlePreviousFlashcard - Moves to the previous flashcard.
- * @function handleAddNewCategory - Opens the new category modal.
- * @function handleSaveNewCategory - Saves the new category and refreshes the categories list.
- * @function formatFlashcardData - Formats the flashcard data for review.
  */
 const NewDeck = () => {
   const { user } = useAuth();
@@ -112,6 +72,7 @@ const NewDeck = () => {
   const [deckName, setDeckName] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   //create a variable to store the response from the LLM
   const [llmResponse, setLlmResponse] = useState();
   const [errorp1, setError1] = useState(null);
@@ -176,6 +137,7 @@ const NewDeck = () => {
     }
   };
 
+  // Handle file input changes
   const handleFileChange = (event) => {
     const uploadedPDF = event.target.files[0];
     console.log("Uploaded PDF:", uploadedPDF);
@@ -189,11 +151,13 @@ const NewDeck = () => {
     }
   };
 
+  // Handle file deletion
   const handleDelete = (event) => {
     event.stopPropagation();
     setFile(null);
   };
 
+  // Handle file drop event
   const handleDrop = (event) => {
     event.preventDefault();
     const droppedFiles = event.dataTransfer.files;
@@ -217,6 +181,7 @@ const NewDeck = () => {
     }
   };
 
+  // Validate inputs on page 1
   const p1Validations = async () => {
     console.log("Validating page 1 inputs");
 
@@ -246,7 +211,7 @@ const NewDeck = () => {
     const isDuplicate = await checkForDuplicateFile(file, user.id);
     console.log("Duplicate file:", isDuplicate);
 
-    if (isDuplicate) {
+    if (isDuplicate && isDuplicate.length > 0) {
       setError1("File already exists. Please choose a different file.");
       return false;
     }
@@ -262,16 +227,16 @@ const NewDeck = () => {
     return true;
   };
 
-  //function to get all the decks of the user
+  // Get all the decks of the user
   const { decks } = useDecks(user?.id);
 
+  // Check if the deck name already exists
   const CheckDeckName = (deckName) => {
-    //check if the deck name exists in the decks
     const deckExists = decks.some((deck) => deck.name === deckName);
-
     return deckExists;
   };
 
+  // Handle file upload and deck creation
   const handleUpload = async () => {
     try {
       setUploading(true);
@@ -319,31 +284,50 @@ const NewDeck = () => {
 
       if (isValid) {
         setError1(null);
-        setUploading(true);
+        setUploading(true); // Start uploading
+        setUploadProgress(0); // Reset progress to 0
 
-        let response = await fetchLLMResponse(
+        // Simulate progress increment while awaiting the API response
+        const progressInterval = setInterval(() => {
+          setUploadProgress((prev) => {
+            console.log("Progress:", prev);
+            if (prev < 90) {
+              return Math.min(prev + 10, 100); // Increment progress
+            }
+            return prev; // Prevent going over 100
+          });
+        }, 250); // Update progress every 200ms
+
+        // Make the API call
+        const response = await fetchLLMResponse(
           noOfQuestions,
           file,
           questionType
         );
+        clearInterval(progressInterval); // Stop the progress simulation
+        console.log("upload progress", uploadProgress);
 
-        //create a copy of the response to avoid modifying the original response
+        // Format the response
         let thisResponse = JSON.parse(JSON.stringify(response));
         thisResponse = formatFlashcardData(thisResponse);
 
+        // Update state with the received response
         setQuestionList(thisResponse);
         setCurrentQuestion(thisResponse[0]);
-
-        setUploading(false);
+        setLlmResponse(response);
         setError1(null);
         setError2(null);
-        setCurrentPage(1);
-
-        setLlmResponse(response);
       }
     } catch (error) {
-      console.error("Error during upload:", error);
-      setUploading(false);
+      console.error("Error during generation:", error);
+      setError1("Error generating flashcards. Please try again.");
+    } finally {
+      setUploadProgress(100);
+      // Short delay to show the progress bar at 100%
+      setTimeout(() => {
+        setUploading(false); // Stop uploading
+        setCurrentPage(1); // Move to the next page
+      }, 500);
     }
   };
 
@@ -358,7 +342,6 @@ const NewDeck = () => {
 
     // Update the currentQuestion state with the updated values
     setCurrentQuestion({ question: updatedQuestion, answer: updatedAnswer });
-    //console.log(currentQuestion.question);
 
     // Update questionsList with the amended question
     const updatedQuestionList = [...questionList];
@@ -366,8 +349,7 @@ const NewDeck = () => {
     setQuestionList(updatedQuestionList);
 
     // Move to the next question
-    //(using -1 + 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
-    setCurrentQuestion(questionList[currentFlashcard - 1 + 1]);
+    setCurrentQuestion(questionList[currentFlashcard]);
   };
 
   const updateCurrentQuestionBackward = () => {
@@ -388,8 +370,7 @@ const NewDeck = () => {
     setQuestionList(updatedQuestionList);
 
     // Move to the previous question
-    //(using -1 - 1 because the currentFlashcard is 1-indexed and the questionList is 0-indexed)
-    setCurrentQuestion(questionList[currentFlashcard - 1 - 1]);
+    setCurrentQuestion(questionList[currentFlashcard - 2]);
   };
 
   const handleNextFlashcard = () => {
@@ -403,7 +384,6 @@ const NewDeck = () => {
     if (currentFlashcard > 1) {
       setCurrentFlashcard(currentFlashcard - 1);
       updateCurrentQuestionBackward();
-      //console.log(document.getElementById('reviewTextFieldQuestion').value);
     }
   };
 
@@ -423,11 +403,10 @@ const NewDeck = () => {
     setCategoryId(category[0].id);
   };
 
-  //function to modify the flashcard data to be displayed in the review flashcards page
-  //this function takes in the response for the LLM and formats the Multiple Choice questions options
+  // Format flashcard data for review
   const formatFlashcardData = (response) => {
     let thisResponse = response;
-    //check if the response is for multiple choice questions by checking if it contains the "choices" key
+    // Check if the response is for multiple choice questions
     if (response[0].choices) {
       // Modify each question in the response array
       thisResponse.forEach((question) => {
@@ -454,6 +433,7 @@ const NewDeck = () => {
     return thisResponse;
   };
 
+  // Pages for the modal
   const pages = [
     <div className="page1-content" key="page1">
       <div className="deck-text-header">
@@ -588,7 +568,7 @@ const NewDeck = () => {
           disabled={uploading}
         >
           {!uploading && "Generate Flashcards"}
-          {uploading && <CircularWithValueLabel interval={400} />}
+          {uploading && <CircularProgressSpinner value={uploadProgress} />}
         </Button>
       </div>
       {errorp1 && <p className="error-message">{errorp1}</p>}
@@ -658,7 +638,7 @@ const NewDeck = () => {
         </div>
       </div>
       {errorp2 && <p className="error-message">{errorp2}</p>}
-      {uploading && <CircularWithValueLabel />}
+      {uploading && <CircularProgress color="inherit" />}
       <Button
         id="saveButton"
         style={{

@@ -20,14 +20,14 @@ import SelectSort from "@/components/common/SelectSort";
 import SearchIcon from "@mui/icons-material/Search";
 import useDeck from "@/hooks/useDeck";
 import useFlashcards from "@/hooks/useFlashcards";
-import CircularWithValueLabel from "@/components/common/CircularProgressSpinner";
+import CircularProgress from "@mui/material/CircularProgress";
 import CustomButton from "@/components/common/CustomButton";
 import AddIcon from "@mui/icons-material/Add";
 import { styled } from "@mui/material/styles";
 import useModal from "@/hooks/useModal";
 import { useDeckSessions } from "@/hooks/useSessions";
 import NewDeck from "@/components/features/NewDeck/NewDeckModal";
-import BasicTabs from "@/components/features/DisplayDecks/TabSelect";
+import BasicTabs from "@/components/common/TabSelect";
 import ClearIcon from "@mui/icons-material/Clear";
 import FlashcardEditList from "@/components/features/Flashcard/FlashcardEditList";
 import SessionsTable from "@/components/features/Scores/SessionsTable";
@@ -349,7 +349,7 @@ const DeckDetail = () => {
         </div>
 
         <div className="deck-data content">
-          {loading && <CircularWithValueLabel />}
+          {loading && <CircularProgress color="inherit" />}
           {error && <p className="error-message">{error.message}</p>}
           {!loading && !error && flashcards.length === 0 && (
             <Box

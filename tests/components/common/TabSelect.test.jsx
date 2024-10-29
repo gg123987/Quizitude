@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import BasicTabs from "@/components/features/DisplayDecks/TabSelect";
+import BasicTabs from "@/components/common/TabSelect";
 
 describe("BasicTabs Component", () => {
   let value;

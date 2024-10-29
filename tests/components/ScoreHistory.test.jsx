@@ -107,7 +107,7 @@ describe("ScoreHistory Component", () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/loading.../i)).toBeInTheDocument();
+    expect(screen.getByRole("progressbar")).toBeInTheDocument();
   });
 
   test("handles error state", () => {
