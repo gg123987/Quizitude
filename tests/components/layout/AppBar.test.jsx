@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import AccountMenu from "@/components/layout/Header/AccountMenu";
+import AccountMenu from "@/components/Layout/Header/AccountMenu";
 import { MemoryRouter } from "react-router-dom";
 import { vi } from "vitest";
 import * as Auth from "@/hooks/useAuth";

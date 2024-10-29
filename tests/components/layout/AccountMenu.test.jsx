@@ -1,8 +1,7 @@
-// AccountMenu.test.js
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import AccountMenu from "@/components/layout/Header/AccountMenu";
+import AccountMenu from "@/components/Layout/Header/AccountMenu";
 import useAuth from "@/hooks/useAuth";
 
 // Mock the useAuth hook
