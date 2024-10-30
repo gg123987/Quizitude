@@ -258,6 +258,7 @@ export default function SignInSide() {
                 required
                 fullWidth
                 id="email"
+                inputProps={{ "data-testid": "email" }}
                 label=""
                 name="email"
                 autoComplete="email"
@@ -288,6 +289,7 @@ export default function SignInSide() {
                 label=""
                 type="password"
                 id="password"
+                inputProps={{ "data-testid": "password" }}
                 autoComplete="current-password"
                 inputRef={passwordRef}
                 helperText={passwordError ? "Incorrect password" : ""}

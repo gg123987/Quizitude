@@ -240,6 +240,7 @@ export default function PasswordReset() {
             label=""
             name="email"
             autoComplete="email"
+            inputProps={{ "data-testid": "email-input" }}
             autoFocus
             disabled={loading}
             inputRef={emailRef}

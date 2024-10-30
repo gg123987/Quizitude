@@ -243,6 +243,7 @@ export default function Register() {
                 required
                 fullWidth
                 id="fName"
+                inputProps={{ "data-testid": "fName" }}
                 label=""
                 name="fName"
                 autoComplete="fName"
@@ -264,6 +265,7 @@ export default function Register() {
                 required
                 fullWidth
                 id="email"
+                inputProps={{ "data-testid": "email" }}
                 label=""
                 name="email"
                 autoComplete="email"
@@ -293,6 +295,7 @@ export default function Register() {
                 label=""
                 type="password"
                 id="password"
+                inputProps={{ "data-testid": "password" }}
                 autoComplete="current-password"
                 inputRef={passwordRef}
                 error={passwordError}

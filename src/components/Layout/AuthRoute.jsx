@@ -21,9 +21,14 @@ import ResponsiveDrawer from "@/components/Layout/Sidebar/Drawer";
 const AuthRoute = ({ isAuthenticated, userId }) => {
   const location = useLocation();
 
+  console.log("AuthRoute", location);
+
   // Check if the current path is a login or register page
   const isAuthPage =
-    location.pathname === "/login" || location.pathname === "/register";
+    location.pathname === "/login" ||
+    location.pathname === "/register" ||
+    location.pathname === "/passwordreset" ||
+    location.pathname === "/update-password";
   // Check if the current path is for the StudyMode page
   const isStudyModePage = location.pathname === "/study";
 
