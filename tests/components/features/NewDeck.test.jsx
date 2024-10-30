@@ -14,6 +14,11 @@ import useDecks from "@/hooks/useDecks";
 import fetchLLMResponse from "@/api/LLM";
 import { MenuItem, Select } from "@mui/material";
 
+// Mock the hooks
+vi.mock("@/hooks/useDecks", () => ({ default: vi.fn() }));
+vi.mock("@/hooks/useCategories", () => ({ default: vi.fn() }));
+vi.mock("@/hooks/useAuth", () => ({ default: vi.fn() }));
+
 beforeEach(() => {
   vi.clearAllMocks();
 });

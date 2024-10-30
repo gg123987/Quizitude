@@ -104,7 +104,7 @@ const Home = () => {
   // Check if the user has studied today
   const checkStudyToday = () => {
     const today = new Date();
-    const lastSession = userDetails.last_session
+    const lastSession = userDetails?.last_session
       ? new Date(userDetails.last_session)
       : null;
     if (lastSession) {

@@ -1,5 +1,4 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import useAuth from "@/hooks/useAuth";
 import ResponsiveDrawer from "@/components/Layout/Sidebar/Drawer";
 
 /**
@@ -19,14 +18,8 @@ import ResponsiveDrawer from "@/components/Layout/Sidebar/Drawer";
  * @component
  * @returns {JSX.Element} The rendered component based on the authentication status and current path.
  */
-const AuthRoute = () => {
-  const { auth, user } = useAuth();
+const AuthRoute = ({ isAuthenticated, userId }) => {
   const location = useLocation();
-  const userId = user?.id;
-
-  console.log("auth", auth);
-  console.log("location", location);
-  console.log("user", user);
 
   // Check if the current path is a login or register page
   const isAuthPage =
@@ -36,19 +29,27 @@ const AuthRoute = () => {
 
   return (
     <>
+      {/* Redirect to login page if not authenticated and not on the login/register page */}
+      {!isAuthenticated && !isAuthPage && (
+        <Navigate to={"/login"} replace state={{ path: location.pathname }} />
+      )}
+      {/* Redirect to home page if authenticated and trying to access login/register page */}
+      {isAuthenticated && isAuthPage && (
+        <Navigate to={"/"} replace state={{ path: location.pathname }} />
+      )}
+
+      {/* Render the Outlet if not on the StudyMode page */}
+      {isAuthenticated && isStudyModePage && <Outlet context={{ userId }} />}
+
       {/* Show the sidebar if authenticated and not on the StudyMode page */}
-      {auth && !isStudyModePage && (
+      {isAuthenticated && !isStudyModePage && !isAuthPage && (
         <ResponsiveDrawer>
           <Outlet context={{ userId }} />
         </ResponsiveDrawer>
       )}
 
-      {/* Redirect to login page if not authenticated and not on the login/register page */}
-      {!auth && !isAuthPage && (
-        <Navigate to={"/login"} replace state={{ path: location.pathname }} />
-      )}
-      {/* Render the Outlet if not on the StudyMode page */}
-      {auth && isStudyModePage && <Outlet context={{ userId }} />}
+      {/* Render the Outlet if noto authneitcated */}
+      {!isAuthenticated && isAuthPage && <Outlet />}
     </>
   );
 };

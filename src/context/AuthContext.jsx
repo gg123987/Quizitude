@@ -106,13 +106,14 @@ const AuthProvider = ({ children }) => {
         } else if (event === "SIGNED_OUT") {
           setAuth(false);
           setUser(null);
+          setUserDetails(null);
         }
       }
     );
 
     // Cleanup the listener on component unmount
     return () => {
-      authListener.subscription?.unsubscribe();
+      authListener?.subscription?.unsubscribe();
     };
   }, [supabase]);
 
