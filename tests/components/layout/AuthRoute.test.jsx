@@ -2,10 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import AuthRoute from "@/components/Layout/AuthRoute";
-import useAuth from "@/hooks/useAuth";
 
 // Mock necessary components and hooks
-vi.mock("@/hooks/useAuth");
 vi.mock("@/components/Layout/Sidebar/Drawer", () => ({
   default: vi.fn(({ children }) => <div>ResponsiveDrawer Mock {children}</div>), // Ensure children are rendered
 }));
@@ -25,12 +23,15 @@ describe("AuthRoute", () => {
   });
 
   it("renders ResponsiveDrawer with Outlet if authenticated and not on StudyMode page", () => {
-    useAuth.mockReturnValue({ auth: true, user: { id: "user123" } });
-
     render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
-          <Route path="/" element={<AuthRoute />} />
+          <Route
+            path="/"
+            element={
+              <AuthRoute isAuthenticated={true} user={{ id: "user123" }} />
+            }
+          />
         </Routes>
       </MemoryRouter>
     );
@@ -40,12 +41,10 @@ describe("AuthRoute", () => {
   });
 
   it("redirects to login if unauthenticated and not on login/register page", () => {
-    useAuth.mockReturnValue({ auth: false, user: null });
-
     render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
-          <Route path="/" element={<AuthRoute />} />
+          <Route path="/" element={<AuthRoute isAuthenticated={false} />} />
         </Routes>
       </MemoryRouter>
     );
@@ -53,13 +52,33 @@ describe("AuthRoute", () => {
     expect(screen.getByText("Redirect to /login")).toBeInTheDocument();
   });
 
-  it("renders Outlet if authenticated and on StudyMode page", () => {
-    useAuth.mockReturnValue({ auth: true, user: { id: "user123" } });
+  it("redirects to home page if authenticated and on login/register page", () => {
+    render(
+      <MemoryRouter initialEntries={["/login"]}>
+        <Routes>
+          <Route
+            path="/login"
+            element={
+              <AuthRoute isAuthenticated={true} user={{ id: "user123" }} />
+            }
+          />
+        </Routes>
+      </MemoryRouter>
+    );
 
+    expect(screen.getByText("Redirect to /")).toBeInTheDocument();
+  });
+
+  it("renders Outlet if authenticated and on StudyMode page", () => {
     render(
       <MemoryRouter initialEntries={["/study"]}>
         <Routes>
-          <Route path="/study" element={<AuthRoute />} />
+          <Route
+            path="/study"
+            element={
+              <AuthRoute isAuthenticated={true} user={{ id: "user123" }} />
+            }
+          />
         </Routes>
       </MemoryRouter>
     );
@@ -69,12 +88,13 @@ describe("AuthRoute", () => {
   });
 
   it("does not redirect on login/register page even if unauthenticated", () => {
-    useAuth.mockReturnValue({ auth: false, user: null });
-
     render(
       <MemoryRouter initialEntries={["/login"]}>
         <Routes>
-          <Route path="/login" element={<AuthRoute />} />
+          <Route
+            path="/login"
+            element={<AuthRoute isAuthenticated={false} />}
+          />
         </Routes>
       </MemoryRouter>
     );

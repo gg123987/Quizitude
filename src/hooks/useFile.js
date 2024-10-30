@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { getFileByDeck } from '@/services/fileService';
+import { useState, useEffect } from "react";
+import { getFileByDeck } from "@/services/fileService";
 
 const useFile = (deckId) => {
   const [file, setFile] = useState([]);

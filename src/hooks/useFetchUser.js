@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { getUserById } from '@/services/userService';
+import { useState, useEffect } from "react";
+import { getUserById } from "@/services/userService";
 
 const useFetchUser = (userId) => {
   const [data, setData] = useState(null);
@@ -7,18 +7,16 @@ const useFetchUser = (userId) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-
     if (!userId) {
       setLoading(false);
       return;
     }
 
-
     const fetchData = async () => {
       try {
         const result = await getUserById(userId);
-        setData(result);     
-        console.log('result', result)  
+        setData(result);
+        console.log("result", result);
       } catch (error) {
         setError(error);
       } finally {

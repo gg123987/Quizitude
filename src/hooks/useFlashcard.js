@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { getFlashcardById } from '@/services/flashcardService';
+import { useState, useEffect } from "react";
+import { getFlashcardById } from "@/services/flashcardService";
 
 const useFlashcard = (flashcardId) => {
   const [flashcard, setFlashcard] = useState([]);
