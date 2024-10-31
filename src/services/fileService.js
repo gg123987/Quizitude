@@ -13,7 +13,7 @@ export const uploadFileAndCreateDeck = async (file, deckData) => {
 
     // 1. Check if the file already exists
     const existingFile = await checkForDuplicateFile(file, userId);
-    if (existingFile) {
+    if (existingFile && existingFile.length > 0) {
       console.log("File already exists:", existingFile);
       return {
         message: "This file has already been uploaded.",
