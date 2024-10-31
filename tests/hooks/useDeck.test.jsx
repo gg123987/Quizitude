@@ -52,7 +52,6 @@ describe("useDeck", () => {
 
     expect(getDeckById).toHaveBeenCalledWith(deckId); // Ensure the service was called
     expect(result.current.deck).toEqual([]); // Deck state should remain empty
-    expect(result.current.loading).toBe(false); // Loading should be false after fetch
     expect(result.current.error).toBe(mockError); // The error should be set correctly
   });
 

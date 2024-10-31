@@ -1,54 +1,197 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   createSession,
   getSessionsByUser,
   getSessionsByDeck,
   getSessionById,
 } from "@/services/sessionService";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { supabase } from "@/utils/supabase";
+
+// Mock the supabase client
+vi.mock("@/utils/supabase", () => ({
+  supabase: {
+    from: vi.fn(),
+  },
+}));
+
+// Mock the updateUserStreak function
+vi.mock("./userService", () => ({
+  updateUserStreak: vi.fn(),
+}));
 
 describe("Session Service", () => {
+  const mockSessionData = {
+    user_id: "user1",
+    deck_id: "deck1",
+    date_reviewed: "2024-10-31",
+  };
+  const mockUserId = "user1";
+  const mockDeckId = "deck1";
+  const mockSessionId = "1";
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should create a new session", async () => {
-    const sessionData = { user_id: 1, deck_id: 1, date_reviewed: "2024-10-30" };
-    const result = await createSession(sessionData);
-    expect(result).toEqual([
-      { id: 1, user_id: 1, deck_id: 1, date_reviewed: "2024-10-30" },
-    ]);
-    expect(vi.mocked(createSession).mock.calls[0][0]).toEqual(sessionData); // Ensure the right data was passed
-  });
+  describe("createSession", () => {
+    it("should create a session successfully", async () => {
+      const mockResponse = {
+        data: [mockSessionData],
+        error: null,
+      };
 
-  it("should fetch all sessions for a specific user", async () => {
-    const userId = 1;
-    const result = await getSessionsByUser(userId);
-    expect(result).toEqual([
-      { id: 1, user_id: 1, deck_id: 1, date_reviewed: "2024-10-30" },
-      { id: 2, user_id: 1, deck_id: 2, date_reviewed: "2024-10-29" },
-    ]);
-    expect(vi.mocked(getSessionsByUser).mock.calls[0][0]).toBe(userId); // Ensure the right user ID was passed
-  });
+      // Mock the supabase call for creating a session
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockReturnValueOnce({
+          select: vi.fn().mockResolvedValueOnce(mockResponse),
+        }),
+      });
 
-  it("should fetch all sessions for a specific deck", async () => {
-    const deckId = 1;
-    const result = await getSessionsByDeck(deckId);
-    expect(result).toEqual([
-      { id: 1, user_id: 1, deck_id: 1, date_reviewed: "2024-10-30" },
-      { id: 2, user_id: 2, deck_id: 1, date_reviewed: "2024-10-29" },
-    ]);
-    expect(vi.mocked(getSessionsByDeck).mock.calls[0][0]).toBe(deckId); // Ensure the right deck ID was passed
-  });
+      // Mock the supabase call within updateUserStreak for fetching user details
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValueOnce({
+          single: vi.fn().mockResolvedValueOnce({
+            data: { last_session: null, current_streak: 0, longest_streak: 0 },
+            error: null,
+          }),
+        }),
+      });
 
-  it("should fetch a specific session by ID", async () => {
-    const sessionId = 1;
-    const result = await getSessionById(sessionId);
-    expect(result).toEqual({
-      id: 1,
-      user_id: 1,
-      deck_id: 1,
-      date_reviewed: "2024-10-30",
+      // Mock the supabase call within updateUserStreak for updating user details
+      supabase.from.mockReturnValueOnce({
+        update: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce({
+            single: vi.fn().mockResolvedValueOnce({
+              data: null,
+              error: null,
+            }),
+          }),
+        }),
+      });
+
+      const result = await createSession(mockSessionData);
+      expect(result).toEqual([mockSessionData]);
+      expect(supabase.from).toHaveBeenCalledWith("sessions");
     });
-    expect(vi.mocked(getSessionById).mock.calls[0][0]).toBe(sessionId); // Ensure the right session ID was passed
+
+    it("should throw an error when session creation fails", async () => {
+      const error = new Error("Create Error");
+
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockReturnValueOnce({
+          select: vi.fn().mockResolvedValueOnce({
+            data: null,
+            error: error,
+          }),
+        }),
+      });
+
+      await expect(createSession(mockSessionData)).rejects.toThrow(error);
+    });
+  });
+
+  describe("getSessionsByUser", () => {
+    it("should fetch sessions for a specific user", async () => {
+      const mockResponse = [mockSessionData];
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValueOnce({
+          order: vi
+            .fn()
+            .mockReturnValueOnce(
+              Promise.resolve({ data: mockResponse, error: null })
+            ),
+        }),
+      });
+
+      const result = await getSessionsByUser(mockUserId);
+      expect(result).toEqual(mockResponse);
+      expect(supabase.from).toHaveBeenCalledWith("sessions");
+    });
+
+    it("should return an empty array when fetching fails", async () => {
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi
+          .fn()
+          .mockReturnValueOnce(
+            Promise.resolve({ data: null, error: new Error("Fetch Error") })
+          ),
+      });
+
+      const result = await getSessionsByUser(mockUserId);
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("getSessionsByDeck", () => {
+    it("should fetch sessions for a specific deck", async () => {
+      const mockResponse = [mockSessionData];
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValueOnce({
+          order: vi
+            .fn()
+            .mockReturnValueOnce(
+              Promise.resolve({ data: mockResponse, error: null })
+            ),
+        }),
+      });
+
+      const result = await getSessionsByDeck(mockDeckId);
+      expect(result).toEqual(mockResponse);
+      expect(supabase.from).toHaveBeenCalledWith("sessions");
+    });
+
+    it("should return an empty array when fetching fails", async () => {
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi
+          .fn()
+          .mockReturnValueOnce(
+            Promise.resolve({ data: null, error: new Error("Fetch Error") })
+          ),
+      });
+
+      const result = await getSessionsByDeck(mockDeckId);
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("getSessionById", () => {
+    it("should fetch a session by its ID", async () => {
+      const mockResponse = {
+        data: mockSessionData,
+        error: null,
+      };
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockReturnValueOnce(Promise.resolve(mockResponse)),
+      });
+
+      const result = await getSessionById(mockSessionId);
+      expect(result).toEqual(mockSessionData);
+    });
+
+    it("should return null when fetching fails", async () => {
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockReturnValueOnce({
+          data: null,
+          error: new Error("Fetch Error"),
+        }),
+      });
+
+      const result = await getSessionById(mockSessionId);
+      expect(result).toBeNull();
+    });
   });
 });

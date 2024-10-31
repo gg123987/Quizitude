@@ -11,12 +11,6 @@ export const getUserById = async (userId) => {
   return data;
 };
 
-export const insertUser = async (user) => {
-  const { data, error } = await supabase.from("users").insert([user]);
-  if (error) throw error;
-  return data;
-};
-
 export const updateUser = async (userId, userUpdates) => {
   const { data, error } = await supabase
     .from("users")
@@ -28,15 +22,15 @@ export const updateUser = async (userId, userUpdates) => {
 
 export const deleteUser = async (userId) => {
   console.log("Deleting account...");
-  try {
-    const response = await supabase.from("users").delete().eq("id", userId);
+  const { data, error } = await supabase
+    .from("users")
+    .delete()
+    .eq("id", userId);
 
-    console.log("Account successfully deleted:", response);
-    return response;
-  } catch (error) {
-    console.error("Error deleting account:", error.message);
-    alert("Failed to delete the account");
+  if (error) {
+    throw error;
   }
+  return data;
 };
 
 /**

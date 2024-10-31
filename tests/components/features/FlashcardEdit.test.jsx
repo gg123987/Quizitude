@@ -3,6 +3,8 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import FlashcardEdit from "@/components/features/Flashcard/FlashcardEdit";
 import * as flashcardService from "@/services/flashcardService";
 
+vi.mock("@/services/flashcardService");
+
 describe("FlashcardEdit Component", () => {
   const mockFlashcard = {
     id: "1",

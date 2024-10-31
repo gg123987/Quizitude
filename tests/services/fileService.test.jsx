@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   uploadFileAndCreateDeck,
   checkForDuplicateFile,
@@ -7,159 +8,287 @@ import {
   getFileById,
   deleteFile,
 } from "@/services/fileService";
-import { createDeck } from "@/services/deckService";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { supabase } from "@/utils/supabase";
+
+// Mock the Supabase client
+vi.mock("@/utils/supabase", () => ({
+  supabase: {
+    from: vi.fn(),
+    storage: {
+      from: vi.fn().mockReturnValue({
+        upload: vi.fn(),
+        download: vi.fn(),
+        remove: vi.fn(),
+      }),
+    },
+  },
+}));
 
 describe("File Service", () => {
-  let mockFile;
-  const deckData = { user_id: "test-user-id", name: "Test Deck" };
+  const mockFile = new File(["content"], "test.txt", {
+    type: "text/plain",
+    size: 1234,
+  });
+  const mockDeckData = { user_id: "user1", name: "Test Deck" };
+  const mockUserId = "user1";
+  const mockFileId = "1";
 
   beforeEach(() => {
-    // Clear all mocks
     vi.clearAllMocks();
+  });
 
-    // Setup a mock file object
-    mockFile = new File(["content"], "test.pdf", {
-      type: "application/pdf",
-      size: 12345,
+  describe("uploadFileAndCreateDeck", () => {
+    it("should upload a file and create a deck successfully", async () => {
+      const mockFileRecord = [{ id: mockFileId }];
+      const mockDeck = [{ id: "deck1", ...mockDeckData, file_id: mockFileId }];
+
+      // Mock checking for duplicate file
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(), // Chainable
+        single: vi.fn().mockResolvedValueOnce({ data: null, error: null }),
+      });
+
+      // Mock file upload - ensure it returns structured data
+      supabase.storage.from.mockReturnValueOnce({
+        upload: vi.fn().mockResolvedValueOnce({
+          data: {}, // Mock the data structure you expect
+          error: null, // Simulate no error
+        }),
+      });
+
+      // Mock file record creation
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockReturnThis(),
+        select: vi
+          .fn()
+          .mockResolvedValueOnce({ data: mockFileRecord, error: null }),
+      });
+
+      // Mock deck creation
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockReturnThis(),
+        select: vi.fn().mockResolvedValueOnce({ data: mockDeck, error: null }),
+      });
+
+      const result = await uploadFileAndCreateDeck(mockFile, mockDeckData);
+      expect(result).toEqual({ deck: mockDeck[0], file: mockFileRecord[0] });
+      expect(supabase.from).toHaveBeenCalledWith("files");
     });
 
-    // Mock the return values for checkForDuplicateFile
-    vi.mocked(checkForDuplicateFile).mockResolvedValue([
-      mockFile,
-      deckData.user_id,
-    ]);
+    it("should throw an error when file upload fails", async () => {
+      const error = new Error("Upload Error");
 
-    // Mock other dependent functions
-    vi.mocked(uploadFile).mockResolvedValue({ id: "file-id" });
-    vi.mocked(createDeck).mockResolvedValue({
-      id: "deck-id",
-      name: "Test Deck",
+      // Mock checking for duplicate file
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce({
+            eq: vi.fn().mockReturnValueOnce({
+              single: vi
+                .fn()
+                .mockResolvedValueOnce({ data: null, error: null }),
+            }),
+          }),
+        }),
+      });
+
+      // Mock file upload to fail
+      supabase.storage.from.mockReturnValueOnce({
+        upload: vi.fn().mockResolvedValueOnce({ error }),
+      });
+
+      await expect(
+        uploadFileAndCreateDeck(mockFile, mockDeckData)
+      ).rejects.toThrow(error);
     });
   });
 
-  it("should upload a file and create a deck", async () => {
-    // Ensure the mock returns the expected value
-    const duplicateCheckResult = await checkForDuplicateFile(
-      mockFile,
-      deckData.user_id
-    );
-    expect(duplicateCheckResult).toEqual([mockFile, deckData.user_id]);
+  describe("checkForDuplicateFile", () => {
+    it("should return existing files when a duplicate is found", async () => {
+      const existingFiles = [{ id: mockFileId, name: "test.txt", size: 1234 }];
 
-    const result = await uploadFileAndCreateDeck(mockFile, deckData);
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce({
+            eq: vi
+              .fn()
+              .mockResolvedValueOnce({ data: existingFiles, error: null }),
+          }),
+        }),
+      });
 
-    // Ensure the function was called correctly
-    expect(vi.mocked(checkForDuplicateFile).mock.calls[0]).toEqual([
-      mockFile,
-      deckData.user_id,
-    ]);
+      const result = await checkForDuplicateFile(mockFile, mockUserId);
+      expect(result).toEqual(existingFiles);
+    });
 
-    // Check the result
-    expect(result).toEqual({
-      deck: { id: "deck-id", name: "Test Deck" },
-      file: { id: "file-id" },
+    it("should return null when no duplicates are found", async () => {
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce({
+            eq: vi.fn().mockResolvedValueOnce({ data: null, error: null }),
+          }),
+        }),
+      });
+
+      const result = await checkForDuplicateFile(mockFile, mockUserId);
+      expect(result).toBeNull();
     });
   });
 
-  it("should check for duplicate files", async () => {
-    const mockFile = new File(["content"], "test.pdf", {
-      type: "application/pdf",
+  describe("uploadFile", () => {
+    it("should upload a file and create a file record", async () => {
+      const fileRecord = [{ id: mockFileId }];
+
+      supabase.storage.from.mockReturnValueOnce({
+        upload: vi.fn().mockResolvedValueOnce({ data: {}, error: null }),
+      });
+
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockReturnValueOnce({
+          select: vi
+            .fn()
+            .mockResolvedValueOnce({ data: fileRecord, error: null }),
+        }),
+      });
+
+      const result = await uploadFile(mockFile, mockUserId);
+      expect(result).toEqual(fileRecord);
     });
-    const userId = "test-user-id";
-    const existingFiles = [
-      { id: "existing-file-id", name: "test.pdf", size: 12345 },
-    ];
 
-    vi.mocked(checkForDuplicateFile).mockResolvedValue(existingFiles);
+    it("should throw an error if file upload fails", async () => {
+      const error = new Error("Upload Error");
 
-    const result = await checkForDuplicateFile(mockFile, userId);
+      supabase.storage.from.mockReturnValueOnce({
+        upload: vi.fn().mockResolvedValueOnce({ error }),
+      });
 
-    expect(result).toEqual(existingFiles);
-    expect(vi.mocked(checkForDuplicateFile).mock.calls[0]).toEqual([
-      mockFile,
-      userId,
-    ]);
-  });
-
-  it("should upload a file", async () => {
-    const mockFile = new File(["content"], "test.pdf", {
-      type: "application/pdf",
+      await expect(uploadFile(mockFile, mockUserId)).rejects.toThrow(error);
     });
-    const userId = "test-user-id";
-    const fileRecord = [{ id: "file-id" }];
-
-    vi.mocked(uploadFile).mockResolvedValue(fileRecord);
-
-    const result = await uploadFile(mockFile, userId);
-
-    expect(result).toEqual(fileRecord);
-    expect(vi.mocked(uploadFile).mock.calls[0]).toEqual([mockFile, userId]);
   });
 
-  it("should retrieve all files for a user", async () => {
-    const userId = "test-user-id";
-    const filesData = [
-      {
-        id: "file-id-1",
-        name: "file1.pdf",
-        user_id: userId,
-        decks: [],
-        deck_count: 0,
-      }, // Added deck_count
-      {
-        id: "file-id-2",
-        name: "file2.pdf",
-        user_id: userId,
-        decks: [{ id: "deck-id-1" }],
-        deck_count: 1,
-      },
-    ];
+  describe("getFilesByUser", () => {
+    it("should return files with deck count", async () => {
+      const filesData = [
+        { id: mockFileId, name: "test.txt", decks: [{ id: "deck1" }] },
+      ];
 
-    vi.mocked(getFilesByUser).mockResolvedValue(filesData);
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockResolvedValueOnce({ data: filesData, error: null }),
+        }),
+      });
 
-    const result = await getFilesByUser(userId);
+      const result = await getFilesByUser(mockUserId);
+      expect(result).toEqual([{ ...filesData[0], deck_count: 1 }]);
+    });
 
-    expect(result).toEqual(filesData); // Removed transformation since data now includes deck_count
-    expect(vi.mocked(getFilesByUser).mock.calls[0]).toEqual([userId]);
+    it("should throw an error if fetching files fails", async () => {
+      const error = new Error("Fetch Error");
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockResolvedValueOnce({ error }),
+        }),
+      });
+
+      await expect(getFilesByUser(mockUserId)).rejects.toThrow(error);
+    });
   });
 
-  it("should retrieve a file by deck", async () => {
-    const deckId = "deck-id-1";
-    const fileId = "file-id-1";
+  describe("getFileByDeck", () => {
+    it("should return the file associated with a specific deck", async () => {
+      const fileId = "file_id";
+      const deckData = [{ file_id: fileId }];
 
-    vi.mocked(getFileByDeck).mockResolvedValue({ file_id: fileId });
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockResolvedValueOnce({ data: deckData, error: null }),
+        }),
+      });
 
-    const result = await getFileByDeck(deckId);
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnValueOnce({
+          eq: vi
+            .fn()
+            .mockResolvedValueOnce({ data: [{ id: fileId }], error: null }),
+        }),
+      });
 
-    expect(result).toEqual({ file_id: fileId });
-    expect(vi.mocked(getFileByDeck).mock.calls[0]).toEqual([deckId]);
+      const result = await getFileByDeck("deck1");
+      expect(result).toEqual([{ id: fileId }]);
+    });
+
+    it("should throw an error if fetching the deck fails", async () => {
+      const error = new Error("Deck Not Found");
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockResolvedValueOnce({ error }),
+        }),
+      });
+
+      await expect(getFileByDeck("deck1")).rejects.toThrow(error);
+    });
   });
 
-  it("should retrieve a file by its ID", async () => {
-    const fileId = "file-id-1";
-    const fileData = {
-      id: fileId,
-      name: "test.pdf",
-      path: "test-path",
-      type: "application/pdf",
-    };
+  describe("deleteFile", () => {
+    it("should delete a file successfully", async () => {
+      const fileData = { path: "user1/test.txt" };
 
-    vi.mocked(getFileById).mockResolvedValue(fileData);
+      // Mock fetching the file to delete
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce({
+            single: vi
+              .fn()
+              .mockResolvedValueOnce({ data: fileData, error: null }), // Here we return the resolved value
+          }),
+        }),
+      });
 
-    const result = await getFileById(fileId);
+      // Mock the deletion from storage
+      supabase.storage.from.mockReturnValueOnce({
+        remove: vi.fn().mockResolvedValueOnce({ data: {}, error: null }),
+      });
 
-    expect(result).toEqual(fileData);
-    expect(vi.mocked(getFileById).mock.calls[0]).toEqual([fileId]);
-  });
+      // Mock the delete chain for the "files" table
+      supabase.from.mockReturnValueOnce({
+        delete: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValueOnce({ data: fileData, error: null }), // Resolve as if deletion was successful
+      });
 
-  it("should delete a file", async () => {
-    const fileId = "file-id-1";
+      const result = await deleteFile(mockFileId);
+      expect(result).toEqual(fileData);
+    });
 
-    vi.mocked(deleteFile).mockResolvedValue({ id: fileId });
+    it("should throw an error if file deletion fails", async () => {
+      const error = new Error("Delete Error");
 
-    const result = await deleteFile(fileId);
+      // Mock fetching the file to delete
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce({
+            single: vi.fn().mockResolvedValueOnce({ data: {}, error: error }),
+          }),
+        }),
+      });
 
-    expect(result).toEqual({ id: fileId });
-    expect(vi.mocked(deleteFile).mock.calls[0]).toEqual([fileId]);
+      // Mock the deletion from storage
+      supabase.storage.from.mockReturnValueOnce({
+        remove: vi.fn().mockResolvedValueOnce({ error }),
+      });
+
+      // Mock the delete chain for the "files" table
+      supabase.from.mockReturnValueOnce({
+        delete: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockResolvedValueOnce({ error }),
+      });
+
+      const result = deleteFile(mockFileId);
+      await expect(result).rejects.toThrow(error);
+    });
   });
 });

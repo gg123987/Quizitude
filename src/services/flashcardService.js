@@ -37,9 +37,10 @@ export const updateFlashcard = async (flashcardId, flashcardData) => {
   const { data, error } = await supabase
     .from("flashcards")
     .update(flashcardData)
-    .eq("id", flashcardId);
+    .eq("id", flashcardId)
+    .select();
   if (error) throw error;
-  return data;
+  return { data, error };
 };
 
 export const deleteFlashcard = async (flashcardId) => {
@@ -48,7 +49,7 @@ export const deleteFlashcard = async (flashcardId) => {
     .delete()
     .eq("id", flashcardId);
   if (error) throw error;
-  return data;
+  return { data, error };
 };
 
 /**
@@ -123,6 +124,10 @@ export const insertFlashcards = async (flashcards) => {
  * @throws Will throw an error if the insertion fails.
  */
 export const formatAndInsertFlashcardData = async (flashcards, deckId) => {
+  if (!flashcards || flashcards.length === 0) {
+    throw new Error("No flashcards to insert");
+  }
+
   // Determine the type of flashcard (MC for multiple choice, SA for short answer)
   let thisType;
   if (flashcards[0].choices) {

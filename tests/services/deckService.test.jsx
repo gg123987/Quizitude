@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   createDeck,
   getDecksByUser,
@@ -5,57 +6,224 @@ import {
   updateDeck,
   deleteDeck,
 } from "@/services/deckService";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { supabase } from "@/utils/supabase";
+
+// Mock the supabase client
+vi.mock("@/utils/supabase", () => ({
+  supabase: {
+    from: vi.fn(),
+  },
+}));
 
 describe("Deck Service", () => {
+  const mockDeckData = { id: "1", user_id: "user1", name: "Test Deck" };
+  const mockUserId = "user1";
+  const mockDeckId = "1";
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should create a new deck", async () => {
-    const deckData = { name: "New Deck", user_id: "test-user-id" };
-    const result = await createDeck(deckData);
-    expect(result).toEqual({
-      id: 1,
-      name: "New Deck",
-      user_id: "test-user-id",
+  describe("createDeck", () => {
+    it("should create a deck successfully", async () => {
+      // Mock the response for successful insert
+      const mockResponse = {
+        data: [mockDeckData],
+        error: null,
+      };
+
+      // Mock the method chaining for successful creation
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockReturnValueOnce({
+          select: vi.fn().mockResolvedValueOnce(mockResponse),
+        }),
+      });
+
+      const result = await createDeck(mockDeckData);
+      expect(result).toEqual([mockDeckData]);
+      expect(supabase.from).toHaveBeenCalledWith("decks");
     });
-    expect(vi.mocked(createDeck).mock.calls[0][0]).toEqual(deckData); // Ensure the right data was passed
+
+    it("should throw an error when deck creation fails", async () => {
+      // Create a specific error to throw
+      const error = new Error("Create Error");
+
+      // Mock the method chaining for an error response
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockReturnValueOnce({
+          select: vi.fn().mockResolvedValueOnce({
+            data: null,
+            error: error,
+          }),
+        }),
+      });
+
+      // Ensure the error is thrown as expected
+      await expect(createDeck(mockDeckData)).rejects.toThrow(error);
+    });
   });
 
-  it("should fetch all decks for a specific user", async () => {
-    const userId = "test-user-id";
-    const result = await getDecksByUser(userId);
-    expect(result).toEqual([
-      { id: 1, name: "Deck 1", user_id: "test-user-id", flashcards_count: 0 },
-      { id: 2, name: "Deck 2", user_id: "test-user-id", flashcards_count: 5 },
-    ]);
-    expect(vi.mocked(getDecksByUser).mock.calls[0][0]).toBe(userId); // Ensure the right user ID was passed
+  describe("getDecksByUser", () => {
+    it("should fetch decks for a specific user", async () => {
+      const mockResponse = [
+        { id: "1", user_id: "user1", categories: [], flashcards: [] },
+      ];
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValueOnce({
+          order: vi
+            .fn()
+            .mockReturnValueOnce(
+              Promise.resolve({ data: mockResponse, error: null })
+            ),
+        }),
+      });
+
+      const result = await getDecksByUser(mockUserId);
+      expect(result).toEqual([
+        {
+          ...mockResponse[0],
+          categories: [],
+          flashcards_count: 0,
+        },
+      ]);
+      expect(supabase.from).toHaveBeenCalledWith("decks");
+    });
+
+    it("should return an empty array when fetching fails", async () => {
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi
+          .fn()
+          .mockReturnValueOnce(
+            Promise.resolve({ data: null, error: new Error("Fetch Error") })
+          ),
+      });
+
+      const result = await getDecksByUser(mockUserId);
+      expect(result).toEqual([]);
+    });
   });
 
-  it("should fetch a specific deck by ID", async () => {
-    const deckId = 1;
-    const result = await getDeckById(deckId);
-    expect(result).toEqual({ id: 1, name: "Deck 1", flashcards_count: 0 });
-    expect(vi.mocked(getDeckById).mock.calls[0][0]).toBe(deckId); // Ensure the right deck ID was passed
+  describe("getDeckById", () => {
+    it("should fetch a deck by its ID", async () => {
+      const mockResponse = {
+        data: { ...mockDeckData, categories: [], flashcards: [] },
+        error: null,
+      };
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockReturnValueOnce(Promise.resolve(mockResponse)),
+      });
+
+      const result = await getDeckById(mockDeckId);
+      const { flashcards, ...resultWithoutFlashcards } = result;
+
+      expect(resultWithoutFlashcards).toEqual({
+        ...mockDeckData,
+        categories: [],
+        flashcards_count: 0,
+      });
+    });
+
+    it("should return null when fetching fails", async () => {
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        single: vi.fn().mockReturnValueOnce({
+          data: null,
+          error: new Error("Fetch Error"),
+        }),
+      });
+
+      const result = await getDeckById(mockDeckId);
+      expect(result).toBeNull();
+    });
   });
 
-  it("should update a specific deck", async () => {
-    const deckId = 1;
-    const deckData = { name: "Updated Deck" };
-    const result = await updateDeck(deckId, deckData, "test-user-id");
-    expect(result).toEqual({ id: 1, name: "Updated Deck" });
-    expect(vi.mocked(updateDeck).mock.calls[0]).toEqual([
-      deckId,
-      deckData,
-      "test-user-id",
-    ]); // Ensure the right data was passed
+  describe("updateDeck", () => {
+    it("should update a deck successfully", async () => {
+      const mockResponse = {
+        data: [mockDeckData],
+        error: null,
+      };
+
+      // Mock the Supabase method chain
+      const mockSupabaseResponse = {
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              // Allowing a second eq
+              select: vi.fn().mockResolvedValueOnce(mockResponse),
+            }),
+          }),
+        }),
+      };
+
+      supabase.from.mockReturnValueOnce(mockSupabaseResponse);
+
+      const result = await updateDeck(mockDeckId, mockDeckData, mockUserId);
+      expect(result).toEqual(mockResponse);
+    });
+
+    it("should throw an error when updating fails", async () => {
+      const mockError = {
+        data: null,
+        error: new Error("Update Error"),
+      };
+
+      const mockSupabaseResponse = {
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              select: vi.fn().mockResolvedValueOnce(mockError), // select should return a Promise
+            }),
+          }),
+        }),
+      };
+
+      // Mocking the from method to return our mock response
+      supabase.from.mockReturnValueOnce(mockSupabaseResponse);
+
+      await expect(
+        updateDeck(mockDeckId, mockDeckData, mockUserId)
+      ).rejects.toThrow("Update Error");
+    });
   });
 
-  it("should delete a specific deck", async () => {
-    const deckId = 1;
-    const result = await deleteDeck(deckId);
-    expect(result).toEqual({ id: 1 });
-    expect(vi.mocked(deleteDeck).mock.calls[0][0]).toBe(deckId); // Ensure the right deck ID was passed
+  describe("deleteDeck", () => {
+    it("should delete a deck successfully", async () => {
+      const mockResponse = {
+        data: [mockDeckData],
+        error: null,
+      };
+      supabase.from.mockReturnValueOnce({
+        delete: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce(Promise.resolve(mockResponse)), // Ensure eq returns the promise
+        }),
+      });
+
+      const result = await deleteDeck(mockDeckId);
+      expect(result).toEqual([mockDeckData]);
+    });
+
+    it("should throw an error when deletion fails", async () => {
+      const mockError = {
+        data: null,
+        error: new Error("Delete Error"),
+      };
+
+      supabase.from.mockReturnValueOnce({
+        delete: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce(Promise.resolve(mockError)),
+        }),
+      });
+
+      await expect(deleteDeck(mockDeckId)).rejects.toThrow("Delete Error");
+    });
   });
 });

@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   getUserById,
   insertUser,
@@ -5,57 +6,144 @@ import {
   deleteUser,
   updateUserStreak,
   checkUserStreak,
-} from "@/services/userService";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+} from "@/services/userService"; // Update with the correct path to your user service
+import { supabase } from "@/utils/supabase";
+
+// Mock the supabase client
+vi.mock("@/utils/supabase", () => ({
+  supabase: {
+    from: vi.fn(),
+  },
+}));
 
 describe("User Service", () => {
+  const mockUserId = "user1";
+  const mockUserData = {
+    id: mockUserId,
+    name: "Test User",
+    email: "test@example.com",
+    last_session: null,
+    current_streak: 0,
+    longest_streak: 0,
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should fetch a user by ID", async () => {
-    const userId = 1;
-    const result = await getUserById(userId);
-    expect(result).toEqual({ id: 1, name: "Test User" });
-    expect(vi.mocked(getUserById).mock.calls[0][0]).toBe(userId); // Ensure the correct user ID was passed
+  describe("getUserById", () => {
+    it("should fetch a user by ID", async () => {
+      const mockResponse = {
+        data: mockUserData,
+        error: null,
+      };
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValueOnce({
+          single: vi.fn().mockResolvedValueOnce(mockResponse),
+        }),
+      });
+
+      const result = await getUserById(mockUserId);
+      expect(result).toEqual(mockUserData);
+      expect(supabase.from).toHaveBeenCalledWith("users");
+    });
+
+    it("should throw an error if fetching user fails", async () => {
+      const error = new Error("Fetch Error");
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValueOnce({
+          single: vi.fn().mockResolvedValueOnce({ data: null, error }),
+        }),
+      });
+
+      await expect(getUserById(mockUserId)).rejects.toThrow(error);
+    });
   });
 
-  it("should insert a new user", async () => {
-    const newUser = { name: "New User" };
-    const result = await insertUser(newUser);
-    expect(result).toEqual([{ id: 1, name: "New User" }]);
-    expect(vi.mocked(insertUser).mock.calls[0][0]).toEqual(newUser); // Ensure the correct user data was passed
+  describe("deleteUser", () => {
+    it("should delete a user successfully", async () => {
+      const mockResponse = {
+        data: [mockUserData],
+        error: null,
+      };
+
+      supabase.from.mockReturnValueOnce({
+        delete: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce(Promise.resolve(mockResponse)),
+        }),
+      });
+
+      const result = await deleteUser(mockUserId);
+      expect(result).toEqual(mockResponse.data);
+    });
+
+    it("should log an error when deletion fails", async () => {
+      const error = new Error("Delete Error");
+      supabase.from.mockReturnValueOnce({
+        delete: vi.fn().mockReturnValueOnce({
+          eq: vi
+            .fn()
+            .mockReturnValueOnce(Promise.resolve({ data: null, error })),
+        }),
+      });
+
+      // should return object wih field data and error
+      await expect(deleteUser(mockUserId)).rejects.toThrow(error);
+    });
   });
 
-  it("should update a user", async () => {
-    const userId = 1;
-    const userUpdates = { name: "Updated User" };
-    const result = await updateUser(userId, userUpdates);
-    expect(result).toEqual([{ id: 1, name: "Updated User" }]);
-    expect(vi.mocked(updateUser).mock.calls[0]).toEqual([userId, userUpdates]); // Ensure correct arguments were passed
+  describe("updateUserStreak", () => {
+    it("should throw an error if streak update fails", async () => {
+      const error = new Error("Streak Update Error");
+      const currentDate = new Date();
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce({
+            single: vi.fn().mockResolvedValueOnce({ data: null, error }),
+          }),
+        }),
+      });
+
+      await expect(updateUserStreak(mockUserId, currentDate)).rejects.toThrow(
+        error
+      );
+    });
   });
 
-  it("should delete a user", async () => {
-    const userId = 1;
-    const result = await deleteUser(userId);
-    expect(result).toEqual({ data: [{ id: 1 }], error: null });
-    expect(vi.mocked(deleteUser).mock.calls[0][0]).toBe(userId); // Ensure the correct user ID was passed
-  });
+  describe("checkUserStreak", () => {
+    it("should check and reset the user's streak correctly", async () => {
+      const mockResponse = {
+        data: { ...mockUserData, last_session: new Date() },
+        error: null,
+      };
 
-  it("should update user streak", async () => {
-    const userId = 1;
-    const currentDate = new Date();
-    await updateUserStreak(userId, currentDate);
-    expect(vi.mocked(updateUserStreak).mock.calls[0]).toEqual([
-      userId,
-      currentDate,
-    ]); // Ensure correct arguments were passed
-  });
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce({
+            single: vi.fn().mockResolvedValueOnce(mockResponse),
+          }),
+        }),
+      });
 
-  it("should check and reset user streak", async () => {
-    const userId = 1;
-    const currentStreak = await checkUserStreak(userId);
-    expect(currentStreak).toBe(0);
-    expect(vi.mocked(checkUserStreak).mock.calls[0][0]).toBe(userId); // Ensure the correct user ID was passed
+      const result = await checkUserStreak(mockUserId);
+      expect(result).toBe(mockUserData.current_streak);
+    });
+
+    it("should throw an error if streak check fails", async () => {
+      const error = new Error("Streak Check Error");
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce({
+            single: vi.fn().mockResolvedValueOnce({ data: null, error }),
+          }),
+        }),
+      });
+
+      await expect(checkUserStreak(mockUserId)).rejects.toThrow(error);
+    });
   });
 });

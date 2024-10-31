@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   createFlashcard,
   getFlashcardsByDeck,
@@ -8,102 +9,270 @@ import {
   insertFlashcards,
   formatAndInsertFlashcardData,
 } from "@/services/flashcardService";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { supabase } from "@/utils/supabase";
+
+// Mock the supabase client
+vi.mock("@/utils/supabase", () => ({
+  supabase: {
+    from: vi.fn(),
+  },
+}));
 
 describe("Flashcard Service", () => {
+  const mockFlashcardData = {
+    id: "1",
+    question: "Test Question",
+    answer: "Test Answer",
+    deck_id: "deck1",
+    type: "SA",
+  };
+  const mockDeckId = "deck1";
+  const mockFlashcardId = "1";
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it("should create a new flashcard", async () => {
-    const flashcardData = {
-      question: "What is the capital of France?",
-      answer: "Paris",
-      deck_id: 1,
-    };
-    const result = await createFlashcard(flashcardData);
-    expect(result).toEqual([
-      { id: 1, question: "What is the capital of France?", answer: "Paris" },
-    ]);
-    expect(vi.mocked(createFlashcard).mock.calls[0][0]).toEqual(flashcardData); // Ensure the right data was passed
+  describe("createFlashcard", () => {
+    it("should create a flashcard successfully", async () => {
+      const mockResponse = { data: [mockFlashcardData], error: null };
+
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockResolvedValueOnce(mockResponse),
+      });
+
+      const result = await createFlashcard(mockFlashcardData);
+      expect(result).toEqual(mockResponse.data);
+      expect(supabase.from).toHaveBeenCalledWith("flashcards");
+    });
+
+    it("should throw an error when flashcard creation fails", async () => {
+      const error = new Error("Create Error");
+
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockResolvedValueOnce({ data: null, error }),
+      });
+
+      await expect(createFlashcard(mockFlashcardData)).rejects.toThrow(error);
+    });
   });
 
-  it("should fetch all flashcards for a specific deck", async () => {
-    const deckId = 1;
-    const result = await getFlashcardsByDeck(deckId);
-    expect(result).toEqual([
-      {
-        id: 1,
-        question: "What is the capital of France?",
-        answer: "Paris",
-        deck_id: 1,
-      },
-      { id: 2, question: "What is 2 + 2?", answer: "4", deck_id: 1 },
-    ]);
-    expect(vi.mocked(getFlashcardsByDeck).mock.calls[0][0]).toBe(deckId); // Ensure the right deck ID was passed
+  describe("getFlashcardsByDeck", () => {
+    it("should fetch flashcards for a specific deck", async () => {
+      const mockResponse = [
+        {
+          id: "1",
+          question: "Test Question",
+          answer: "Test Answer",
+          deck_id: mockDeckId,
+        },
+      ];
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi
+          .fn()
+          .mockReturnValueOnce(
+            Promise.resolve({ data: mockResponse, error: null })
+          ),
+      });
+
+      const result = await getFlashcardsByDeck(mockDeckId);
+      expect(result).toEqual(mockResponse);
+      expect(supabase.from).toHaveBeenCalledWith("flashcards");
+    });
+
+    it("should throw an error when fetching fails", async () => {
+      const mockError = new Error("Fetch Error");
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi
+          .fn()
+          .mockReturnValueOnce(
+            Promise.resolve({ data: null, error: mockError })
+          ),
+      });
+
+      // Ensure the function throws an error as expected
+      await expect(getFlashcardsByDeck(mockDeckId)).rejects.toThrow(
+        "Fetch Error"
+      );
+    });
   });
 
-  it("should fetch a specific flashcard by ID", async () => {
-    const flashcardId = 1;
-    const result = await getFlashcardById(flashcardId);
-    expect(result).toEqual([
-      { id: 1, question: "What is the capital of France?", answer: "Paris" },
-    ]);
-    expect(vi.mocked(getFlashcardById).mock.calls[0][0]).toBe(flashcardId); // Ensure the right flashcard ID was passed
+  describe("getFlashcardById", () => {
+    it("should fetch a flashcard by its ID", async () => {
+      const mockResponse = { data: mockFlashcardData, error: null };
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnValueOnce(Promise.resolve(mockResponse)),
+      });
+
+      const result = await getFlashcardById(mockFlashcardId);
+      expect(result).toEqual(mockFlashcardData);
+    });
+
+    it("should throw an error when fetching fails", async () => {
+      const mockError = new Error("Fetch Error");
+
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnThis(),
+        eq: vi
+          .fn()
+          .mockReturnValueOnce(
+            Promise.resolve({ data: null, error: mockError })
+          ),
+      });
+
+      // Ensure the function throws an error as expected
+      await expect(getFlashcardById(mockFlashcardId)).rejects.toThrow(
+        "Fetch Error"
+      );
+    });
   });
 
-  it("should update a specific flashcard", async () => {
-    const flashcardId = 1;
-    const flashcardData = {
-      question: "Updated Question",
-      answer: "Updated Answer",
-    };
-    const result = await updateFlashcard(flashcardId, flashcardData);
-    expect(result).toEqual([
-      { id: 1, question: "Updated Question", answer: "Updated Answer" },
-    ]);
-    expect(vi.mocked(updateFlashcard).mock.calls[0]).toEqual([
-      flashcardId,
-      flashcardData,
-    ]); // Ensure the right data was passed
+  describe("updateFlashcard", () => {
+    it("should update a flashcard successfully", async () => {
+      const mockResponse = { data: [mockFlashcardData], error: null };
+
+      supabase.from.mockReturnValueOnce({
+        update: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce({
+            select: vi.fn().mockResolvedValueOnce(mockResponse),
+          }),
+        }),
+      });
+
+      const result = await updateFlashcard(mockFlashcardId, mockFlashcardData);
+      expect(result).toEqual(mockResponse);
+    });
+
+    it("should throw an error when updating fails", async () => {
+      const error = new Error("Update Error");
+
+      supabase.from.mockReturnValueOnce({
+        update: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce({
+            select: vi.fn().mockResolvedValueOnce({ data: null, error }),
+          }),
+        }),
+      });
+
+      await expect(
+        updateFlashcard(mockFlashcardId, mockFlashcardData)
+      ).rejects.toThrow(error);
+    });
   });
 
-  it("should delete a specific flashcard", async () => {
-    const flashcardId = 1;
-    const result = await deleteFlashcard(flashcardId);
-    expect(result).toEqual([{ id: 1 }]);
-    expect(vi.mocked(deleteFlashcard).mock.calls[0][0]).toBe(flashcardId); // Ensure the right flashcard ID was passed
+  describe("deleteFlashcard", () => {
+    it("should delete a flashcard successfully", async () => {
+      const mockResponse = { data: [mockFlashcardData], error: null };
+
+      supabase.from.mockReturnValueOnce({
+        delete: vi.fn().mockReturnValueOnce({
+          eq: vi.fn().mockReturnValueOnce(Promise.resolve(mockResponse)),
+        }),
+      });
+
+      const result = await deleteFlashcard(mockFlashcardId);
+      expect(result).toEqual(mockResponse);
+    });
+
+    it("should throw an error when deletion fails", async () => {
+      const error = new Error("Delete Error");
+
+      supabase.from.mockReturnValueOnce({
+        delete: vi.fn().mockReturnValueOnce({
+          eq: vi
+            .fn()
+            .mockReturnValueOnce(Promise.resolve({ data: null, error })),
+        }),
+      });
+
+      await expect(deleteFlashcard(mockFlashcardId)).rejects.toThrow(error);
+    });
   });
 
-  it("should insert dummy flashcards", async () => {
-    const deckId = 1;
-    const result = await insertDummyFlashcards(deckId);
-    expect(result).toHaveLength(2); // Ensure two dummy flashcards were inserted
-    expect(vi.mocked(insertDummyFlashcards).mock.calls[0][0]).toBe(deckId); // Ensure the right deck ID was passed
+  describe("insertDummyFlashcards", () => {
+    it("should insert dummy flashcards successfully", async () => {
+      const mockResponse = { data: [{ id: "1" }, { id: "2" }], error: null };
+
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockResolvedValueOnce(mockResponse),
+      });
+
+      const result = await insertDummyFlashcards(mockDeckId);
+      expect(result).toEqual(mockResponse.data);
+    });
+
+    it("should throw an error when dummy insertion fails", async () => {
+      const error = new Error("Insert Dummy Error");
+
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockResolvedValueOnce({ data: null, error }),
+      });
+
+      await expect(insertDummyFlashcards(mockDeckId)).rejects.toThrow(error);
+    });
   });
 
-  it("should insert multiple flashcards", async () => {
-    const flashcards = [
-      {
-        question: "What is the capital of France?",
-        answer: "Paris",
-        deck_id: 1,
-      },
-    ];
-    const result = await insertFlashcards(flashcards);
-    expect(result).toHaveLength(2); // Ensure two flashcards were inserted
+  describe("insertFlashcards", () => {
+    it("should insert flashcards successfully", async () => {
+      const mockResponse = { data: [mockFlashcardData], error: null };
+
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockResolvedValueOnce(mockResponse),
+      });
+
+      const result = await insertFlashcards([mockFlashcardData]);
+      expect(result).toEqual(mockResponse.data);
+    });
+
+    it("should throw an error when insertion fails", async () => {
+      const error = new Error("Insert Error");
+
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockResolvedValueOnce({ data: null, error }),
+      });
+
+      await expect(insertFlashcards([mockFlashcardData])).rejects.toThrow(
+        error
+      );
+    });
   });
 
-  it("should format and insert flashcard data", async () => {
-    const flashcards = [
-      {
-        question: "What is the capital of France?",
-        answer: "Paris",
-        choices: ["Paris", "London", "Berlin"],
-      },
-    ];
-    const deckId = 1;
-    const result = await formatAndInsertFlashcardData(flashcards, deckId);
-    expect(result).toHaveLength(2); // Ensure two flashcards were inserted
+  describe("formatAndInsertFlashcardData", () => {
+    it("should format and insert flashcard data successfully", async () => {
+      const flashcards = [
+        {
+          question: "Test Question",
+          answer: "Test Answer",
+          choices: ["Choice 1", "Choice 2"],
+        },
+      ];
+      const mockResponse = { data: [{ id: "1" }], error: null };
+
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockResolvedValueOnce(mockResponse),
+      });
+
+      const result = await formatAndInsertFlashcardData(flashcards, mockDeckId);
+      expect(result).toEqual(mockResponse.data);
+    });
+
+    it("should throw an error when formatting and inserting fails", async () => {
+      const error = new Error("Format and Insert Error");
+
+      supabase.from.mockReturnValueOnce({
+        insert: vi.fn().mockResolvedValueOnce({ data: null, error }),
+      });
+
+      // Call the function with an empty array
+      await expect(
+        formatAndInsertFlashcardData([], mockDeckId)
+      ).rejects.toThrow("No flashcards to insert");
+    });
   });
 });
