@@ -35,6 +35,8 @@ export default defineConfig({
     setupFiles: "./tests/setupTests.js", // Setup file
     coverage: {
       reporter: ["text", "json", "html"],
+      include: ["src/**/*.{js,jsx}"],
+      exclude: ["src/main.jsx"],
     },
     transform: {
       // Allow mjs extensions

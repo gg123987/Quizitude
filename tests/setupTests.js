@@ -57,29 +57,6 @@ const mockSupabaseClient = {
 // Assign the mock client to createClient for every instance
 createClient.mockReturnValue(mockSupabaseClient);
 
-// Other mocks for external libraries and hooks
-vi.mock("@/api/LLM", () => ({
-  default: vi.fn().mockImplementation(async (id, pdf, type) => {
-    if (type === "multiple-choice") {
-      return [
-        {
-          question: "What is 2 + 2?",
-          choices: ["3", "4", "5", "6"],
-          answer: "4",
-        },
-      ];
-    } else if (type === "short-answer") {
-      return [
-        {
-          question: "What is the capital of France?",
-          answer: "Paris",
-        },
-      ];
-    }
-    throw new Error("Unsupported question type");
-  }),
-}));
-
 vi.mock("react-pdf", () => ({
   pdfjs: { GlobalWorkerOptions: { workerSrc: "" } },
 }));
