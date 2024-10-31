@@ -271,6 +271,8 @@ const NewDeck = () => {
 
   const handleGenerateFlashcards = async () => {
     try {
+      // Validate inputs on page 1
+      const isValid = await p1Validations();
       // Check for duplicate file
       const isDuplicate = await checkForDuplicateFile(file, user.id);
       console.log("Duplicate file:", isDuplicate);
@@ -278,53 +280,51 @@ const NewDeck = () => {
       if (isDuplicate && isDuplicate.length > 0) {
         setError1("File already exists. Please choose a different file.");
         return;
-      } else {
-        const isValid = await p1Validations();
-
-        if (isValid) {
-          setError1(null);
-          setUploading(true); // Start uploading
-          setUploadProgress(0); // Reset progress to 0
-
-          // Simulate progress increment while awaiting the API response
-          const progressInterval = setInterval(() => {
-            setUploadProgress((prev) => {
-              console.log("Progress:", prev);
-              if (prev < 90) {
-                return Math.min(prev + 10, 100); // Increment progress
-              }
-              return prev; // Prevent going over 100
-            });
-          }, 250); // Update progress every 200ms
-
-          // Make the API call
-          const response = await fetchLLMResponse(
-            noOfQuestions,
-            file,
-            questionType
-          );
-          clearInterval(progressInterval); // Stop the progress simulation
-          console.log("upload progress", uploadProgress);
-
-          // Format the response
-          let thisResponse = JSON.parse(JSON.stringify(response));
-          thisResponse = formatFlashcardData(thisResponse);
-
-          // Update state with the received response
-          setQuestionList(thisResponse);
-          setCurrentQuestion(thisResponse[0]);
-          setLlmResponse(response);
-          setError1(null);
-          setError2(null);
-        }
-
-        setUploadProgress(100);
-        // Short delay to show the progress bar at 100%
-        setTimeout(() => {
-          setUploading(false); // Stop uploading
-          setCurrentPage(1); // Move to the next page only if no error
-        }, 500);
       }
+
+      if (isValid) {
+        setError1(null);
+        setUploading(true); // Start uploading
+        setUploadProgress(0); // Reset progress to 0
+
+        // Simulate progress increment while awaiting the API response
+        const progressInterval = setInterval(() => {
+          setUploadProgress((prev) => {
+            console.log("Progress:", prev);
+            if (prev < 90) {
+              return Math.min(prev + 10, 100); // Increment progress
+            }
+            return prev; // Prevent going over 100
+          });
+        }, 250); // Update progress every 200ms
+
+        // Make the API call
+        const response = await fetchLLMResponse(
+          noOfQuestions,
+          file,
+          questionType
+        );
+        clearInterval(progressInterval); // Stop the progress simulation
+        console.log("upload progress", uploadProgress);
+
+        // Format the response
+        let thisResponse = JSON.parse(JSON.stringify(response));
+        thisResponse = formatFlashcardData(thisResponse);
+
+        // Update state with the received response
+        setQuestionList(thisResponse);
+        setCurrentQuestion(thisResponse[0]);
+        setLlmResponse(response);
+        setError1(null);
+        setError2(null);
+      }
+
+      setUploadProgress(100);
+      // Short delay to show the progress bar at 100%
+      setTimeout(() => {
+        setUploading(false); // Stop uploading
+        setCurrentPage(1); // Move to the next page only if no error
+      }, 500);
     } catch (error) {
       console.error("Error during generation:", error);
       setError1("Error generating flashcards. Please try again.");
