@@ -37,108 +37,108 @@ import "./appbar.css";
  *
  */
 const CustomAppBar = ({ handleDrawerToggle, drawerWidth }) => {
-  const { width } = useWindowDimensions();
-  const [buttonText, setButtonText] = useState("New Deck");
-  const { modalOpen, openModal, closeModal } = useModal();
+	const { width } = useWindowDimensions();
+	const [buttonText, setButtonText] = useState("New Deck");
+	const { modalOpen, openModal, closeModal } = useModal();
 
-  // Update button text based on screen width
-  useEffect(() => {
-    if (width < 1000) {
-      setButtonText("");
-    } else {
-      setButtonText("New Deck");
-    }
-  }, [width]);
+	// Update button text based on screen width
+	useEffect(() => {
+		if (width < 1000) {
+			setButtonText("");
+		} else {
+			setButtonText("New Deck");
+		}
+	}, [width]);
 
-  return (
-    <AppBar
-      position="fixed"
-      sx={{
-        width: { sm: `calc(${width}px - ${drawerWidth}px)` },
-        ml: { sm: `${drawerWidth}px` },
-        backgroundColor: "#F9FAFB",
-        boxShadow: "none",
-        borderBottom: 2,
-        borderBottomColor: "rgba(0, 0, 0, 0.03)",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <Toolbar
-          className="toolbar-left"
-          sx={{ width: { sm: `calc(0.5* (${width}px - ${drawerWidth}px))` } }}
-        >
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 0, display: { md: "none" }, color: "grey" }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <IconBreadcrumbs />
-        </Toolbar>
+	return (
+		<AppBar
+			position="fixed"
+			sx={{
+				width: { sm: `calc(${width}px - ${drawerWidth}px)` },
+				ml: { sm: `${drawerWidth}px` },
+				backgroundColor: "#F9FAFB",
+				boxShadow: "none",
+				borderBottom: 2,
+				borderBottomColor: "rgba(0, 0, 0, 0.03)",
+			}}
+		>
+			<div style={{ display: "flex", alignItems: "center" }}>
+				<Toolbar
+					className="toolbar-left"
+					sx={{ width: { sm: `calc(0.5* (${width}px - ${drawerWidth}px))` } }}
+				>
+					<IconButton
+						color="inherit"
+						aria-label="open drawer"
+						edge="start"
+						onClick={handleDrawerToggle}
+						sx={{ mr: 0, display: { md: "none" }, color: "grey" }}
+					>
+						<MenuIcon />
+					</IconButton>
+					<IconBreadcrumbs />
+				</Toolbar>
 
-        <Toolbar
-          className="toolbar-right"
-          sx={{
-            width: { sm: `calc(0.5* (${width}px - ${drawerWidth}px))` },
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            padding: "0px",
-            spaceBetween: "3px",
-          }}
-        >
-          <CustomButton onClick={openModal} icon={<AddIcon />}>
-            {buttonText}
-          </CustomButton>
-          <IconButton
-            color="inherit"
-            aria-label="settings"
-            edge="end"
-            sx={{
-              ml: 2,
-              color: "#667085",
-              display: { xs: "none", sm: "flex" },
-            }}
-          >
-            <SettingsIcon />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            aria-label="notifications"
-            edge="end"
-            sx={{
-              ml: 2,
-              color: "#667085",
-              display: { xs: "none", sm: "flex" },
-            }}
-          >
-            <NotificationsIcon />
-          </IconButton>
-          <IconButton
-            color="inherit"
-            aria-label="account"
-            edge="end"
-            sx={{
-              ml: 2,
-              color: "#667085",
-              display: { xs: "none", sm: "flex" },
-            }}
-          >
-            <AccountMenu />
-          </IconButton>
-        </Toolbar>
-        <NewDeckModal open={modalOpen} handleClose={closeModal} />
-      </div>
-    </AppBar>
-  );
+				<Toolbar
+					className="toolbar-right"
+					sx={{
+						width: { sm: `calc(0.5* (${width}px - ${drawerWidth}px))` },
+						display: "flex",
+						justifyContent: "flex-end",
+						alignItems: "center",
+						padding: "0px",
+						spaceBetween: "3px",
+					}}
+				>
+					<CustomButton onClick={openModal} icon={<AddIcon />}>
+						{buttonText}
+					</CustomButton>
+					<IconButton
+						color="inherit"
+						aria-label="settings"
+						edge="end"
+						sx={{
+							ml: 2,
+							color: "#667085",
+							display: { xs: "none", sm: "flex" },
+						}}
+					>
+						<SettingsIcon />
+					</IconButton>
+					{/* <IconButton
+						color="inherit"
+						aria-label="notifications"
+						edge="end"
+						sx={{
+							ml: 2,
+							color: "#667085",
+							display: { xs: "none", sm: "flex" },
+						}}
+					>
+						<NotificationsIcon />
+					</IconButton> */}
+					<IconButton
+						color="inherit"
+						aria-label="account"
+						edge="end"
+						sx={{
+							ml: 2,
+							color: "#667085",
+							display: { xs: "none", sm: "flex" },
+						}}
+					>
+						<AccountMenu />
+					</IconButton>
+				</Toolbar>
+				<NewDeckModal open={modalOpen} handleClose={closeModal} />
+			</div>
+		</AppBar>
+	);
 };
 
 CustomAppBar.propTypes = {
-  handleDrawerToggle: PropTypes.func.isRequired,
-  drawerWidth: PropTypes.number.isRequired,
+	handleDrawerToggle: PropTypes.func.isRequired,
+	drawerWidth: PropTypes.number.isRequired,
 };
 
 export default CustomAppBar;
