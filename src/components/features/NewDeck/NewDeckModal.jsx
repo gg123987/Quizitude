@@ -30,6 +30,7 @@ import {
 } from "@/services/fileService";
 import { formatAndInsertFlashcardData } from "@/services/flashcardService";
 import "./newdeck.css";
+import { UNCATEGORIZED_CATEGORY } from "@/constants/categories";
 
 /**
  * NewDeck component allows users to create a new deck of flashcards by uploading a PDF file,
@@ -245,10 +246,11 @@ const NewDeck = () => {
 				return;
 			}
 
+			// Update the deckData creation in handleUpload
 			const deckData = {
 				name: deckName,
 				user_id: user.id,
-				category_id: categoryId === "" ? null : categoryId,
+				category_id: !categoryId || categoryId === "0" ? null : categoryId,
 			};
 
 			console.log("Uploading file:", file);
