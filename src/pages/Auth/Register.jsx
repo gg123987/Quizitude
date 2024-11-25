@@ -23,6 +23,7 @@ export default function Register() {
 	const fNameRef = useRef(null);
 	const emailRef = useRef(null);
 	const passwordRef = useRef(null);
+	const confirmPasswordRef = useRef(null);
 
 	// State variables for error messages and loading state
 	const [errorMsg, setErrorMsg] = useState("");
@@ -50,7 +51,8 @@ export default function Register() {
 			if (
 				!fNameRef.current?.value ||
 				!passwordRef.current?.value ||
-				!emailRef.current?.value
+				!emailRef.current?.value ||
+				!confirmPasswordRef.current?.value
 			) {
 				setErrorMsg("Please fill in all fields");
 				setLoading(false);
@@ -68,6 +70,12 @@ export default function Register() {
 
 			if (passwordRef.current.value.length < 8) {
 				setPasswordError(true);
+				setLoading(false);
+				return;
+			}
+
+			if (passwordRef.current.value !== confirmPasswordRef.current.value) {
+				setErrorMsg("Passwords do not match");
 				setLoading(false);
 				return;
 			}
@@ -304,6 +312,28 @@ export default function Register() {
 									passwordError ? "Must be at least 8 characters" : ""
 								}
 								sx={{ borderColor: passwordError ? "red" : "" }}
+							/>
+							<Typography
+								fontFamily="Inter"
+								fontWeight={400}
+								fontSize={"0.9em"}
+								textAlign="left"
+								marginTop={"20px"}
+								marginBottom={"4px"}
+							>
+								Confirm Password
+							</Typography>
+							<TextField
+								required
+								fullWidth
+								name="confirmPassword"
+								label=""
+								type="password"
+								id="confirmPassword"
+								inputProps={{ "data-testid": "confirmPassword" }}
+								autoComplete="current-password"
+								inputRef={confirmPasswordRef}
+								disabled={loading}
 							/>
 							<Button
 								type="submit"
