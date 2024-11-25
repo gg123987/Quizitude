@@ -9,6 +9,11 @@ import { createDeck } from "./deckService";
  */
 export const uploadFileAndCreateDeck = async (file, deckData) => {
 	try {
+		// Validate inputs
+		if (!file || !deckData || !deckData.user_id) {
+			throw new Error("Missing required data for upload");
+		}
+
 		const userId = deckData.user_id;
 
 		// 1. Check if the file already exists
@@ -16,11 +21,16 @@ export const uploadFileAndCreateDeck = async (file, deckData) => {
 		let fileRecord;
 
 		if (existingFile && existingFile.length > 0) {
-			// Use existing file record
+			// Use existing file
+			console.log("Using existing file:", existingFile);
 			fileRecord = existingFile;
 		} else {
 			// Upload new file
 			fileRecord = await uploadFile(file, userId);
+		}
+
+		if (!fileRecord || !fileRecord[0]) {
+			throw new Error("Failed to process file");
 		}
 
 		const file_id = fileRecord[0].id;
@@ -45,19 +55,30 @@ export const uploadFileAndCreateDeck = async (file, deckData) => {
  * @returns {Object|null} - The existing file if found, otherwise null.
  */
 export const checkForDuplicateFile = async (file, userId) => {
-	const { data: existingFiles, error } = await supabase
-		.from("files")
-		.select("*")
-		.eq("user_id", userId)
-		.eq("name", file.name)
-		.eq("size", file.size);
-
-	if (error) {
-		console.error("Error checking for duplicate file:", error);
+	// Add validation check
+	if (!file || !userId) {
+		console.log("Missing file or userId in checkForDuplicateFile");
 		return null;
 	}
 
-	return existingFiles; // Will be null if no duplicate is found
+	try {
+		const { data: existingFiles, error } = await supabase
+			.from("files")
+			.select("*")
+			.eq("user_id", userId)
+			.eq("name", file.name)
+			.eq("size", file.size);
+
+		if (error) {
+			console.error("Error checking for duplicate file:", error);
+			return null;
+		}
+
+		return existingFiles;
+	} catch (error) {
+		console.error("Error in checkForDuplicateFile:", error);
+		return null;
+	}
 };
 
 /**

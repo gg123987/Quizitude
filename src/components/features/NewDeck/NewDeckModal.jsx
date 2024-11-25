@@ -144,6 +144,7 @@ const NewDeck = () => {
 		if (uploadedPDF) {
 			if (uploadedPDF.size <= maxPDFSize) {
 				setFile(uploadedPDF);
+				console.log("File set:", uploadedPDF); // Add this log
 			} else {
 				setFile(null);
 				alert("File size exceeds the maximum allowed size (30MB).");
@@ -232,11 +233,27 @@ const NewDeck = () => {
 		try {
 			setUploading(true);
 			setError2(null);
+
+			// Validate that we have all required data
+			if (!file) {
+				setError2("No file selected");
+				return;
+			}
+
+			if (!deckName) {
+				setError2("Please enter a deck name");
+				return;
+			}
+
 			const deckData = {
 				name: deckName,
 				user_id: user.id,
 				category_id: categoryId === "" ? null : categoryId,
 			};
+
+			console.log("Uploading file:", file);
+			console.log("Deck data:", deckData);
+
 			const result = await uploadFileAndCreateDeck(file, deckData);
 			console.log("Upload and deck creation successful:", result);
 
