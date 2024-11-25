@@ -93,7 +93,7 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth }) => {
 					<CustomButton onClick={openModal} icon={<AddIcon />}>
 						{buttonText}
 					</CustomButton>
-					<IconButton
+					{/*<IconButton
 						color="inherit"
 						aria-label="settings"
 						edge="end"
@@ -105,7 +105,7 @@ const CustomAppBar = ({ handleDrawerToggle, drawerWidth }) => {
 					>
 						<SettingsIcon />
 					</IconButton>
-					{/* <IconButton
+					 <IconButton
 						color="inherit"
 						aria-label="notifications"
 						edge="end"
