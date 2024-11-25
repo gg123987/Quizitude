@@ -1,0 +1,27 @@
+.privacy-container {
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #F9FAFB;
+    height: 93vh;  /* Match the height used in home.css */
+    overflow-y: auto;  /* Make it scrollable */
+    box-sizing: border-box;
+  }
+  
+  /* Add scrollbar styling to match the study mode page */
+  .privacy-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .privacy-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  .privacy-container::-webkit-scrollbar-thumb {
+    background: #3538CD;
+    border-radius: 5px;
+  }
+  
+  .privacy-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
