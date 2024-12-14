@@ -10,70 +10,70 @@ import pdfToText from "react-pdftotext";
  * @returns {Promise<Array>} - Returns a promise that resolves to an array of questions and answers.
  */
 export default async function FetchLLMResponse(
-  noOfQuestions,
-  pdf,
-  typeOfQuestion
+	noOfQuestions,
+	pdf,
+	typeOfQuestion
 ) {
-  // Extract text from the provided PDF
-  const text = await getPdfText(pdf);
+	// Extract text from the provided PDF
+	const text = await getPdfText(pdf);
 
-  // Define the message structure based on the type of question
-  let messages;
-  if (typeOfQuestion === "multiple-choice") {
-    messages = [
-      {
-        role: "system",
-        content: `Give the answer in a array of JSON format objects with the following schema: {"question": "","choices":["",""],"answer": ""} separated by commas`,
-      },
-      {
-        role: "user",
-        content: `Given the provided data, generate ${noOfQuestions} multiple-choice questions with answers. Make sure each question has 4 options. Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`,
-      },
-    ];
-  } else if (typeOfQuestion === "short-answer") {
-    messages = [
-      {
-        role: "system",
-        content: `Give the answer in a array of JSON format objects with the following schema: {"question": "", "answer": ""} separated by commas`,
-      },
-      {
-        role: "user",
-        content: `Given the provided data, generate ${noOfQuestions} short-answer questions with answers. Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`,
-      },
-    ];
-  }
+	// Define the message structure based on the type of question
+	let messages;
+	if (typeOfQuestion === "multiple-choice") {
+		messages = [
+			{
+				role: "system",
+				content: `Give the answer in a array of JSON format objects with the following schema: {"question": "","choices":["",""],"answer": ""} separated by commas`,
+			},
+			{
+				role: "user",
+				content: `Given the provided data, generate ${noOfQuestions} multiple-choice questions with answers. Make sure each question has 4 options. Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`,
+			},
+		];
+	} else if (typeOfQuestion === "short-answer") {
+		messages = [
+			{
+				role: "system",
+				content: `Give the answer in a array of JSON format objects with the following schema: {"question": "", "answer": ""} separated by commas`,
+			},
+			{
+				role: "user",
+				content: `Given the provided data, generate ${noOfQuestions} short-answer questions with answers. Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`,
+			},
+		];
+	}
 
-  // Use the OpenRouter API to fetch the response from the LLM model
-  try {
-    const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${"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"}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "anthropic/claude-3-haiku",
-          messages: messages,
-        }),
-      }
-    );
+	// Use the OpenRouter API to fetch the response from the LLM model
+	try {
+		const response = await fetch(
+			"https://openrouter.ai/api/v1/chat/completions",
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${"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"}`,
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					model: "google/gemini-pro-1.5-exp",
+					messages: messages,
+				}),
+			}
+		);
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch data");
-    }
-    const data = await response.json();
+		if (!response.ok) {
+			throw new Error("Failed to fetch data");
+		}
+		const data = await response.json();
 
-    // Parse the response content
-    let thisResponse = JSON.parse(data.choices[0].message.content);
-    return thisResponse; // Return the content from the response
-  } catch (error) {
-    alert(
-      "Error: Issue with the AI model. Please attempt to regenerate the flashcards"
-    );
-    throw new Error("Error fetching data: " + error.message);
-  }
+		// Parse the response content
+		let thisResponse = JSON.parse(data.choices[0].message.content);
+		return thisResponse; // Return the content from the response
+	} catch (error) {
+		alert(
+			"Error: Issue with the AI model. Please attempt to regenerate the flashcards"
+		);
+		throw new Error("Error fetching data: " + error.message);
+	}
 }
 
 /**
@@ -83,12 +83,12 @@ export default async function FetchLLMResponse(
  * @returns {Promise<string>} - Returns a promise that resolves to the extracted text.
  */
 async function getPdfText(pdf) {
-  try {
-    const pdfjsLib = await import("pdfjs-dist/build/pdf.mjs");
-    const text = await pdfToText(pdf);
-    return text;
-  } catch (error) {
-    console.error("Failed to extract text from pdf");
-    throw error;
-  }
+	try {
+		const pdfjsLib = await import("pdfjs-dist/build/pdf.mjs");
+		const text = await pdfToText(pdf);
+		return text;
+	} catch (error) {
+		console.error("Failed to extract text from pdf");
+		throw error;
+	}
 }

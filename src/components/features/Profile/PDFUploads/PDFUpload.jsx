@@ -7,6 +7,7 @@ import EnhancedTable from "./Table.jsx";
 import { deleteFile } from "@/services/fileService.js";
 import useFiles from "@/hooks/useFiles.js";
 import CircularProgress from "@mui/material/CircularProgress";
+import { supabase } from "@/utils/supabase";
 
 /**
  * PDFUploads component handles the display and management of PDF files for a user.
@@ -65,48 +66,77 @@ import CircularProgress from "@mui/material/CircularProgress";
  * @returns {JSX.Element} The rendered component.
  */
 const PDFUploads = () => {
-  const { userId } = useOutletContext();
-  const { files, loading, error, refetch } = useFiles(userId);
-  const { openModalwithFile, modalOpen } = useModal();
-  const [selectedFile, setSelectedFile] = useState(null);
+	const { userId } = useOutletContext();
+	const { files, loading, error, refetch } = useFiles(userId);
+	const { openModalwithFile, modalOpen } = useModal();
+	const [selectedFile, setSelectedFile] = useState(null);
 
-  // If modal is closed, refetch
-  useEffect(() => {
-    if (!modalOpen) {
-      refetch();
-    }
-  }, [modalOpen, refetch]);
+	// If modal is closed, refetch
+	useEffect(() => {
+		if (!modalOpen) {
+			refetch();
+		}
+	}, [modalOpen, refetch]);
 
-  // Function to delete a row
-  const handleDelete = async (fileId) => {
-    try {
-      await deleteFile(fileId);
-      refetch();
-    } catch (error) {
-      console.error("Error deleting file:", error);
-    }
-  };
+	// Function to delete a row
+	// const handleDelete = async (fileId) => {
+	//   try {
+	//     await deleteFile(fileId);
+	//     refetch();
+	//   } catch (error) {
+	//     console.error("Error deleting file:", error);
+	//   }
+	// };
 
-  // Function to generate a PDF
-  const handleGenerate = async (file) => {
-    console.log("Generating PDF for file:", file);
-    setSelectedFile(file); // Set the selected file
-    openModalwithFile(file);
-  };
+	/**
+	 * Updates decks to remove the file reference before deleting the file.
+	 * @param {string} fileId - The ID of the file to be deleted.
+	 * @returns {Promise<void>}
+	 */
+	const removeFileReferenceFromDecks = async (fileId) => {
+		const { error } = await supabase
+			.from("decks")
+			.update({ file_id: null })
+			.eq("file_id", fileId);
 
-  return (
-    <div className="table-container">
-      {loading && <CircularProgress color="inherit" />}
-      {error && <p>Error: {error.message}</p>}
-      {!loading && !error && (
-        <EnhancedTable
-          data={files}
-          onDelete={handleDelete}
-          onGenerate={handleGenerate}
-        />
-      )}
-    </div>
-  );
+		if (error) throw error;
+	};
+
+	/**
+	 * Deletes a file after removing its reference from decks.
+	 * @param {string} fileId - The ID of the file to delete.
+	 * @returns {Promise<void>}
+	 */
+	const handleDelete = async (fileId) => {
+		try {
+			await removeFileReferenceFromDecks(fileId);
+			await deleteFile(fileId); // Assuming deleteFile is your existing function
+			refetch();
+		} catch (error) {
+			console.error("Error deleting file:", error);
+		}
+	};
+
+	// Function to generate a PDF
+	const handleGenerate = async (file) => {
+		console.log("Generating PDF for file:", file);
+		setSelectedFile(file); // Set the selected file
+		openModalwithFile(file);
+	};
+
+	return (
+		<div className="table-container">
+			{loading && <CircularProgress color="inherit" />}
+			{error && <p>Error: {error.message}</p>}
+			{!loading && !error && (
+				<EnhancedTable
+					data={files}
+					onDelete={handleDelete}
+					onGenerate={handleGenerate}
+				/>
+			)}
+		</div>
+	);
 };
 
 export default PDFUploads;
