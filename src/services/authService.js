@@ -7,17 +7,17 @@ import { supabase } from "@/utils/supabase";
  * @returns {Promise<Object>} - The user data or an error object.
  */
 export const login = async (email, password) => {
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error("Login error:", error.message);
-    return { error };
-  }
+	try {
+		const { data, error } = await supabase.auth.signInWithPassword({
+			email,
+			password,
+		});
+		if (error) throw error;
+		return data;
+	} catch (error) {
+		console.error("Login error:", error.message);
+		return { error };
+	}
 };
 
 /**
@@ -25,12 +25,12 @@ export const login = async (email, password) => {
  * @returns {Promise<void>}
  */
 export const signOut = async () => {
-  try {
-    localStorage.removeItem("rememberMeToken");
-    await supabase.auth.signOut();
-  } catch (error) {
-    console.error("Sign out error:", error.message);
-  }
+	try {
+		localStorage.removeItem("rememberMeToken");
+		await supabase.auth.signOut();
+	} catch (error) {
+		console.error("Sign out error:", error.message);
+	}
 };
 
 /**
@@ -38,16 +38,28 @@ export const signOut = async () => {
  * @param {string} email - The user's email address.
  * @returns {Promise<Object>} - An error object if there was an error.
  */
+// export const passwordReset = async (email) => {
+//   try {
+//     const { error } = await supabase.auth.resetPasswordForEmail(email, {
+//       redirectTo: "http://localhost:5173/update-password",
+//     });
+//     return { error };
+//   } catch (error) {
+//     console.error("Password reset error:", error.message);
+//     return { error };
+//   }
+// };
+
 export const passwordReset = async (email) => {
-  try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:5173/update-password",
-    });
-    return { error };
-  } catch (error) {
-    console.error("Password reset error:", error.message);
-    return { error };
-  }
+	try {
+		const { error } = await supabase.auth.resetPasswordForEmail(email, {
+			redirectTo: `${import.meta.env.VITE_APP_URL}/update-password`,
+		});
+		return { error };
+	} catch (error) {
+		console.error("Password reset error:", error.message);
+		return { error };
+	}
 };
 
 /**
@@ -56,15 +68,15 @@ export const passwordReset = async (email) => {
  * @returns {Promise<Object>} - An error object if there was an error.
  */
 export const updatePassword = async (updatedPassword) => {
-  try {
-    const { error } = await supabase.auth.updateUser({
-      password: updatedPassword,
-    });
-    return { error };
-  } catch (error) {
-    console.error("Update password error:", error.message);
-    return { error };
-  }
+	try {
+		const { error } = await supabase.auth.updateUser({
+			password: updatedPassword,
+		});
+		return { error };
+	} catch (error) {
+		console.error("Update password error:", error.message);
+		return { error };
+	}
 };
 
 /**
@@ -72,21 +84,21 @@ export const updatePassword = async (updatedPassword) => {
  * @returns {Promise<void>}
  */
 export const signInWithGoogle = async () => {
-  try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        queryParams: {
-          access_type: "offline",
-          prompt: "consent",
-        },
-      },
-    });
-    if (error) throw error;
-    console.log("Google sign-in data:", data);
-  } catch (error) {
-    console.error("Google sign-in error:", error.message);
-  }
+	try {
+		const { data, error } = await supabase.auth.signInWithOAuth({
+			provider: "google",
+			options: {
+				queryParams: {
+					access_type: "offline",
+					prompt: "consent",
+				},
+			},
+		});
+		if (error) throw error;
+		console.log("Google sign-in data:", data);
+	} catch (error) {
+		console.error("Google sign-in error:", error.message);
+	}
 };
 
 /**
@@ -97,16 +109,16 @@ export const signInWithGoogle = async () => {
  * @returns {Promise<Object>} - The user data or an error object.
  */
 export const register = async (email, password, name) => {
-  try {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      data: { name },
-    });
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error("Sign-up error:", error.message);
-    return { error };
-  }
+	try {
+		const { data, error } = await supabase.auth.signUp({
+			email,
+			password,
+			data: { name },
+		});
+		if (error) throw error;
+		return data;
+	} catch (error) {
+		console.error("Sign-up error:", error.message);
+		return { error };
+	}
 };
