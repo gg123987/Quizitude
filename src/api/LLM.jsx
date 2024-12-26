@@ -54,7 +54,7 @@ export default async function FetchLLMResponse(
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					model: "meta-llama/llama-3.1-8b-instruct",
+					model: "openai/gpt-4o-mini",
 					messages: messages,
 				}),
 			}
