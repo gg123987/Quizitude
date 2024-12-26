@@ -54,7 +54,7 @@ export default async function FetchLLMResponse(
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					model: "google/gemini-pro-1.5-exp",
+					model: "meta-llama/llama-3.1-8b-instruct",
 					messages: messages,
 				}),
 			}
