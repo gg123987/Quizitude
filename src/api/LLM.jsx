@@ -14,30 +14,48 @@ export default async function FetchLLMResponse(
 	pdf,
 	typeOfQuestion
 ) {
+	// Extract text from the provided PDF
 	const text = await getPdfText(pdf);
 
-	// Define the prompt based on question type
-	let prompt;
+	// Define the message structure based on the type of question
+	let messages;
 	if (typeOfQuestion === "multiple-choice") {
-		prompt = `Given the provided data, generate ${noOfQuestions} multiple-choice questions with answers. Make sure each question has 4 options. Return the answer in a array of JSON format objects with the following schema: {"question": "","choices":["",""],"answer": ""} separated by commas. Here's the data: ${text}. Only respond with the JSON text.`;
+		messages = [
+			{
+				role: "system",
+				content: `Give the answer in a array of JSON format objects with the following schema: {"question": "","choices":["",""],"answer": ""} separated by commas`,
+			},
+			{
+				role: "user",
+				content: `Given the provided data, generate ${noOfQuestions} multiple-choice questions with answers. Make sure each question has 4 options. Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`,
+			},
+		];
 	} else if (typeOfQuestion === "short-answer") {
-		prompt = `Given the provided data, generate ${noOfQuestions} short-answer questions with answers. Return the answer in a array of JSON format objects with the following schema: {"question": "", "answer": ""} separated by commas. Here's the data: ${text}. Only respond with the JSON text.`;
+		messages = [
+			{
+				role: "system",
+				content: `Give the answer in a array of JSON format objects with the following schema: {"question": "", "answer": ""} separated by commas`,
+			},
+			{
+				role: "user",
+				content: `Given the provided data, generate ${noOfQuestions} short-answer questions with answers. Here's the data: ${text}. Only respond with the JSON text as this answer will be fed directly into the model.`,
+			},
+		];
 	}
 
+	// Use the OpenRouter API to fetch the response from the LLM model
 	try {
 		const response = await fetch(
-			"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=AIzaSyCdUfpsYylxpVuf14Odw5Fh3BAVsZquMdQ",
+			"https://openrouter.ai/api/v1/chat/completions",
 			{
 				method: "POST",
 				headers: {
+					Authorization: `Bearer ${"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"}`,
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					contents: [
-						{
-							parts: [{ text: prompt }],
-						},
-					],
+					model: "meta-llama/llama-3.1-8b-instruct",
+					messages: messages,
 				}),
 			}
 		);
@@ -47,9 +65,9 @@ export default async function FetchLLMResponse(
 		}
 		const data = await response.json();
 
-		// Parse the response content (you might need to adjust this based on Gemini's response format)
-		let thisResponse = JSON.parse(data.candidates[0].content.parts[0].text);
-		return thisResponse;
+		// Parse the response content
+		let thisResponse = JSON.parse(data.choices[0].message.content);
+		return thisResponse; // Return the content from the response
 	} catch (error) {
 		alert(
 			"Error: Issue with the AI model. Please attempt to regenerate the flashcards"
@@ -57,6 +75,7 @@ export default async function FetchLLMResponse(
 		throw new Error("Error fetching data: " + error.message);
 	}
 }
+
 /**
  * getPdfText - Extracts text from a given PDF file.
  *
