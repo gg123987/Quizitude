@@ -90,9 +90,15 @@ export const checkForDuplicateFile = async (file, userId) => {
 export const uploadFile = async (file, userId) => {
 	try {
 		// 1. Create a user-specific folder path
-		const fileExt = file.name.split(".").pop();
+		const fileExt = file.name.split(".").pop().toLowerCase();
+		const validExtensions = ["pdf", "doc", "docx"];
+
+		if (!validExtensions.includes(fileExt)) {
+			throw new Error("Invalid file type");
+		}
+
 		const fileName = `${Math.random()}.${fileExt}`;
-		const filePath = `${userId}/${fileName}`; // Use userId as the top-level folder
+		const filePath = `${userId}/${fileName}`;
 
 		// 2. Upload the file to Supabase Storage
 		const { data, error } = await supabase.storage

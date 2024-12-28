@@ -140,12 +140,25 @@ const NewDeck = () => {
 
 	// Handle file input changes
 	const handleFileChange = (event) => {
-		const uploadedPDF = event.target.files[0];
-		console.log("Uploaded PDF:", uploadedPDF);
-		if (uploadedPDF) {
-			if (uploadedPDF.size <= maxPDFSize) {
-				setFile(uploadedPDF);
-				console.log("File set:", uploadedPDF); // Add this log
+		const uploadedFile = event.target.files[0];
+		const maxFileSize = 30 * 1024 * 1024; // 30MB
+
+		if (uploadedFile) {
+			const fileType = uploadedFile.type;
+			const validTypes = [
+				"application/pdf",
+				"application/msword",
+				"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+			];
+
+			if (!validTypes.includes(fileType)) {
+				setFile(null);
+				alert("Please upload a PDF or Word document.");
+				return;
+			}
+
+			if (uploadedFile.size <= maxFileSize) {
+				setFile(uploadedFile);
 			} else {
 				setFile(null);
 				alert("File size exceeds the maximum allowed size (30MB).");
@@ -171,14 +184,18 @@ const NewDeck = () => {
 
 		if (droppedFiles.length === 1) {
 			const droppedFile = droppedFiles[0];
-			if (
-				droppedFile.type === "application/pdf" &&
-				droppedFile.size <= maxPDFSize
-			) {
+			const fileType = droppedFile.type;
+			const validTypes = [
+				"application/pdf",
+				"application/msword",
+				"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+			];
+
+			if (validTypes.includes(fileType) && droppedFile.size <= maxPDFSize) {
 				setFile(droppedFile);
 			} else {
 				setFile(null);
-				alert("Please drop a valid PDF file (max. 30MB).");
+				alert("Please drop a valid PDF or Word document (max. 30MB).");
 			}
 		}
 	};
@@ -554,7 +571,9 @@ const NewDeck = () => {
 					<>
 						<CloudUploadIcon className="upload-icon" />
 						<div className="upload-text">Click to upload or drag and drop</div>
-						<div className="upload-text">PDF only (max. 30MB)</div>
+						<div className="upload-text">
+							PDF or Word documents only (max. 30MB)
+						</div>
 					</>
 				)}
 				{file && (
@@ -572,7 +591,7 @@ const NewDeck = () => {
 				<input
 					type="file"
 					id="pdf-upload"
-					accept=".pdf"
+					accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 					onChange={handleFileChange}
 					style={{ display: "none" }}
 					data-testid="pdf-upload"

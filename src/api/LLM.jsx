@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 import pdfToText from "react-pdftotext";
+import mammoth from "mammoth";
 
 /**
  * FetchLLMResponse - Fetches responses from a Language Learning Model (LLM) based on the provided PDF and question type.
@@ -11,11 +12,11 @@ import pdfToText from "react-pdftotext";
  */
 export default async function FetchLLMResponse(
 	noOfQuestions,
-	pdf,
+	file,
 	typeOfQuestion
 ) {
 	// Extract text from the provided PDF
-	const text = await getPdfText(pdf);
+	const text = await getDocumentText(file);
 
 	// Define the message structure based on the type of question
 	let messages;
@@ -82,13 +83,31 @@ export default async function FetchLLMResponse(
  * @param {File} pdf - PDF file from which text is to be extracted.
  * @returns {Promise<string>} - Returns a promise that resolves to the extracted text.
  */
-async function getPdfText(pdf) {
+// async function getPdfText(pdf) {
+// 	try {
+// 		const pdfjsLib = await import("pdfjs-dist/build/pdf.mjs");
+// 		const text = await pdfToText(pdf);
+// 		return text;
+// 	} catch (error) {
+// 		console.error("Failed to extract text from pdf");
+// 		throw error;
+// 	}
+// }
+
+async function getDocumentText(file) {
 	try {
-		const pdfjsLib = await import("pdfjs-dist/build/pdf.mjs");
-		const text = await pdfToText(pdf);
-		return text;
+		if (file.type === "application/pdf") {
+			const pdfjsLib = await import("pdfjs-dist/build/pdf.mjs");
+			const text = await pdfToText(file);
+			return text;
+		} else {
+			// Handle Word documents
+			const arrayBuffer = await file.arrayBuffer();
+			const result = await mammoth.extractRawText({ arrayBuffer });
+			return result.value;
+		}
 	} catch (error) {
-		console.error("Failed to extract text from pdf");
+		console.error("Failed to extract text from document");
 		throw error;
 	}
 }
