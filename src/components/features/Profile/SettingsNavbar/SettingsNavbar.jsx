@@ -15,28 +15,28 @@ import "./settingsNavbar.css";
  * @returns {JSX.Element} The rendered SettingsNavbar component.
  */
 function SettingsNavbar({ activeTab, setActiveTab }) {
-  return (
-    <nav className="settings-navbar">
-      <ul className="settings-navbar-tabs">
-        {[
-          "Streak",
-          "View Score History",
-          "PDF Uploads",
-          "General Settings",
-        ].map((tab) => (
-          <li
-            key={tab}
-            className={`settings-navbar-tab ${
-              activeTab === tab ? "active" : ""
-            }`}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
+	return (
+		<nav className="settings-navbar">
+			<ul className="settings-navbar-tabs">
+				{[
+					"Streak",
+					"View Score History",
+					"Document Uploads",
+					"General Settings",
+				].map((tab) => (
+					<li
+						key={tab}
+						className={`settings-navbar-tab ${
+							activeTab === tab ? "active" : ""
+						}`}
+						onClick={() => setActiveTab(tab)}
+					>
+						{tab}
+					</li>
+				))}
+			</ul>
+		</nav>
+	);
 }
 
 export default SettingsNavbar;
